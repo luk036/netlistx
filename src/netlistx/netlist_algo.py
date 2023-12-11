@@ -4,10 +4,11 @@ Minimum vertex cover for weighted netlist.
 import copy
 from typing import Union, Set, Tuple, Optional
 from typing import MutableMapping
+from .netlist import Netlist
 
 
 def min_maximal_matching(
-    hyprgraph,
+    hyprgraph: Netlist,
     weight: MutableMapping,
     matchset: Optional[Set] = None,
     dep: Optional[Set] = None,
