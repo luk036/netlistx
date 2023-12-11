@@ -14,7 +14,7 @@ def min_vertex_cover_fast(
     """
     The `min_vertex_cover_fast` function performs minimum weighted vertex cover using a primal-dual
     approximation algorithm (without post-processing).
-    
+
     :param gra: gra is a NetworkX graph object representing the graph on which the minimum weighted
     vertex cover algorithm will be performed. It contains the nodes and edges of the graph
 

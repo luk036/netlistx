@@ -205,6 +205,56 @@ def read_json(filename):
     return hyprgraph
 
 
+def create_inverter():
+    gr = ThinGraph()
+    gr.add_nodes_from(["a0", "p1", "p2", "n0", "n1"])
+    nets = ["n0", "n1"]
+    modules = ["a0", "p1", "p2"]
+    module_weight = {"a0": 1, "p1": 0, "p2": 0}
+
+    gr.add_edges_from(
+        [
+            ("n0", "p1", {"dir": "I"}),
+            ("n0", "a0", {"dir": "O"}),
+            ("n1", "a0", {"dir": "I"}),
+            ("n1", "p2", {"dir": "O"}),
+        ]
+    )
+    gr.graph["num_modules"] = 3
+    gr.graph["num_nets"] = 2
+    gr.graph["num_pads"] = 2
+    hyprgraph = Netlist(gr, modules, nets)
+    hyprgraph.module_weight = module_weight
+    hyprgraph.net_weight = RepeatArray(1, len(nets))
+    hyprgraph.num_pads = 2
+    return hyprgraph
+
+
+def create_inverter2():
+    gr = ThinGraph()
+    gr.add_nodes_from([0, 1, 2, 3, 4])
+    nets = range(3, 5)
+    modules = range(3)
+    module_weight = [1, 0, 0]
+
+    gr.add_edges_from(
+        [
+            (3, 1, {"dir": "I"}),
+            (3, 0, {"dir": "O"}),
+            (4, 0, {"dir": "I"}),
+            (4, 2, {"dir": "O"}),
+        ]
+    )
+    gr.graph["num_modules"] = 3
+    gr.graph["num_nets"] = 2
+    gr.graph["num_pads"] = 2
+    hyprgraph = Netlist(gr, modules, nets)
+    hyprgraph.module_weight = module_weight
+    hyprgraph.net_weight = RepeatArray(1, len(nets))
+    hyprgraph.num_pads = 2
+    return hyprgraph
+
+
 def create_drawf():
     """
     The function `create_drawf` creates a graph and netlist object with specified nodes, edges, and
