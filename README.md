@@ -20,7 +20,7 @@
 
 # 🏉 netlistx
 
-> Ellipsoid Method in Python
+> Netlist and its related Algorithms in Python
 
 A longer description of your project goes here...
 
