@@ -12,13 +12,9 @@
 
 [![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
 [![Documentation Status](https://readthedocs.org/projects/netlistx/badge/?version=latest)](https://netlistx.readthedocs.io/en/latest/?badge=latest)
-[![codecov](https://codecov.io/gh/luk036/netlistx/branch/main/graph/badge.svg?token=6lpjUzPavX)](https://codecov.io/gh/luk036/netlistx)
+[![codecov](https://codecov.io/gh/luk036/netlistx/branch/master/graph/badge.svg?token=6lpjUzPavX)](https://codecov.io/gh/luk036/netlistx)
 
-<p align="center">
-  <img src="./ellipsoid-method-for-convex-optimization.svg"/>
-</p>
-
-# 🏉 netlistx
+# netlistx
 
 > Netlist and its related Algorithms in Python
 
@@ -26,9 +22,7 @@ A longer description of your project goes here...
 
 ## Used by
 
-- [netoptim](https://github.com/luk036/netoptim)
-- [corr-solver](https://github.com/luk036/corr-solver)
-- [multiplierless](https://github.com/luk036/multiplierless)
+- [ckpttnpy](https://github.com/luk036/ckpttnpy)
 
 <!-- pyscaffold-notes -->
 
