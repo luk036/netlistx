@@ -5,6 +5,5 @@ dependencies:
   - pytest
   - pytest-benchmark
   - pytest-cov
-  - numpy
   - networkx
   - decorator

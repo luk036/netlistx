@@ -20,6 +20,11 @@
 
 A longer description of your project goes here...
 
+## Depend on
+
+- [mywheel](https://github.com/luk036/mywheel)
+- networkx
+
 ## Used by
 
 - [ckpttnpy](https://github.com/luk036/ckpttnpy)
