@@ -1,6 +1,6 @@
+from netlistx.cover import min_hyper_vertex_cover
 from netlistx.netlist import create_drawf
 from netlistx.netlist_algo import min_maximal_matching
-from netlistx.cover import min_hyper_vertex_cover
 
 
 def test_min_vertex_cover():

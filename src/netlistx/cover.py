@@ -1,11 +1,18 @@
+import copy
 from collections import deque
+from typing import (
+    Callable,
+    Deque,
+    Dict,
+    Generator,
+    MutableMapping,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+)
 
 import networkx as nx
-import copy
-
-from typing import Generator
-from typing import Dict, Set, Callable, Union, Optional, Tuple, Deque
-from typing import MutableMapping
 
 
 def pd_cover(

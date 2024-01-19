@@ -2,8 +2,8 @@
 Minimum vertex cover for weighted netlist.
 """
 import copy
-from typing import Union, Set, Tuple, Optional
-from typing import MutableMapping
+from typing import MutableMapping, Optional, Set, Tuple, Union
+
 from .netlist import Netlist
 
 

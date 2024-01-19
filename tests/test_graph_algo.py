@@ -1,6 +1,6 @@
+from netlistx.cover import min_cycle_cover, min_odd_cycle_cover, min_vertex_cover
+from netlistx.graph_algo import min_maximal_independant_set, min_vertex_cover_fast
 from netlistx.netlist import create_drawf
-from netlistx.graph_algo import min_vertex_cover_fast, min_maximal_independant_set
-from netlistx.cover import min_vertex_cover, min_cycle_cover, min_odd_cycle_cover
 
 
 def test_min_vertex_cover():

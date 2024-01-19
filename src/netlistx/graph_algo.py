@@ -3,9 +3,8 @@
 Minimum vertex cover for weighed graphs.
 1. Support Lazy evalution
 """
-from typing import Set, Union, Tuple, Optional
-from typing import MutableMapping
 import copy
+from typing import MutableMapping, Optional, Set, Tuple, Union
 
 
 def min_vertex_cover_fast(
@@ -81,7 +80,7 @@ def min_maximal_independant_set(
     r"""
     The `min_maximal_independant_set` function performs minimum weighted maximal independent set using
     primal-dual algorithm.
-    
+
     :param gra: gra is an undirected graph represented using the NetworkX library. It represents the
     graph structure and contains the vertices and edges of the graph
 
