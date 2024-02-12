@@ -1,6 +1,7 @@
 """
 Minimum vertex cover for weighted netlist.
 """
+
 import copy
 from typing import MutableMapping, Optional, Set, Tuple, Union
 
