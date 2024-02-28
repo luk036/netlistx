@@ -22,18 +22,18 @@ def pd_cover(
     The function `pd_cover` implements a primal-dual approximation algorithm for covering problems.
 
     :param violate: The `violate` parameter is a callable function or oracle that returns a set of
-    violate elements. It is used to generate sets of elements that violate the current solution. Each
-    set represents a potential improvement to the solution
+        violate elements. It is used to generate sets of elements that violate the current solution. Each
+        set represents a potential improvement to the solution
 
     :type violate: Callable
 
     :param weight: The `weight` parameter is a dictionary that represents the weight of each element.
-    The keys of the dictionary are the elements, and the values are their corresponding weights
+        The keys of the dictionary are the elements, and the values are their corresponding weights
 
     :type weight: MutableMapping
 
     :param soln: The `soln` parameter is a set that represents the current solution set. It initially
-    contains no elements, and elements are added to it during the algorithm
+        contains no elements, and elements are added to it during the algorithm
 
     :type soln: Set
 
@@ -72,24 +72,24 @@ def min_vertex_cover(
     approximation algorithm (without post-processing).
 
     :param gra: The parameter `gra` is a `nx.Graph` object, which represents the input graph. It is an
-    undirected graph where each edge represents a connection between two vertices
+        undirected graph where each edge represents a connection between two vertices
 
     :type gra: nx.Graph
 
     :param weight: The `weight` parameter is a dictionary that assigns a weight to each vertex in the
-    graph. The weights are used to determine the minimum weighted vertex cover
+        graph. The weights are used to determine the minimum weighted vertex cover
 
     :type weight: MutableMapping
 
     :param coverset: The `coverset` parameter is an optional set that represents the current vertex
-    cover solution. It is used to keep track of the vertices that are included in the cover. If no
-    `coverset` is provided, an empty set is used as the initial cover
+        cover solution. It is used to keep track of the vertices that are included in the cover. If no
+        `coverset` is provided, an empty set is used as the initial cover
 
     :type coverset: Optional[Set]
 
     :return: The function `min_vertex_cover` returns a tuple containing two elements. The first element
-    is a set representing the minimum weighted vertex cover, and the second element is either an integer
-    or a float representing the weight of the minimum vertex cover.
+        is a set representing the minimum weighted vertex cover, and the second element is either an integer
+        or a float representing the weight of the minimum vertex cover.
 
     .. svgbob::
        :align: center
@@ -129,23 +129,23 @@ def min_hyper_vertex_cover(
     approximation algorithm (without post-processing).
 
     :param hyprgraph: The `hyprgraph` parameter represents a hypergraph, which is a generalization of a
-    graph where an edge can connect more than two vertices. It is likely represented as a data structure
-    that contains information about the vertices and edges of the hypergraph
+        graph where an edge can connect more than two vertices. It is likely represented as a data structure
+        that contains information about the vertices and edges of the hypergraph
 
     :param weight: The `weight` parameter is a mutable mapping that assigns a weight to each vertex in
-    the hypergraph. It is used to determine the minimum weighted vertex cover
+        the hypergraph. It is used to determine the minimum weighted vertex cover
 
     :type weight: MutableMapping
 
     :param coverset: The `coverset` parameter is an optional set that represents the current vertex
-    cover. It contains the vertices that have been selected as part of the cover. If no `coverset` is
-    provided, it defaults to an empty set
+        cover. It contains the vertices that have been selected as part of the cover. If no `coverset` is
+        provided, it defaults to an empty set
 
     :type coverset: Optional[Set]
 
     :return: The function `min_hyper_vertex_cover` returns a tuple containing two elements. The first
-    element is a set representing the minimum weighted vertex cover, and the second element is either an
-    integer or a float representing the weight of the vertex cover.
+        element is a set representing the minimum weighted vertex cover, and the second element is either an
+        integer or a float representing the weight of the vertex cover.
 
     .. svgbob::
        :align: center
@@ -179,15 +179,15 @@ def _construct_cycle(info: Dict, parent, child) -> Deque:
     dictionary.
 
     :param info: The `info` parameter is a dictionary that contains information about the nodes in a
-    graph. Each key in the dictionary represents a node, and the corresponding value is a tuple
-    containing two elements: the parent node and the depth of the node
+        graph. Each key in the dictionary represents a node, and the corresponding value is a tuple
+        containing two elements: the parent node and the depth of the node
 
     :type info: Dict
 
     :param parent: The parent parameter represents the parent node in a graph or tree structure
 
     :param child: The `child` parameter represents a node in a graph that is connected to the `parent`
-    node
+        node
 
     :return: a deque object.
     """
@@ -218,27 +218,27 @@ def min_cycle_cover(
 ) -> Tuple[Set, Union[int, float]]:
     """
     The `min_cycle_cover` function performs minimum cycle cover using a primal-dual approximation
-    algorithm (without post-processing).
+        algorithm (without post-processing).
 
     :param gra: The `gra` parameter is a `nx.Graph` object representing the input graph. It contains the
-    nodes and edges of the graph
+        nodes and edges of the graph
 
     :type gra: nx.Graph
 
     :param weight: The `weight` parameter is a dictionary that assigns a weight to each node in the
-    graph. The weights are used to determine the minimum cycle cover
+        graph. The weights are used to determine the minimum cycle cover
 
     :type weight: MutableMapping
 
     :param coverset: The `coverset` parameter is an optional set that contains the nodes that are
-    already covered by previous cycles. It is used to keep track of the nodes that have already been
-    included in the minimum cycle cover. If no `coverset` is provided, it is initialized as an empty set
+        already covered by previous cycles. It is used to keep track of the nodes that have already been
+        included in the minimum cycle cover. If no `coverset` is provided, it is initialized as an empty set
 
     :type coverset: Optional[Set]
 
     :return: The function `min_cycle_cover` returns a tuple containing a set and either an integer or a
-    float. The set represents the minimum cycle cover, and the integer or float represents the weight of
-    the minimum cycle cover.
+        float. The set represents the minimum cycle cover, and the integer or float represents the weight of
+        the minimum cycle cover.
 
     .. svgbob::
        :align: center
@@ -281,11 +281,11 @@ def _generic_bfs_cycle(gra: nx.Graph, coverset: Set) -> Generator:
     excluding nodes in a given `coverset`.
 
     :param gra: The parameter `gra` is a graph object that represents a directed graph. It should have a
-    method `neighbors(node)` that returns the neighbors of a given node in the graph. The graph can be
-    represented using any graph library or data structure that supports this method
+        method `neighbors(node)` that returns the neighbors of a given node in the graph. The graph can be
+        represented using any graph library or data structure that supports this method
 
     :param coverset: The `coverset` parameter is a set of nodes that should be excluded from the BFS
-    traversal. These nodes will not be considered as potential starting points for the BFS algorithm
+        traversal. These nodes will not be considered as potential starting points for the BFS algorithm
     """
     depth_limit = len(gra)
     neighbors = gra.neighbors
@@ -319,24 +319,24 @@ def min_odd_cycle_cover(
     approximation algorithm (without post-processing).
 
     :param gra: The `gra` parameter is a `nx.Graph` object representing the input graph. It is used to
-    define the graph structure and find cycles in the graph
+        define the graph structure and find cycles in the graph
 
     :type gra: nx.Graph
 
     :param weight: The `weight` parameter is a dictionary that assigns a weight to each node in the
-    graph
+        graph
 
     :type weight: MutableMapping
 
     :param coverset: The `coverset` parameter is an optional set that represents the initial set of
-    vertices that are covered by the minimum odd cycle cover. This set can be empty if no vertices are
-    initially covered
+        vertices that are covered by the minimum odd cycle cover. This set can be empty if no vertices are
+        initially covered
 
     :type coverset: Optional[Set]
 
     :return: The function `min_odd_cycle_cover` returns a tuple containing a set and either an integer
-    or a float. The set represents the minimum odd cycle cover, and the integer or float represents the
-    weight of the cover.
+        or a float. The set represents the minimum odd cycle cover, and the integer or float represents the
+        weight of the cover.
 
     .. svgbob::
        :align: center

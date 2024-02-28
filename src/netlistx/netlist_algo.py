@@ -19,30 +19,30 @@ def min_maximal_matching(
     approximation algorithm.
 
     :param hyprgraph: The `hyprgraph` parameter represents a hypergraph, which is a generalization of a
-    graph where an edge can connect more than two vertices. It is not clear from the code snippet what
-    the exact data structure of the hypergraph is, but it likely contains information about the vertices
-    and edges of
+        graph where an edge can connect more than two vertices. It is not clear from the code snippet what
+        the exact data structure of the hypergraph is, but it likely contains information about the vertices
+        and edges of
 
     :param weight: The `weight` parameter is a mutable mapping that represents the weights of the
-    hypergraph edges. It is used to determine the weight of each edge in the matching. The keys of the
-    `weight` mapping correspond to the hypergraph edges, and the values represent their weights
+        hypergraph edges. It is used to determine the weight of each edge in the matching. The keys of the
+        `weight` mapping correspond to the hypergraph edges, and the values represent their weights
 
     :type weight: MutableMapping
 
     :param matchset: The `matchset` parameter is a set that represents the pre-defined matching. It
-    contains the hyperedges (nets) that are already matched
+        contains the hyperedges (nets) that are already matched
 
     :type matchset: Optional[Set]
 
     :param dep: The `dep` parameter is a set that represents the set of vertices that are covered by the
-    current matching. It is initially set to an empty set, and is updated during the execution of the
-    algorithm
+        current matching. It is initially set to an empty set, and is updated during the execution of the
+        algorithm
 
     :type dep: Optional[Set]
 
     :return: The function `min_maximal_matching` returns a tuple containing the matchset (a set of
-    matched elements) and the total primal cost (an integer or float representing the total weight of
-    the matching).
+        matched elements) and the total primal cost (an integer or float representing the total weight of
+        the matching).
 
     .. svgbob::
        :align: center

@@ -70,13 +70,13 @@ class Netlist:
         of the graph.
 
         :param gra: The parameter `gra` is a graph object of type `nx.Graph`. It represents the graph
-        structure of the system
+            structure of the system
         :type gra: nx.Graph
         :param modules: The `modules` parameter is a list or range object that represents the modules in the
-        graph. Each module is a node in the graph
+            graph. Each module is a node in the graph
         :type modules: Union[range, List[Any]]
         :param nets: The `nets` parameter is a list or range that represents the nets in the graph. A net is
-        a connection between two or more modules
+            a connection between two or more modules
         :type nets: Union[range, List[Any]]
         """
         self.gra = gra
@@ -142,7 +142,7 @@ class Netlist:
         The function `get_module_weight` returns the weight of a module given its index.
 
         :param v: The parameter `v` in the `get_module_weight` function is of type `size_t`. It represents
-        the index or key of the module weight that you want to retrieve
+            the index or key of the module weight that you want to retrieve
         :return: the value of `self.module_weight[v]`.
         """
         return self.module_weight[v]
@@ -164,9 +164,9 @@ class Netlist:
         The function `get_net_weight` returns an integer value.
 
         :param _: The underscore (_) in the function signature is a convention in Python to indicate that
-        the parameter is not used within the function. It is often used when a parameter is required by the
-        function signature but not actually used within the function's implementation. In this case, the
-        underscore (_) is used as a placeholder for
+            the parameter is not used within the function. It is often used when a parameter is required by the
+            function signature but not actually used within the function's implementation. In this case, the
+            underscore (_) is used as a placeholder for
         :return: An integer value of 1 is being returned.
         """
         return 1
@@ -185,7 +185,7 @@ def read_json(filename):
     with module and net weights.
 
     :param filename: The filename parameter is the name of the JSON file that contains the data you want
-    to read
+        to read
     :return: an object of type `Netlist`.
     """
     with open(filename, "r") as fr:
@@ -260,7 +260,7 @@ def create_drawf():
     The function `create_drawf` creates a graph and netlist object with specified nodes, edges, and
     weights.
     :return: an instance of the Netlist class, which is created using the ThinGraph class and some
-    predefined modules and nets.
+        predefined modules and nets.
     """
     gra = ThinGraph()
     gra.add_nodes_from(
