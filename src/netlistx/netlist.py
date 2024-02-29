@@ -61,7 +61,7 @@ class Netlist:
 
     def __init__(
         self,
-        gra: nx.Graph,
+        ugraph: nx.Graph,
         modules: Union[range, List[Any]],
         nets: Union[range, List[Any]],
     ):
@@ -69,9 +69,9 @@ class Netlist:
         The function initializes an object with a graph, modules, and nets, and calculates some properties
         of the graph.
 
-        :param gra: The parameter `gra` is a graph object of type `nx.Graph`. It represents the graph
+        :param ugraph: The parameter `ugraph` is a graph object of type `nx.Graph`. It represents the graph
             structure of the system
-        :type gra: nx.Graph
+        :type ugraph: nx.Graph
         :param modules: The `modules` parameter is a list or range object that represents the modules in the
             graph. Each module is a node in the graph
         :type modules: Union[range, List[Any]]
@@ -79,7 +79,7 @@ class Netlist:
             a connection between two or more modules
         :type nets: Union[range, List[Any]]
         """
-        self.gra = gra
+        self.ugraph = ugraph
         self.modules = modules
         self.nets = nets
 
@@ -99,8 +99,8 @@ class Netlist:
 
         # self.module_fixed = module_fixed
         # self.has_fixed_modules = (self.module_fixed != [])
-        self.max_degree = max(self.gra.degree[cell] for cell in modules)
-        # self.max_net_degree = max(self.gra.degree[net] for net in nets)
+        self.max_degree = max(self.ugraph.degree[cell] for cell in modules)
+        # self.max_net_degree = max(self.ugraph.degree[net] for net in nets)
 
     def number_of_modules(self) -> int:
         """
@@ -121,21 +121,21 @@ class Netlist:
         The function "number_of_nodes" returns the number of nodes in a graph.
         :return: The number of nodes in the graph.
         """
-        return self.gra.number_of_nodes()
+        return self.ugraph.number_of_nodes()
 
     def number_of_pins(self) -> int:
         """
         The function `number_of_pins` returns the number of edges in a graph.
         :return: The number of edges in the graph.
         """
-        return self.gra.number_of_edges()
+        return self.ugraph.number_of_edges()
 
     def get_max_degree(self) -> int:
         """
         The function `get_max_degree` returns the maximum degree of nodes in a graph.
         :return: the maximum degree of the nodes in the graph.
         """
-        return max(self.gra.degree[cell] for cell in self.modules)
+        return max(self.ugraph.degree[cell] for cell in self.modules)
 
     def get_module_weight(self, v) -> int:
         """
@@ -190,12 +190,12 @@ def read_json(filename):
     """
     with open(filename, "r") as fr:
         data = json.load(fr)
-    gra = json_graph.node_link_graph(data)
-    num_modules = gra.graph["num_modules"]
-    num_nets = gra.graph["num_nets"]
-    num_pads = gra.graph["num_pads"]
+    ugraph = json_graph.node_link_graph(data)
+    num_modules = ugraph.graph["num_modules"]
+    num_nets = ugraph.graph["num_nets"]
+    num_pads = ugraph.graph["num_pads"]
     hyprgraph = Netlist(
-        gra, range(num_modules), range(num_modules, num_modules + num_nets)
+        ugraph, range(num_modules), range(num_modules, num_modules + num_nets)
     )
     hyprgraph.num_pads = num_pads
     hyprgraph.module_weight = RepeatArray(1, num_modules)
@@ -262,8 +262,8 @@ def create_drawf():
     :return: an instance of the Netlist class, which is created using the ThinGraph class and some
         predefined modules and nets.
     """
-    gra = ThinGraph()
-    gra.add_nodes_from(
+    ugraph = ThinGraph()
+    ugraph.add_nodes_from(
         [
             "a0",
             "a1",
@@ -294,7 +294,7 @@ def create_drawf():
     # module_weight = [1, 3, 4, 2, 0, 0, 0]
     module_weight = {"a0": 1, "a1": 3, "a2": 4, "a3": 2, "p1": 0, "p2": 0, "p3": 0}
 
-    gra.add_edges_from(
+    ugraph.add_edges_from(
         [
             ("n0", "p1", {"dir": "I"}),
             ("n0", "a0", {"dir": "I"}),
@@ -312,10 +312,10 @@ def create_drawf():
             ("n5", "p2", {"dir": "B"}),
         ]
     )
-    gra.graph["num_modules"] = 7
-    gra.graph["num_nets"] = 6
-    gra.graph["num_pads"] = 3
-    hyprgraph = Netlist(gra, modules, nets)
+    ugraph.graph["num_modules"] = 7
+    ugraph.graph["num_nets"] = 6
+    ugraph.graph["num_pads"] = 3
+    hyprgraph = Netlist(ugraph, modules, nets)
     hyprgraph.module_weight = module_weight
     hyprgraph.net_weight = RepeatArray(1, len(nets))
     hyprgraph.num_pads = 3
@@ -328,11 +328,11 @@ def create_test_netlist():
     weights.
     :return: an instance of the `Netlist` class, which represents a netlist with modules and nets.
     """
-    gra = ThinGraph()
-    gra.add_nodes_from(["a0", "a1", "a2", "a3", "a4", "a5"])
+    ugraph = ThinGraph()
+    ugraph.add_nodes_from(["a0", "a1", "a2", "a3", "a4", "a5"])
     # module_weight = [533, 543, 532]
     module_weight = {"a0": 533, "a1": 543, "a2": 532}
-    gra.add_edges_from(
+    ugraph.add_edges_from(
         [
             ("a3", "a0"),
             ("a3", "a1"),
@@ -343,15 +343,15 @@ def create_test_netlist():
         ]
     )
 
-    gra.graph["num_modules"] = 3
-    gra.graph["num_nets"] = 3
+    ugraph.graph["num_modules"] = 3
+    ugraph.graph["num_nets"] = 3
     modules = ["a0", "a1", "a2"]
     # module_map = {v: i_v for i_v, v in enumerate(modules)}
     nets = ["a3", "a4", "a5"]
     # net_weight = {net: 1 for net in nets}
     net_weight = RepeatArray(1, len(nets))
 
-    hyprgraph = Netlist(gra, modules, nets)
+    hyprgraph = Netlist(ugraph, modules, nets)
     hyprgraph.module_weight = module_weight
     hyprgraph.net_weight = net_weight
     return hyprgraph
@@ -411,9 +411,9 @@ def form_graph(N, M, _, eta, seed=None):  # ignore pos
         random.seed(seed)
 
     # connect nodes with edges
-    gra = bipartite.random_graph(N, M, eta)
-    # gra = nx.DiGraph(gra)
-    return gra
+    ugraph = bipartite.random_graph(N, M, eta)
+    # ugraph = nx.DiGraph(ugraph)
+    return ugraph
 
 
 def create_random_hgraph(N=30, M=26, eta=0.1):
@@ -423,11 +423,11 @@ def create_random_hgraph(N=30, M=26, eta=0.1):
     x = [i for i in vdcorput(T, xbase)]
     y = [i for i in vdcorput(T, ybase)]
     pos = zip(x, y)
-    gra = form_graph(N, M, pos, eta, seed=5)
+    ugraph = form_graph(N, M, pos, eta, seed=5)
 
-    gra.graph["num_modules"] = N
-    gra.graph["num_nets"] = M
-    hyprgraph = Netlist(gra, range(N), range(N, N + M))
+    ugraph.graph["num_modules"] = N
+    ugraph.graph["num_nets"] = M
+    hyprgraph = Netlist(ugraph, range(N), range(N, N + M))
     hyprgraph.module_weight = RepeatArray(1, N)
     hyprgraph.net_weight = RepeatArray(1, M)
     # hyprgraph.net_weight = ShiftArray(1 for _ in range(M))

@@ -64,11 +64,11 @@ def min_maximal_matching(
         dep = set()
 
     def cover(net):
-        for vtx in hyprgraph.gra[net]:
+        for vtx in hyprgraph.ugraph[net]:
             dep.add(vtx)
 
     def any_of_dep(net):
-        return any(vtx in dep for vtx in hyprgraph.gra[net])
+        return any(vtx in dep for vtx in hyprgraph.ugraph[net])
 
     total_primal_cost = 0
     total_dual_cost = 0
@@ -82,8 +82,8 @@ def min_maximal_matching(
             continue
         min_val = gap[net]
         min_net = net
-        for vtx in hyprgraph.gra[net]:
-            for net2 in hyprgraph.gra[vtx]:
+        for vtx in hyprgraph.ugraph[net]:
+            for net2 in hyprgraph.ugraph[vtx]:
                 if any_of_dep(net2):
                     continue
                 if min_val > gap[net2]:
@@ -96,8 +96,8 @@ def min_maximal_matching(
         if min_net == net:
             continue
         gap[net] -= min_val
-        for vtx in hyprgraph.gra[net]:
-            for net2 in hyprgraph.gra[vtx]:
+        for vtx in hyprgraph.ugraph[net]:
+            for net2 in hyprgraph.ugraph[vtx]:
                 # if net2 == net:
                 #     continue
                 gap[net2] -= min_val

@@ -65,16 +65,16 @@ def pd_cover(
 
 
 def min_vertex_cover(
-    gra: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
+    ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     r"""
     The `min_vertex_cover` function performs minimum weighted vertex cover using a primal-dual
     approximation algorithm (without post-processing).
 
-    :param gra: The parameter `gra` is a `nx.Graph` object, which represents the input graph. It is an
+    :param ugraph: The parameter `ugraph` is a `nx.Graph` object, which represents the input graph. It is an
         undirected graph where each edge represents a connection between two vertices
 
-    :type gra: nx.Graph
+    :type ugraph: nx.Graph
 
     :param weight: The `weight` parameter is a dictionary that assigns a weight to each vertex in the
         graph. The weights are used to determine the minimum weighted vertex cover
@@ -102,18 +102,18 @@ def min_vertex_cover(
         a        e     f
 
     Examples:
-        >>> gra = nx.Graph()
-        >>> gra.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
+        >>> ugraph = nx.Graph()
+        >>> ugraph.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
         >>> weight = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1}
         >>> soln = set()
-        >>> min_vertex_cover(gra, weight, soln)
+        >>> min_vertex_cover(ugraph, weight, soln)
         ({0, 1, 2, 3}, 4)
     """
     if coverset is None:
         coverset = set()
 
     def violate_graph() -> Generator:
-        for utx, vtx in gra.edges():
+        for utx, vtx in ugraph.edges():
             if utx in coverset or vtx in coverset:
                 continue
             yield [utx, vtx]
@@ -166,9 +166,9 @@ def min_hyper_vertex_cover(
 
     def violate_netlist() -> Generator:
         for net in hyprgraph.nets:
-            if any(vtx in coverset for vtx in hyprgraph.gra[net]):
+            if any(vtx in coverset for vtx in hyprgraph.ugraph[net]):
                 continue
-            yield hyprgraph.gra[net]
+            yield hyprgraph.ugraph[net]
 
     return pd_cover(violate_netlist, weight, coverset)
 
@@ -214,16 +214,16 @@ def _construct_cycle(info: Dict, parent, child) -> Deque:
 
 
 def min_cycle_cover(
-    gra: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
+    ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     """
     The `min_cycle_cover` function performs minimum cycle cover using a primal-dual approximation
         algorithm (without post-processing).
 
-    :param gra: The `gra` parameter is a `nx.Graph` object representing the input graph. It contains the
+    :param ugraph: The `ugraph` parameter is a `nx.Graph` object representing the input graph. It contains the
         nodes and edges of the graph
 
-    :type gra: nx.Graph
+    :type ugraph: nx.Graph
 
     :param weight: The `weight` parameter is a dictionary that assigns a weight to each node in the
         graph. The weights are used to determine the minimum cycle cover
@@ -251,18 +251,18 @@ def min_cycle_cover(
         d  e  f
 
     Examples:
-        >>> gra = nx.Graph()
-        >>> gra.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
+        >>> ugraph = nx.Graph()
+        >>> ugraph.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
         >>> weight = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1}
         >>> soln = set()
-        >>> min_cycle_cover(gra, weight, soln)
+        >>> min_cycle_cover(ugraph, weight, soln)
         ({0, 1, 2}, 3)
     """
     if coverset is None:
         coverset = set()
 
     def find_cycle():
-        for info, parent, child in _generic_bfs_cycle(gra, coverset):
+        for info, parent, child in _generic_bfs_cycle(ugraph, coverset):
             return _construct_cycle(info, parent, child)
 
     def violate() -> Generator:
@@ -275,21 +275,21 @@ def min_cycle_cover(
     return pd_cover(violate, weight, coverset)
 
 
-def _generic_bfs_cycle(gra: nx.Graph, coverset: Set) -> Generator:
+def _generic_bfs_cycle(ugraph: nx.Graph, coverset: Set) -> Generator:
     """
     The function `_generic_bfs_cycle` performs a breadth-first search on a graph to find cycles,
     excluding nodes in a given `coverset`.
 
-    :param gra: The parameter `gra` is a graph object that represents a directed graph. It should have a
+    :param ugraph: The parameter `ugraph` is a graph object that represents a directed graph. It should have a
         method `neighbors(node)` that returns the neighbors of a given node in the graph. The graph can be
         represented using any graph library or data structure that supports this method
 
     :param coverset: The `coverset` parameter is a set of nodes that should be excluded from the BFS
         traversal. These nodes will not be considered as potential starting points for the BFS algorithm
     """
-    depth_limit = len(gra)
-    neighbors = gra.neighbors
-    nodelist = list(gra.nodes())
+    depth_limit = len(ugraph)
+    neighbors = ugraph.neighbors
+    nodelist = list(ugraph.nodes())
     for source in nodelist:
         if source in coverset:
             continue
@@ -312,16 +312,16 @@ def _generic_bfs_cycle(gra: nx.Graph, coverset: Set) -> Generator:
 
 
 def min_odd_cycle_cover(
-    gra: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
+    ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     """
     The `min_odd_cycle_cover` function performs minimum odd cycle cover using a primal-dual
     approximation algorithm (without post-processing).
 
-    :param gra: The `gra` parameter is a `nx.Graph` object representing the input graph. It is used to
+    :param ugraph: The `ugraph` parameter is a `nx.Graph` object representing the input graph. It is used to
         define the graph structure and find cycles in the graph
 
-    :type gra: nx.Graph
+    :type ugraph: nx.Graph
 
     :param weight: The `weight` parameter is a dictionary that assigns a weight to each node in the
         graph
@@ -349,18 +349,18 @@ def min_odd_cycle_cover(
         d  e  f
 
     Examples:
-        >>> gra = nx.Graph()
-        >>> gra.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
+        >>> ugraph = nx.Graph()
+        >>> ugraph.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
         >>> weight = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1}
         >>> soln = set()
-        >>> min_odd_cycle_cover(gra, weight, soln)
+        >>> min_odd_cycle_cover(ugraph, weight, soln)
         ({0, 1, 2}, 3)
     """
     if coverset is None:
         coverset = set()
 
     def find_odd_cycle():
-        for info, parent, child in _generic_bfs_cycle(gra, coverset):
+        for info, parent, child in _generic_bfs_cycle(ugraph, coverset):
             _, depth_child = info[child]
             _, depth_parent = info[parent]
             if (depth_parent - depth_child) % 2 == 0:

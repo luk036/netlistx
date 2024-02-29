@@ -8,13 +8,13 @@ from typing import MutableMapping, Optional, Set, Tuple, Union
 
 
 def min_vertex_cover_fast(
-    gra, weight: MutableMapping, coverset: Optional[Set] = None
+    ugraph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     """
     The `min_vertex_cover_fast` function performs minimum weighted vertex cover using a primal-dual
     approximation algorithm (without post-processing).
 
-    :param gra: gra is a NetworkX graph object representing the graph on which the minimum weighted
+    :param ugraph: ugraph is a NetworkX graph object representing the graph on which the minimum weighted
         vertex cover algorithm will be performed. It contains the nodes and edges of the graph
 
     :param weight: The `weight` parameter is a mutable mapping that represents the weight of each vertex
@@ -45,11 +45,11 @@ def min_vertex_cover_fast(
     Examples:
         >>> import networkx as nx
         >>> from netlistx.graph_algo import min_vertex_cover_fast
-        >>> gra = nx.Graph()
-        >>> gra.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
+        >>> ugraph = nx.Graph()
+        >>> ugraph.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
         >>> weight = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1}
         >>> coverset = set()
-        >>> min_vertex_cover_fast(gra, weight, coverset)
+        >>> min_vertex_cover_fast(ugraph, weight, coverset)
         ({0, 1, 2, 3}, 4)
     """
     if coverset is None:
@@ -59,7 +59,7 @@ def min_vertex_cover_fast(
     total_primal_cost = 0
     gap = copy.copy(weight)
 
-    for utx, vtx in gra.edges():
+    for utx, vtx in ugraph.edges():
         if utx in coverset or vtx in coverset:
             continue
         if gap[utx] < gap[vtx]:
@@ -75,13 +75,13 @@ def min_vertex_cover_fast(
 
 
 def min_maximal_independant_set(
-    gra, weight: MutableMapping, indset: Optional[Set] = None, dep: Optional[Set] = None
+    ugraph, weight: MutableMapping, indset: Optional[Set] = None, dep: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     r"""
     The `min_maximal_independant_set` function performs minimum weighted maximal independent set using
     primal-dual algorithm.
 
-    :param gra: gra is an undirected graph represented using the NetworkX library. It represents the
+    :param ugraph: ugraph is an undirected graph represented using the NetworkX library. It represents the
         graph structure and contains the vertices and edges of the graph
 
     :param weight: The `weight` parameter is a dictionary-like object that assigns a weight to each
@@ -119,12 +119,12 @@ def min_maximal_independant_set(
     Examples:
         >>> import networkx as nx
         >>> from netlistx.graph_algo import min_maximal_independant_set
-        >>> gra = nx.Graph()
-        >>> gra.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
+        >>> ugraph = nx.Graph()
+        >>> ugraph.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
         >>> weight = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1}
         >>> indset = set()
         >>> dep = set()
-        >>> min_maximal_independant_set(gra, weight, indset, dep)
+        >>> min_maximal_independant_set(ugraph, weight, indset, dep)
         ({0, 3}, 2)
     """
     if indset is None:
@@ -134,13 +134,13 @@ def min_maximal_independant_set(
 
     def coverset(utx):
         dep.add(utx)
-        for vtx in gra[utx]:
+        for vtx in ugraph[utx]:
             dep.add(vtx)
 
     gap = copy.copy(weight)
     total_primal_cost = 0
     total_dual_cost = 0
-    for utx in gra:
+    for utx in ugraph:
         if utx in dep:
             continue
         if utx in indset:  # pre-define indepentant
@@ -148,7 +148,7 @@ def min_maximal_independant_set(
             continue
         min_val = gap[utx]
         min_vtx = utx
-        for vtx in gra[utx]:
+        for vtx in ugraph[utx]:
             if vtx in dep:
                 continue
             if min_val > gap[vtx]:
@@ -160,7 +160,7 @@ def min_maximal_independant_set(
         total_dual_cost += min_val
         if min_vtx == utx:
             continue
-        for vtx in gra[utx]:
+        for vtx in ugraph[utx]:
             gap[vtx] -= min_val
 
     assert total_dual_cost <= total_primal_cost

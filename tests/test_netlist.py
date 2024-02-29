@@ -31,26 +31,26 @@ def test_drawf():
 
 def test_json():
     # hyprgraph = create_drawf()
-    # data = json_graph.node_link_data(hyprgraph.gra)
+    # data = json_graph.node_link_data(hyprgraph.ugraph)
     # with open('testcases/drawf.json', 'w') as fw:
     #     json.dump(data, fw, indent=1)
     with open("testcases/drawf.json", "r") as fr:
         data2 = json.load(fr)
-    gra = json_graph.node_link_graph(data2)
-    assert gra.number_of_nodes() == 13
-    assert gra.graph["num_modules"] == 7
-    assert gra.graph["num_nets"] == 6
-    assert gra.graph["num_pads"] == 3
+    ugraph = json_graph.node_link_graph(data2)
+    assert ugraph.number_of_nodes() == 13
+    assert ugraph.graph["num_modules"] == 7
+    assert ugraph.graph["num_nets"] == 6
+    assert ugraph.graph["num_pads"] == 3
 
 
 def test_json2():
     with open("testcases/p1.json", "r") as fr:
         data = json.load(fr)
-    gra = json_graph.node_link_graph(data)
-    assert gra.number_of_nodes() == 1735
-    assert gra.graph["num_modules"] == 833
-    assert gra.graph["num_nets"] == 902
-    assert gra.graph["num_pads"] == 81
+    ugraph = json_graph.node_link_graph(data)
+    assert ugraph.number_of_nodes() == 1735
+    assert ugraph.graph["num_modules"] == 833
+    assert ugraph.graph["num_nets"] == 902
+    assert ugraph.graph["num_pads"] == 81
 
 
 def test_readjson():
@@ -59,7 +59,7 @@ def test_readjson():
     count_3 = 0
     count_rest = 0
     for net in hyprgraph.nets:
-        deg = hyprgraph.gra.degree(net)
+        deg = hyprgraph.ugraph.degree(net)
         if deg == 2:
             count_2 += 1
         elif deg == 3:
