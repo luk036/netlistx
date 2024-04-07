@@ -75,7 +75,10 @@ def min_vertex_cover_fast(
 
 
 def min_maximal_independant_set(
-    ugraph, weight: MutableMapping, indset: Optional[Set] = None, dep: Optional[Set] = None
+    ugraph,
+    weight: MutableMapping,
+    indset: Optional[Set] = None,
+    dep: Optional[Set] = None,
 ) -> Tuple[Set, Union[int, float]]:
     r"""
     The `min_maximal_independant_set` function performs minimum weighted maximal independent set using
