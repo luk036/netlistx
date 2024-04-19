@@ -13,6 +13,7 @@
 [![Project generated with PyScaffold](https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold)](https://pyscaffold.org/)
 [![Documentation Status](https://readthedocs.org/projects/netlistx/badge/?version=latest)](https://netlistx.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/luk036/netlistx/branch/master/graph/badge.svg?token=6lpjUzPavX)](https://codecov.io/gh/luk036/netlistx)
+[![Coverage Status](https://coveralls.io/repos/github/luk036/netlistx/badge.svg?branch=master)](https://coveralls.io/github/luk036/netlistx?branch=master)
 
 # netlistx
 
