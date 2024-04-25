@@ -35,12 +35,12 @@ def min_vertex_cover_fast(
     .. svgbob::
        :align: center
 
-        b  c  d  e
-        #--o--#--o
-        |  | /|     ({b, d, e}, 3)
-        o  |/ |
-        a  #--o
-           e  f
+        b     c     d     e
+        #-----o-----#-----o
+        |      \   / \       ({b, d, e}, 3)
+        |       \ /   \
+        o        #-----o
+        a        e     f
 
     Examples:
         >>> import networkx as nx
@@ -56,7 +56,7 @@ def min_vertex_cover_fast(
         coverset = set()
 
     total_dual_cost = 0  # for assertion
-    total_primal_cost = 0
+    total_prml_cost = 0
     gap = copy.copy(weight)
 
     for utx, vtx in ugraph.edges():
@@ -66,12 +66,12 @@ def min_vertex_cover_fast(
             utx, vtx = vtx, utx  # swap
         coverset.add(vtx)
         total_dual_cost += gap[vtx]
-        total_primal_cost += weight[vtx]
+        total_prml_cost += weight[vtx]
         gap[utx] -= gap[vtx]
         gap[vtx] = 0
 
-    assert total_dual_cost <= total_primal_cost
-    return coverset, total_primal_cost
+    assert total_dual_cost <= total_prml_cost
+    return coverset, total_prml_cost
 
 
 def min_maximal_independant_set(
@@ -107,17 +107,17 @@ def min_maximal_independant_set(
     :type dep: Optional[Set]
 
     :return: The function `min_maximal_independant_set` returns a tuple containing the minimum weighted
-        maximal independent set (indset) and the total primal cost (total_primal_cost).
+        maximal independent set (indset) and the total primal cost (total_prml_cost).
 
     .. svgbob::
        :align: center
 
-       0  2
-       #--o
-       | /|\   ({0, 3}, 2)
-       |/ | \
-       o--#--o
-       1  3  4
+        0     2     4
+        #-----o-----o
+         \   / \   /    ({0, 3}, 2)
+          \ /   \ /
+           o-----#
+           1     3
 
     Examples:
         >>> import networkx as nx
@@ -141,7 +141,7 @@ def min_maximal_independant_set(
             dep.add(vtx)
 
     gap = copy.copy(weight)
-    total_primal_cost = 0
+    total_prml_cost = 0
     total_dual_cost = 0
     for utx in ugraph:
         if utx in dep:
@@ -159,12 +159,12 @@ def min_maximal_independant_set(
                 min_vtx = vtx
         indset.add(min_vtx)
         coverset(min_vtx)
-        total_primal_cost += weight[min_vtx]
+        total_prml_cost += weight[min_vtx]
         total_dual_cost += min_val
         if min_vtx == utx:
             continue
         for vtx in ugraph[utx]:
             gap[vtx] -= min_val
 
-    assert total_dual_cost <= total_primal_cost
-    return indset, total_primal_cost
+    assert total_dual_cost <= total_prml_cost
+    return indset, total_prml_cost

@@ -49,19 +49,19 @@ def pd_cover(
         >>> pd_cover(violate_graph, weight, soln)
         ({0, 1}, 4)
     """
-    total_primal_cost = 0
+    total_prml_cost = 0
     total_dual_cost = 0
     gap = copy.copy(weight)
     for S in violate():
         min_vtx = min(S, key=lambda vtx: gap[vtx])
         min_val = gap[min_vtx]
         soln.add(min_vtx)
-        total_primal_cost += weight[min_vtx]
+        total_prml_cost += weight[min_vtx]
         total_dual_cost += min_val
         for vtx in S:
             gap[vtx] -= min_val
-    assert total_dual_cost <= total_primal_cost
-    return soln, total_primal_cost
+    assert total_dual_cost <= total_prml_cost
+    return soln, total_prml_cost
 
 
 def min_vertex_cover(
@@ -216,7 +216,7 @@ def _construct_cycle(info: Dict, parent, child) -> Deque:
 def min_cycle_cover(
     ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
-    """
+    r"""
     The `min_cycle_cover` function performs minimum cycle cover using a primal-dual approximation
         algorithm (without post-processing).
 
@@ -243,12 +243,12 @@ def min_cycle_cover(
     .. svgbob::
        :align: center
 
-        a  b  c
-        o--#--o
-        | /|  |
-        |/ |  |  ({b}, 1)
-        o--o--o
-        d  e  f
+        a     b     c
+        o-----#-----o
+         \   / \     \    ({b}, 1)
+          \ /   \     \
+           o-----o-----o
+           d     e     f
 
     Examples:
         >>> ugraph = nx.Graph()
@@ -341,12 +341,12 @@ def min_odd_cycle_cover(
     .. svgbob::
        :align: center
 
-        a  b  c
-        o--o--o
-        | /|  |
-        |/ |  |  ({d}, 1)
-        #--o--o
-        d  e  f
+        a     b     c
+        o-----o-----o
+         \   / \     \    ({d}, 1)
+          \ /   \     \
+           #-----o-----o
+           d     e     f
 
     Examples:
         >>> ugraph = nx.Graph()
