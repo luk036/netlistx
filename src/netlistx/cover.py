@@ -314,7 +314,7 @@ def _generic_bfs_cycle(ugraph: nx.Graph, coverset: Set) -> Generator:
 def min_odd_cycle_cover(
     ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
-    """
+    r"""
     The `min_odd_cycle_cover` function performs minimum odd cycle cover using a primal-dual
     approximation algorithm (without post-processing).
 
