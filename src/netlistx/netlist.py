@@ -86,7 +86,7 @@ class Netlist:
         self.num_modules = len(modules)
         self.num_nets = len(nets)
         # self.net_weight: Optional[Union[Dict, List[int]]] = None
-        self.module_weight: Optional[Union[Dict, List[int]]] = None
+        self.module_weight = RepeatArray(1, self.num_modules)
         self.module_fixed: set = set()
 
         # self.module_dict = {}
@@ -198,8 +198,7 @@ def read_json(filename):
         ugraph, range(num_modules), range(num_modules, num_modules + num_nets)
     )
     hyprgraph.num_pads = num_pads
-    hyprgraph.module_weight = RepeatArray(1, num_modules)
-    hyprgraph.net_weight = RepeatArray(1, num_nets)
+    # hyprgraph.module_weight = RepeatArray(1, num_modules)
     # hyprgraph.net_weight = ShiftArray(1 for _ in range(num_nets))
     # hyprgraph.net_weight.set_start(num_modules)
     return hyprgraph
