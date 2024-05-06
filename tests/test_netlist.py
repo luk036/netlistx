@@ -2,7 +2,12 @@ import json
 
 from networkx.readwrite import json_graph
 
-from netlistx.netlist import create_drawf, create_test_netlist, read_json
+from netlistx.netlist import (
+    create_drawf,
+    create_random_hgraph,
+    create_test_netlist,
+    read_json,
+)
 
 
 def test_netlist():
@@ -27,6 +32,12 @@ def test_drawf():
     # assert hyprgraph.get_max_net_degree() == 3
     # assert not hyprgraph.has_fixed_modules
     # assert hyprgraph.get_module_weight_by_id(1) == 3
+
+
+def test_random_hgraph():
+    hyprgraph = create_random_hgraph(30, 26)
+    assert hyprgraph.number_of_modules() == 30
+    assert hyprgraph.number_of_nets() == 26
 
 
 def test_json():
