@@ -1,7 +1,42 @@
-# -*- coding: utf-8 -*-
 """
-Minimum vertex cover for weighed graphs.
-1. Support Lazy evalution
+Graph Algorithms (graph_algo.py)
+
+This code contains two main functions that work with graphs to solve optimization problems. Let's break down what each function does in simple terms.
+
+The first function, min_vertex_cover_fast, finds a minimum weighted vertex cover in a graph. A vertex cover is a set of vertices that includes at least one endpoint of every edge in the graph. The "weighted" part means that each vertex has a weight, and we want to find a cover with the lowest total weight.
+
+This function takes three inputs:
+
+1. A graph (ugraph)
+2. A dictionary of weights for each vertex (weight)
+3. An optional set of vertices to start with (coverset)
+
+It outputs two things:
+
+1. The set of vertices that form the cover
+2. The total weight of this cover
+
+The function works by looking at each edge in the graph. If neither end of the edge is in the cover yet, it adds the end with the higher weight to the cover. It keeps track of the total weight and updates the remaining "gap" for each vertex. This process continues until all edges are covered.
+
+The second function, min_maximal_independant_set, finds a minimum weighted maximal independent set in a graph. An independent set is a set of vertices where no two vertices are connected by an edge. "Maximal" means we can't add any more vertices to the set without breaking this rule. Like before, we want to find such a set with the lowest total weight.
+
+This function takes four inputs:
+
+1. A graph (ugraph)
+2. A dictionary of weights for each vertex (weight)
+3. An optional set to start the independent set (indset)
+4. An optional set of dependent vertices (dep)
+
+It outputs:
+
+1. The independent set of vertices
+2. The total weight of this set
+
+The function works by looking at each vertex in the graph. For each vertex and its neighbors, it chooses the one with the lowest remaining weight to add to the independent set. It then marks this vertex and all its neighbors as "dependent" (they can't be added to the independent set). This process continues until all vertices are either in the independent set or marked as dependent.
+
+Both functions use a technique called a primal-dual algorithm, which is a way of solving optimization problems. They both keep track of a "gap" for each vertex, which helps ensure that the solution is close to optimal.
+
+These functions are useful in various graph theory applications, such as network design, scheduling problems, or resource allocation, where we need to find efficient ways to cover a graph or select non-adjacent elements.
 """
 
 import copy

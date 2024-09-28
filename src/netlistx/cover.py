@@ -1,3 +1,31 @@
+"""
+Cover.py
+
+This code implements several algorithms for solving different types of covering problems in graphs. The main purpose is to find minimal sets of vertices or edges that "cover" certain structures in a graph, such as all edges, cycles, or odd cycles.
+
+The code takes various inputs depending on the specific function being used. Generally, it requires a graph structure (either a regular graph or a hypergraph), a weight mapping for the vertices, and sometimes an optional initial cover set. The graphs are typically represented using the NetworkX library (nx.Graph).
+
+The outputs produced by these functions are usually a tuple containing two elements: a set representing the minimal cover found, and a number representing the total weight or cost of that cover.
+
+The code achieves its purpose through several different algorithms, but they all follow a similar pattern called the primal-dual approximation method. This method iteratively builds a solution by selecting elements that violate certain conditions and adding them to the cover set.
+
+Here's a breakdown of the main functions:
+
+1. pd_cover: This is the core function that implements the primal-dual approximation algorithm. It takes a "violate" function that generates sets of violating elements, a weight mapping, and an initial solution set. It iteratively adds elements to the solution until no violations remain.
+
+2. min_vertex_cover: This function finds a minimum weighted vertex cover in a graph. It uses pd_cover with a violate function that yields edges not covered by the current solution.
+
+3. min_hyper_vertex_cover: Similar to min_vertex_cover, but works on hypergraphs where edges can connect more than two vertices.
+
+4. min_cycle_cover: This function finds a minimum weighted set of vertices that cover all cycles in a graph. It uses a breadth-first search to find cycles and then uses pd_cover to select vertices that break these cycles.
+
+5. min_odd_cycle_cover: Similar to min_cycle_cover, but specifically targets odd cycles in the graph.
+
+The code uses several important data structures and algorithms. Graphs are represented using NetworkX, which provides efficient graph operations. The algorithms make heavy use of sets for storing covers and dictionaries for storing weights and other information. The cycle-finding algorithms use breadth-first search and clever bookkeeping to efficiently detect cycles in the graph.
+
+Overall, this code provides a toolkit for solving various covering problems on graphs, which have applications in many areas of computer science and operations research. The algorithms implemented here provide approximate solutions to these problems, which are often NP-hard and thus difficult to solve exactly for large instances.
+"""
+
 import copy
 from collections import deque
 from typing import (
