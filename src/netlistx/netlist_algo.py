@@ -11,6 +11,7 @@ The function takes four inputs:
 2. weight: A dictionary-like object that assigns weights to each edge in the hypergraph.
 3. matchset: An optional set of pre-selected edges (defaults to an empty set if not provided).
 4. dep: An optional set of vertices that are already covered by the matching (defaults to an empty set if not provided).
+
 The output of the function is a tuple containing two elements:
 
 1. The final set of matched edges (nets).
@@ -44,7 +45,7 @@ def min_maximal_matching(
     matchset: Optional[Set] = None,
     dep: Optional[Set] = None,
 ) -> Tuple[Set, Union[int, float]]:
-    """
+    r"""
     The `min_maximal_matching` function performs minimum weighted maximal matching using a primal-dual
     approximation algorithm.
 
@@ -86,7 +87,6 @@ def min_maximal_matching(
                    |     |
         o=======o--*-----o=======o
         c       d        f       h
-
     """
     if matchset is None:
         matchset = set()
