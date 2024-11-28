@@ -51,6 +51,11 @@ Overall, this code provides a foundation for working with netlists in Python. It
 - [mywheel](https://github.com/luk036/mywheel)
 - networkx
 
+## 👀 See also
+
+- [sphere-n-cpp](https://github.com/luk036/netlistx-cpp)
+- [slides](https://luk036.github.io/algo4dfm/primal_dual.html)
+
 ## Used by
 
 - [ckpttnpy](https://github.com/luk036/ckpttnpy)
