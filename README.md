@@ -53,7 +53,7 @@ Overall, this code provides a foundation for working with netlists in Python. It
 
 ## 👀 See also
 
-- [sphere-n-cpp](https://github.com/luk036/netlistx-cpp)
+- [netlistx-cpp](https://github.com/luk036/netlistx-cpp)
 - [slides](https://luk036.github.io/algo4dfm/primal_dual.html)
 
 ## Used by
