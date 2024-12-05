@@ -14,7 +14,7 @@
 [![Documentation Status](https://readthedocs.org/projects/netlistx/badge/?version=latest)](https://netlistx.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/luk036/netlistx/branch/master/graph/badge.svg?token=6lpjUzPavX)](https://codecov.io/gh/luk036/netlistx)
 
-# 🕸 netlistx
+# 🥅 netlistx
 
 > Netlist and its related Algorithms in Python
 
