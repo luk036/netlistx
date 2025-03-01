@@ -26,7 +26,7 @@ from typing import Any, List, Union
 
 import networkx as nx
 from mywheel.array_like import RepeatArray
-from mywheel.lict import Lict
+from mywheel.map_adapter import MapAdapter
 from networkx.algorithms import bipartite
 from networkx.readwrite import json_graph
 
@@ -60,10 +60,10 @@ class TinyGraph(nx.Graph):
     num_nodes = 0
 
     def cheat_node_dict(self):
-        return Lict([dict() for _ in range(self.num_nodes)])
+        return MapAdapter([dict() for _ in range(self.num_nodes)])
 
     def cheat_adjlist_outer_dict(self):
-        return Lict([dict() for _ in range(self.num_nodes)])
+        return MapAdapter([dict() for _ in range(self.num_nodes)])
 
     node_dict_factory = cheat_node_dict
     adjlist_outer_dict_factory = cheat_adjlist_outer_dict
