@@ -122,9 +122,11 @@ def min_vertex_cover(
     .. svgbob::
        :align: center
 
+        "({b, d, e}, 3)"
+
         b     c     d     e
         #-----o-----#-----o
-        |      \   / \       ({b, d, e}, 3)
+        |      \   / \
         |       \ /   \
         o        #-----o
         a        e     f
@@ -178,16 +180,18 @@ def min_hyper_vertex_cover(
     .. svgbob::
        :align: center
 
+        "({b, d, g, h}, 4)"
+
         a       b        e       g
-        o-------#-----*--o-------#
+        o-------#-----+--o-------#
                       |  |
                    ,--)--'
-                   |  |      ({b, d, g, h}, 4)
+                   |  |
                    |  `--.
                    |     |
-        o-------#--*-----o-------#
+        o-------#--+-----o-------#
         c       d        f       h
-
+   
     """
     if coverset is None:
         coverset = set()
@@ -271,11 +275,13 @@ def min_cycle_cover(
     .. svgbob::
        :align: center
 
+        "({c, d}, 2)"
+
         a     b     c
-        o-----#-----o
-         \   / \     \    ({b}, 1)
+        o-----o-----#
+         \   / \     \
           \ /   \     \
-           o-----o-----o
+           #-----o-----o
            d     e     f
 
     Examples:
@@ -369,9 +375,11 @@ def min_odd_cycle_cover(
     .. svgbob::
        :align: center
 
+        "({d}, 1)"
+
         a     b     c
         o-----o-----o
-         \   / \     \    ({d}, 1)
+         \   / \     \
           \ /   \     \
            #-----o-----o
            d     e     f

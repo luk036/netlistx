@@ -71,9 +71,11 @@ def min_vertex_cover_fast(
     .. svgbob::
        :align: center
 
+        "({b, d, e}, 3)"
+
         b     c     d     e
         #-----o-----#-----o
-        |      \   / \       ({b, d, e}, 3)
+        |      \   / \ 
         |       \ /   \
         o        #-----o
         a        e     f
@@ -148,9 +150,11 @@ def min_maximal_independant_set(
     .. svgbob::
        :align: center
 
+        "({0, 3}, 2)"
+
         0     2     4
         #-----o-----o
-         \   / \   /    ({0, 3}, 2)
+         \   / \   /
           \ /   \ /
            o-----#
            1     3

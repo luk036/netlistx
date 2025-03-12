@@ -79,14 +79,15 @@ def min_maximal_matching(
        :align: center
 
         a       b        e       g
-        o=======o-----*--o=======o
+        o=======o-----+--o=======o
                       |  |
                    ,--)--'
                    |  |
                    |  `--.
                    |     |
-        o=======o--*-----o=======o
+        o=======o--+-----o=======o
         c       d        f       h
+
     """
     if matchset is None:
         matchset = set()
