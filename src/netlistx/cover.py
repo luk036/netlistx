@@ -191,7 +191,7 @@ def min_hyper_vertex_cover(
                    |     |
         o-------#--+-----o-------#
         c       d        f       h
-   
+
     """
     if coverset is None:
         coverset = set()
