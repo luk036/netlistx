@@ -60,8 +60,6 @@ Overall, this code provides a foundation for working with netlists in Python. It
 
 - [ckpttnpy](https://github.com/luk036/ckpttnpy)
 
-<!-- pyscaffold-notes -->
-
 ## 👉 Note
 
 This project has been set up using PyScaffold 4.5. For details and usage
