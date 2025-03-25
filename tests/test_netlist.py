@@ -3,11 +3,22 @@ import json
 from networkx.readwrite import json_graph
 
 from netlistx.netlist import (
+    create_inverter,
     create_drawf,
     create_random_hgraph,
     create_test_netlist,
     read_json,
 )
+
+
+def test_inverter():
+    hyprgraph = create_inverter()
+    assert hyprgraph.number_of_modules() == 3
+    assert hyprgraph.number_of_nets() == 2
+    assert hyprgraph.number_of_nodes() == 5
+    assert hyprgraph.number_of_pins() == 4
+    assert hyprgraph.get_max_degree() == 2
+    assert isinstance(hyprgraph.module_weight, dict)
 
 
 def test_netlist():
