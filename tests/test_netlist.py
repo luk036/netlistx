@@ -3,8 +3,8 @@ import json
 from networkx.readwrite import json_graph
 
 from netlistx.netlist import (
-    create_inverter,
     create_drawf,
+    create_inverter,
     create_random_hgraph,
     create_test_netlist,
     read_json,

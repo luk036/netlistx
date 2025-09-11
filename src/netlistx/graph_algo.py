@@ -75,7 +75,7 @@ def min_vertex_cover_fast(
 
         b     c     d     e
         #-----o-----#-----o
-        |      \   / \ 
+        |      \   / \
         |       \ /   \
         o        #-----o
         a        e     f
