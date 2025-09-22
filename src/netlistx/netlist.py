@@ -31,18 +31,6 @@ from networkx.algorithms import bipartite
 from networkx.readwrite import json_graph
 
 
-# The `ThinGraph` class is a subclass of `nx.Graph` that defines default attributes for edges and
-# nodes.
-class ThinGraph(nx.Graph):
-    all_edge_dict = {"weight": 1}
-
-    def single_edge_dict(self):
-        return self.all_edge_dict
-
-    edge_attr_dict_factory = single_edge_dict
-    node_attr_dict_factory = single_edge_dict
-
-
 # The class SimpleGraph is a subclass of nx.Graph and defines default attributes for edges and nodes.
 class SimpleGraph(nx.Graph):
     all_edge_dict = {"weight": 1}
@@ -227,7 +215,7 @@ def read_json(filename):
 
 
 def create_inverter():
-    gr = ThinGraph()
+    gr = SimpleGraph()
     gr.add_nodes_from(["a0", "p1", "p2", "n0", "n1"])
     nets = ["n0", "n1"]
     modules = ["a0", "p1", "p2"]
@@ -252,7 +240,7 @@ def create_inverter():
 
 
 def create_inverter2():
-    gr = ThinGraph()
+    gr = SimpleGraph()
     gr.add_nodes_from([0, 1, 2, 3, 4])
     nets = range(3, 5)
     modules = range(3)
@@ -280,10 +268,10 @@ def create_drawf():
     """
     The function `create_drawf` creates a graph and netlist object with specified nodes, edges, and
     weights.
-    :return: an instance of the Netlist class, which is created using the ThinGraph class and some
+    :return: an instance of the Netlist class, which is created using the SimpleGraph class and some
         predefined modules and nets.
     """
-    ugraph = ThinGraph()
+    ugraph = SimpleGraph()
     ugraph.add_nodes_from(
         [
             "a0",
@@ -349,7 +337,7 @@ def create_test_netlist():
     weights.
     :return: an instance of the `Netlist` class, which represents a netlist with modules and nets.
     """
-    ugraph = ThinGraph()
+    ugraph = SimpleGraph()
     ugraph.add_nodes_from(["a0", "a1", "a2", "a3", "a4", "a5"])
     # module_weight = [533, 543, 532]
     module_weight = {"a0": 533, "a1": 543, "a2": 532}
