@@ -88,6 +88,27 @@ def min_maximal_matching(
         o=======o--+-----o=======o
         c       d        f       h
 
+    Examples:
+        >>> class MockUgraph:
+        ...     def __init__(self, net_to_modules, module_to_nets):
+        ...         self.net_to_modules = net_to_modules
+        ...         self.module_to_nets = module_to_nets
+        ...     def __getitem__(self, key):
+        ...         if key in self.net_to_modules:
+        ...             return self.net_to_modules[key]
+        ...         return self.module_to_nets[key]
+        >>> class MockHyprgraph:
+        ...     def __init__(self, nets, ugraph):
+        ...         self.nets = nets
+        ...         self.ugraph = ugraph
+        >>> ugraph = MockUgraph({"N1": [0, 1], "N2": [1, 2], "N3": [2, 3]}, {0: ["N1"], 1: ["N1", "N2"], 2: ["N2", "N3"], 3: ["N3"]})
+        >>> hyprgraph = MockHyprgraph(["N1", "N2", "N3"], ugraph)
+        >>> weight = {"N1": 1, "N2": 2, "N3": 1}
+        >>> matchset = set()
+        >>> dep = set()
+        >>> result, cost = min_maximal_matching(hyprgraph, weight, matchset, dep)
+        >>> result == {'N1', 'N3'} and cost == 2
+        True
     """
     if matchset is None:
         matchset = set()

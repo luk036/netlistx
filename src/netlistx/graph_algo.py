@@ -89,6 +89,13 @@ def min_vertex_cover_fast(
         >>> coverset = set()
         >>> min_vertex_cover_fast(ugraph, weight, coverset)
         ({0, 1, 2, 3}, 4)
+
+        >>> ugraph = nx.Graph()
+        >>> ugraph.add_edges_from([(0, 1), (1, 2)])
+        >>> weight = {0: 1, 1: 2, 2: 1}
+        >>> coverset = set()
+        >>> min_vertex_cover_fast(ugraph, weight, coverset)
+        ({0, 2}, 2)
     """
     if coverset is None:
         coverset = set()
@@ -169,6 +176,14 @@ def min_maximal_independant_set(
         >>> dep = set()
         >>> min_maximal_independant_set(ugraph, weight, indset, dep)
         ({0, 3}, 2)
+
+        >>> ugraph = nx.Graph()
+        >>> ugraph.add_edges_from([(0, 1), (1, 2)])
+        >>> weight = {0: 1, 1: 2, 2: 1}
+        >>> indset = set()
+        >>> dep = set()
+        >>> min_maximal_independant_set(ugraph, weight, indset, dep)
+        ({0, 2}, 2)
     """
     if indset is None:
         indset = set()

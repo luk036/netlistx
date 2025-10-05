@@ -377,6 +377,16 @@ def vdc(n, base=2):
 
     Returns:
         [type]: [description]
+
+    Examples:
+        >>> vdc(0)
+        0.0
+        >>> vdc(1)
+        0.5
+        >>> vdc(2)
+        0.25
+        >>> vdc(3)
+        0.75
     """
     vdc, denom = 0.0, 1.0
     while n:
@@ -397,6 +407,10 @@ def vdcorput(n, base=2):
 
     Returns:
         [type]: [description]
+
+    Examples:
+        >>> vdcorput(4)
+        [0.0, 0.5, 0.25, 0.75]
     """
     return [vdc(i, base) for i in range(n)]
 

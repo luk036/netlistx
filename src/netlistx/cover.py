@@ -192,6 +192,16 @@ def min_hyper_vertex_cover(
         o-------#--+-----o-------#
         c       d        f       h
 
+    Examples:
+        >>> class MockHyprgraph:
+        ...     def __init__(self, nets, ugraph):
+        ...         self.nets = nets
+        ...         self.ugraph = ugraph
+        >>> hyprgraph = MockHyprgraph(["N1", "N2"], {"N1": [0, 1], "N2": [1, 2]})
+        >>> weight = {0: 1, 1: 1, 2: 1}
+        >>> soln = set()
+        >>> min_hyper_vertex_cover(hyprgraph, weight, soln)
+        ({0, 1}, 2)
     """
     if coverset is None:
         coverset = set()
