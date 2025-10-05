@@ -27,6 +27,17 @@ def test_min_vertex_cover_fast():
     assert rslt == 8
 
 
+def test_min_vertex_cover_fast_weighted():
+    hyprgraph = create_drawf()
+    weight = dict()
+
+    for node in hyprgraph.ugraph:
+        weight[node] = 2
+
+    _, rslt = min_vertex_cover_fast(hyprgraph.ugraph, weight)
+    assert rslt == 16
+
+
 def test_min_maximal_independant_set():
     hyprgraph = create_drawf()
     weight = dict()
@@ -36,6 +47,17 @@ def test_min_maximal_independant_set():
 
     _, rslt = min_maximal_independant_set(hyprgraph.ugraph, weight)
     assert rslt == 7
+
+
+def test_min_maximal_independant_set_weighted():
+    hyprgraph = create_drawf()
+    weight = dict()
+
+    for node in hyprgraph.ugraph:
+        weight[node] = 2
+
+    _, rslt = min_maximal_independant_set(hyprgraph.ugraph, weight)
+    assert rslt == 14
 
 
 def test_min_cycle_cover():
