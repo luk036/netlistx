@@ -36,6 +36,7 @@ class SimpleGraph(nx.Graph):
     all_edge_dict = {"weight": 1}
 
     def single_edge_dict(self):
+        """Returns the default edge attribute dictionary."""
         return self.all_edge_dict
 
     edge_attr_dict_factory = single_edge_dict
@@ -48,9 +49,11 @@ class TinyGraph(nx.Graph):
     num_nodes = 0
 
     def cheat_node_dict(self):
+        """Returns a MapAdapter for node dictionaries."""
         return MapAdapter([dict() for _ in range(self.num_nodes)])
 
     def cheat_adjlist_outer_dict(self):
+        """Returns a MapAdapter for adjacency list outer dictionaries."""
         return MapAdapter([dict() for _ in range(self.num_nodes)])
 
     node_dict_factory = cheat_node_dict
@@ -268,6 +271,7 @@ def create_drawf():
     """
     The function `create_drawf` creates a graph and netlist object with specified nodes, edges, and
     weights.
+
     :return: an instance of the Netlist class, which is created using the SimpleGraph class and some
         predefined modules and nets.
     """
