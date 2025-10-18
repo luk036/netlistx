@@ -40,11 +40,11 @@ These functions are useful in various graph theory applications, such as network
 """
 
 import copy
-from typing import MutableMapping, Optional, Set, Tuple, Union
+from typing import Any, MutableMapping, Optional, Set, Tuple, Union
 
 
 def min_vertex_cover_fast(
-    ugraph, weight: MutableMapping, coverset: Optional[Set] = None
+    ugraph: Any, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     r"""
     The `min_vertex_cover_fast` function performs minimum weighted vertex cover using a primal-dual
@@ -120,7 +120,7 @@ def min_vertex_cover_fast(
 
 
 def min_maximal_independant_set(
-    ugraph,
+    ugraph: Any,
     weight: MutableMapping,
     indset: Optional[Set] = None,
     dep: Optional[Set] = None,

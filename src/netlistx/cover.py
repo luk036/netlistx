@@ -29,6 +29,7 @@ Overall, this code provides a toolkit for solving various covering problems on g
 import copy
 from collections import deque
 from typing import (
+    Any,
     Callable,
     Deque,
     Dict,
@@ -215,7 +216,7 @@ def min_hyper_vertex_cover(
     return pd_cover(violate_netlist, weight, coverset)
 
 
-def _construct_cycle(info: Dict, parent, child) -> Deque:
+def _construct_cycle(info: Dict[Any, Tuple[Any, int]], parent: Any, child: Any) -> Deque[Any]:
     """
     The `_construct_cycle` function constructs a cycle by traversing the parent-child relationship in a
     dictionary.
@@ -319,7 +320,7 @@ def min_cycle_cover(
     return pd_cover(violate, weight, coverset)
 
 
-def _generic_bfs_cycle(ugraph: nx.Graph, coverset: Set) -> Generator:
+def _generic_bfs_cycle(ugraph: nx.Graph, coverset: Set[Any]) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
     """
     The function `_generic_bfs_cycle` performs a breadth-first search on a graph to find cycles,
     excluding nodes in a given `coverset`.

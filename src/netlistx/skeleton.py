@@ -23,6 +23,7 @@ References:
 import argparse
 import logging
 import sys
+from typing import List
 
 from netlistx import __version__
 
@@ -40,7 +41,7 @@ _logger = logging.getLogger(__name__)
 # when using this Python module as a library.
 
 
-def fib(n):
+def fib(n: int) -> int:
     """Fibonacci example function
 
     Args:
@@ -62,7 +63,7 @@ def fib(n):
 # executable/script.
 
 
-def parse_args(args):
+def parse_args(args: List[str]) -> argparse.Namespace:
     """Parse command line parameters
 
     Args:
@@ -98,7 +99,7 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def setup_logging(loglevel):
+def setup_logging(loglevel: int) -> None:
     """Setup basic logging
 
     Args:
@@ -113,7 +114,7 @@ def setup_logging(loglevel):
     )
 
 
-def main(args):
+def main(args: List[str]) -> None:
     """Wrapper allowing :func:`fib` to be called with string arguments in a CLI fashion
 
     Instead of returning the value from :func:`fib`, it prints the result to the
@@ -123,14 +124,14 @@ def main(args):
       args (List[str]): command line parameters as list of strings
           (for example  ``["--verbose", "42"]``).
     """
-    args = parse_args(args)
-    setup_logging(args.loglevel)
+    parsed_args = parse_args(args)
+    setup_logging(parsed_args.loglevel)
     _logger.debug("Starting crazy calculations...")
-    print("The {}-th Fibonacci number is {}".format(args.n, fib(args.n)))
+    print("The {}-th Fibonacci number is {}".format(parsed_args.n, fib(parsed_args.n)))
     _logger.info("Script ends here")
 
 
-def run():
+def run() -> None:
     """Calls :func:`main` passing the CLI arguments extracted from :obj:`sys.argv`
 
     This function can be used as entry point to create console scripts with setuptools.

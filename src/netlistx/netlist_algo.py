@@ -34,7 +34,7 @@ In summary, this algorithm provides a way to find a good (though not necessarily
 """
 
 import copy
-from typing import MutableMapping, Optional, Set, Tuple, Union
+from typing import Any, MutableMapping, Optional, Set, Tuple, Union
 
 from .netlist import Netlist
 
@@ -42,9 +42,9 @@ from .netlist import Netlist
 def min_maximal_matching(
     hyprgraph: Netlist,
     weight: MutableMapping,
-    matchset: Optional[Set] = None,
-    dep: Optional[Set] = None,
-) -> Tuple[Set, Union[int, float]]:
+    matchset: Optional[Set[Any]] = None,
+    dep: Optional[Set[Any]] = None,
+) -> Tuple[Set[Any], Union[int, float]]:
     r"""
     The `min_maximal_matching` function performs minimum weighted maximal matching using a primal-dual
     approximation algorithm.

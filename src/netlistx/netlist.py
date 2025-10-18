@@ -22,11 +22,11 @@ Overall, this code provides a foundation for working with netlists in Python. It
 
 import json
 import random
-from typing import Any, List, Union
+from typing import Any, List, Union, Optional, Dict, Tuple
 
 import networkx as nx
-from mywheel.array_like import RepeatArray
-from mywheel.map_adapter import MapAdapter
+from mywheel.array_like import RepeatArray  # type: ignore
+from mywheel.map_adapter import MapAdapter  # type: ignore
 from networkx.algorithms import bipartite
 from networkx.readwrite import json_graph
 
@@ -69,15 +69,15 @@ class TinyGraph(nx.Graph):
 # The `Netlist` class represents a netlist, which is a collection of modules and nets in a graph
 # structure, and provides various properties and methods for working with the netlist.
 class Netlist:
-    num_pads = 0
-    cost_model = 0
+    num_pads: int = 0
+    cost_model: int = 0
 
     def __init__(
         self,
         ugraph: nx.Graph,
         modules: Union[range, List[Any]],
         nets: Union[range, List[Any]],
-    ):
+    ) -> None:
         """
         The function initializes an object with a graph, modules, and nets, and calculates some properties
         of the graph.
@@ -101,6 +101,7 @@ class Netlist:
         # self.net_weight: Optional[Union[Dict, List[int]]] = None
         self.module_weight = RepeatArray(1, self.num_modules)
         self.module_fixed: set = set()
+        self.net_weight: Optional[Union[Dict, List[int]]] = None
 
         # self.module_dict = {}
         # for v in enumerate(self.module_list):
@@ -150,7 +151,7 @@ class Netlist:
         """
         return max(self.ugraph.degree[cell] for cell in self.modules)
 
-    def get_module_weight(self, v) -> int:
+    def get_module_weight(self, v: int) -> int:
         """
         The function `get_module_weight` returns the weight of a module given its index.
 
@@ -172,7 +173,7 @@ class Netlist:
     #     return 1 if self.module_weight is None \
     #         else self.module_weight[v]
 
-    def get_net_weight(self, _) -> int:
+    def get_net_weight(self, _: Any) -> int:
         """
         The function `get_net_weight` returns an integer value.
 
@@ -192,7 +193,7 @@ class Netlist:
         return iter(self.modules)
 
 
-def read_json(filename):
+def read_json(filename: str) -> Netlist:
     """
     The function `read_json` reads a JSON file, converts it into a graph, and creates a netlist object
     with module and net weights.
@@ -217,7 +218,7 @@ def read_json(filename):
     return hyprgraph
 
 
-def create_inverter():
+def create_inverter() -> Netlist:
     gr = SimpleGraph()
     gr.add_nodes_from(["a0", "p1", "p2", "n0", "n1"])
     nets = ["n0", "n1"]
@@ -242,7 +243,7 @@ def create_inverter():
     return hyprgraph
 
 
-def create_inverter2():
+def create_inverter2() -> Netlist:
     gr = SimpleGraph()
     gr.add_nodes_from([0, 1, 2, 3, 4])
     nets = range(3, 5)
@@ -267,7 +268,7 @@ def create_inverter2():
     return hyprgraph
 
 
-def create_drawf():
+def create_drawf() -> Netlist:
     """
     The function `create_drawf` creates a graph and netlist object with specified nodes, edges, and
     weights.
@@ -335,7 +336,7 @@ def create_drawf():
     return hyprgraph
 
 
-def create_test_netlist():
+def create_test_netlist() -> Netlist:
     """
     The function `create_test_netlist` creates a test netlist with nodes, edges, module weights, and net
     weights.
@@ -370,7 +371,7 @@ def create_test_netlist():
     return hyprgraph
 
 
-def vdc(n, base=2):
+def vdc(n: int, base: int = 2) -> float:
     """[summary]
 
     Arguments:
@@ -400,7 +401,7 @@ def vdc(n, base=2):
     return vdc
 
 
-def vdcorput(n, base=2):
+def vdcorput(n: int, base: int = 2) -> List[float]:
     """[summary]
 
     Arguments:
@@ -419,7 +420,7 @@ def vdcorput(n, base=2):
     return [vdc(i, base) for i in range(n)]
 
 
-def form_graph(N, M, _, eta, seed=None):  # ignore pos
+def form_graph(N: int, M: int, _: Any, eta: float, seed: Optional[int] = None) -> nx.Graph:
     """Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
 
@@ -443,7 +444,7 @@ def form_graph(N, M, _, eta, seed=None):  # ignore pos
     return ugraph
 
 
-def create_random_hgraph(N=30, M=26, eta=0.1):
+def create_random_hgraph(N: int = 30, M: int = 26, eta: float = 0.1) -> Netlist:
     T = N + M
     xbase = 2
     ybase = 3
