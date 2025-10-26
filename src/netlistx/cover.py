@@ -216,7 +216,9 @@ def min_hyper_vertex_cover(
     return pd_cover(violate_netlist, weight, coverset)
 
 
-def _construct_cycle(info: Dict[Any, Tuple[Any, int]], parent: Any, child: Any) -> Deque[Any]:
+def _construct_cycle(
+    info: Dict[Any, Tuple[Any, int]], parent: Any, child: Any
+) -> Deque[Any]:
     """
     The `_construct_cycle` function constructs a cycle by traversing the parent-child relationship in a
     dictionary.
@@ -320,7 +322,9 @@ def min_cycle_cover(
     return pd_cover(violate, weight, coverset)
 
 
-def _generic_bfs_cycle(ugraph: nx.Graph, coverset: Set[Any]) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
+def _generic_bfs_cycle(
+    ugraph: nx.Graph, coverset: Set[Any]
+) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
     """
     The function `_generic_bfs_cycle` performs a breadth-first search on a graph to find cycles,
     excluding nodes in a given `coverset`.

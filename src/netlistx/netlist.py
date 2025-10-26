@@ -22,7 +22,7 @@ Overall, this code provides a foundation for working with netlists in Python. It
 
 import json
 import random
-from typing import Any, List, Union, Optional, Dict, Tuple
+from typing import Any, List, Union, Optional, Dict
 
 import networkx as nx
 from mywheel.array_like import RepeatArray  # type: ignore
@@ -420,7 +420,9 @@ def vdcorput(n: int, base: int = 2) -> List[float]:
     return [vdc(i, base) for i in range(n)]
 
 
-def form_graph(N: int, M: int, _: Any, eta: float, seed: Optional[int] = None) -> nx.Graph:
+def form_graph(
+    N: int, M: int, _: Any, eta: float, seed: Optional[int] = None
+) -> nx.Graph:
     """Form N by N grid of nodes, connect nodes within eta.
         mu and eta are relative to 1/(N-1)
 
