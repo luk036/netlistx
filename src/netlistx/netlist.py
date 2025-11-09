@@ -68,6 +68,19 @@ class TinyGraph(nx.Graph):
 
 # The `Netlist` class represents a netlist, which is a collection of modules and nets in a graph
 # structure, and provides various properties and methods for working with the netlist.
+#
+# .. svgbob::
+#
+#    +---+     +---+
+#    | M1|-----| N1|
+#    +---+     +---+
+#      |         |
+#      +---------+
+#      |         |
+#    +---+     +---+
+#    | M2|-----| N2|
+#    +---+     +---+
+#
 class Netlist:
     num_pads: int = 0
     cost_model: int = 0

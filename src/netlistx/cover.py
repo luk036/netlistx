@@ -68,6 +68,17 @@ def pd_cover(
 
     :return: a tuple containing the updated solution set and the total primal cost.
 
+    .. svgbob::
+       :align: center
+
+        .-------.   .-------.
+        |   A   |---|   B   |
+        '-------'   '-------'
+            /         \
+             '-------'
+             |   C   |
+             '-------'
+
     Examples:
         >>> def violate_graph() -> Generator:
         ...     yield [0, 1]
