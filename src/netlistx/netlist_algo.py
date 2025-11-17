@@ -78,15 +78,14 @@ def min_maximal_matching(
     .. svgbob::
        :align: center
 
-        a       b        e       g
-        o=======o-----+--o=======o
-                      |  |
-                   ,--)--'
-                   |  |
-                   |  `--.
-                   |     |
-        o=======o--+-----o=======o
-        c       d        f       h
+          .---.
+         |     |
+         o     o
+        / \   / \
+       /   \ /   \
+      o-----o-----o
+      |     |     |
+      '-----'-----'
 
     Examples:
         >>> class MockUgraph:

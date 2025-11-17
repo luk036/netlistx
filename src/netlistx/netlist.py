@@ -33,6 +33,19 @@ from networkx.readwrite import json_graph
 
 # The class SimpleGraph is a subclass of nx.Graph and defines default attributes for edges and nodes.
 class SimpleGraph(nx.Graph):
+    r"""
+    The `SimpleGraph` class is a subclass of `nx.Graph` that defines default attributes for edges and
+    nodes.
+
+    .. svgbob::
+       :align: center
+
+          o-----o
+         / \   /
+        /   \ /
+       o-----o
+
+    """
     all_edge_dict = {"weight": 1}
 
     def single_edge_dict(self):
@@ -46,6 +59,18 @@ class SimpleGraph(nx.Graph):
 # The TinyGraph class is a subclass of nx.Graph that initializes a graph with a specified number of
 # nodes and provides methods for creating node dictionaries and adjacency list dictionaries.
 class TinyGraph(nx.Graph):
+    r"""
+    The `TinyGraph` class is a subclass of `nx.Graph` that initializes a graph with a specified number
+    of nodes and provides methods for creating node dictionaries and adjacency list dictionaries.
+
+    .. svgbob::
+       :align: center
+
+          o-o
+         / /
+        o-o
+
+    """
     num_nodes = 0
 
     def cheat_node_dict(self):
@@ -91,7 +116,7 @@ class Netlist:
         modules: Union[range, List[Any]],
         nets: Union[range, List[Any]],
     ) -> None:
-        """
+        r"""
         The function initializes an object with a graph, modules, and nets, and calculates some properties
         of the graph.
 
@@ -104,6 +129,18 @@ class Netlist:
         :param nets: The `nets` parameter is a list or range that represents the nets in the graph. A net is
             a connection between two or more modules
         :type nets: Union[range, List[Any]]
+
+        .. svgbob::
+           :align: center
+
+              +---+
+              | M |
+              +---+
+                |
+              +---+
+              | N |
+              +---+
+
         """
         self.ugraph = ugraph
         self.modules = modules
