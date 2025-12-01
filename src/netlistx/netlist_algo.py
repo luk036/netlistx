@@ -114,11 +114,11 @@ def min_maximal_matching(
     if dep is None:
         dep = set()
 
-    def cover(net):
+    def cover(net: Any) -> None:
         for vtx in hyprgraph.ugraph[net]:
             dep.add(vtx)
 
-    def any_of_dep(net):
+    def any_of_dep(net: Any) -> bool:
         return any(vtx in dep for vtx in hyprgraph.ugraph[net])
 
     total_prml_cost = 0

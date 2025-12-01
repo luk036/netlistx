@@ -2,7 +2,7 @@ from netlistx.netlist import create_random_hgraph
 from netlistx.graph_algo import min_vertex_cover_fast, min_maximal_independant_set
 
 
-def test_stress_min_vertex_cover():
+def test_stress_min_vertex_cover() -> None:
     """
     Test min_vertex_cover_fast with a large random graph.
     """
@@ -15,7 +15,7 @@ def test_stress_min_vertex_cover():
     assert len(coverset) > 0
 
 
-def test_stress_min_maximal_independent_set():
+def test_stress_min_maximal_independent_set() -> None:
     """
     Test min_maximal_independant_set with a large random graph.
     """

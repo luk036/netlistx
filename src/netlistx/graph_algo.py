@@ -190,7 +190,7 @@ def min_maximal_independant_set(
     if dep is None:
         dep = set()
 
-    def coverset(utx):
+    def coverset(utx: Any) -> None:
         dep.add(utx)
         for vtx in ugraph[utx]:
             dep.add(vtx)

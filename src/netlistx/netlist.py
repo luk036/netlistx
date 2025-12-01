@@ -22,7 +22,7 @@ Overall, this code provides a foundation for working with netlists in Python. It
 
 import json
 import random
-from typing import Any, List, Union, Optional, Dict
+from typing import Any, List, Union, Optional, Dict, Iterator
 
 import networkx as nx
 from mywheel.array_like import RepeatArray  # type: ignore
@@ -49,7 +49,7 @@ class SimpleGraph(nx.Graph):
 
     all_edge_dict = {"weight": 1}
 
-    def single_edge_dict(self):
+    def single_edge_dict(self) -> Dict:
         """Returns the default edge attribute dictionary."""
         return self.all_edge_dict
 
@@ -75,18 +75,18 @@ class TinyGraph(nx.Graph):
 
     num_nodes = 0
 
-    def cheat_node_dict(self):
+    def cheat_node_dict(self) -> "MapAdapter":
         """Returns a MapAdapter for node dictionaries."""
         return MapAdapter([dict() for _ in range(self.num_nodes)])
 
-    def cheat_adjlist_outer_dict(self):
+    def cheat_adjlist_outer_dict(self) -> "MapAdapter":
         """Returns a MapAdapter for adjacency list outer dictionaries."""
         return MapAdapter([dict() for _ in range(self.num_nodes)])
 
     node_dict_factory = cheat_node_dict
     adjlist_outer_dict_factory = cheat_adjlist_outer_dict
 
-    def init_nodes(self, n: int):
+    def init_nodes(self, n: int) -> None:
         self.num_nodes = n
         self._node = self.cheat_node_dict()
         self._adj = self.cheat_adjlist_outer_dict()
@@ -151,7 +151,7 @@ class Netlist:
         self.num_modules = len(modules)
         self.num_nets = len(nets)
         # self.net_weight: Optional[Union[Dict, List[int]]] = None
-        self.module_weight = RepeatArray(1, self.num_modules)
+        self.module_weight: Union[RepeatArray, Dict, List[int]] = RepeatArray(1, self.num_modules)
         self.module_fixed: set = set()
         self.net_weight: Optional[Union[Dict, List[int]]] = None
 
@@ -211,7 +211,21 @@ class Netlist:
             the index or key of the module weight that you want to retrieve
         :return: the value of `self.module_weight[v]`.
         """
-        return self.module_weight[v]
+        if isinstance(self.module_weight, RepeatArray):
+            return self.module_weight[v]
+        elif isinstance(self.module_weight, dict):
+            # If module_weight is a dictionary, we need to handle it differently
+            # Convert the modules list to get the value by index
+            if isinstance(self.modules, list):
+                module_key = self.modules[v]
+                return self.module_weight.get(module_key, 1)  # default to 1 if not found
+            else:
+                # If modules is a range, assume direct indexing
+                return self.module_weight.get(v, 1)
+        elif isinstance(self.module_weight, list):
+            return self.module_weight[v]
+        else:
+            return 1  # default value
 
     # def get_module_weight_by_id(self, v):
     #     """[summary]
@@ -237,7 +251,7 @@ class Netlist:
         """
         return 1
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         """
         The function returns an iterator over all modules in the Netlist.
         :return: The `iter(self.modules)` is being returned.
@@ -289,8 +303,8 @@ def create_inverter() -> Netlist:
     gr.graph["num_nets"] = 2
     gr.graph["num_pads"] = 2
     hyprgraph = Netlist(gr, modules, nets)
-    hyprgraph.module_weight = module_weight
-    hyprgraph.net_weight = RepeatArray(1, len(nets))
+    hyprgraph.module_weight = module_weight  # type: ignore[assignment]
+    hyprgraph.net_weight = RepeatArray(1, len(nets))  # type: ignore[assignment]
     hyprgraph.num_pads = 2
     return hyprgraph
 
@@ -314,8 +328,8 @@ def create_inverter2() -> Netlist:
     gr.graph["num_nets"] = 2
     gr.graph["num_pads"] = 2
     hyprgraph = Netlist(gr, modules, nets)
-    hyprgraph.module_weight = module_weight
-    hyprgraph.net_weight = RepeatArray(1, len(nets))
+    hyprgraph.module_weight = module_weight  # type: ignore[assignment]
+    hyprgraph.net_weight = RepeatArray(1, len(nets))  # type: ignore[assignment]
     hyprgraph.num_pads = 2
     return hyprgraph
 
@@ -382,8 +396,8 @@ def create_drawf() -> Netlist:
     ugraph.graph["num_nets"] = 6
     ugraph.graph["num_pads"] = 3
     hyprgraph = Netlist(ugraph, modules, nets)
-    hyprgraph.module_weight = module_weight
-    hyprgraph.net_weight = RepeatArray(1, len(nets))
+    hyprgraph.module_weight = module_weight  # type: ignore[assignment]
+    hyprgraph.net_weight = RepeatArray(1, len(nets))  # type: ignore[assignment]
     hyprgraph.num_pads = 3
     return hyprgraph
 
@@ -418,8 +432,8 @@ def create_test_netlist() -> Netlist:
     net_weight = RepeatArray(1, len(nets))
 
     hyprgraph = Netlist(ugraph, modules, nets)
-    hyprgraph.module_weight = module_weight
-    hyprgraph.net_weight = net_weight
+    hyprgraph.module_weight = module_weight  # type: ignore[assignment]
+    hyprgraph.net_weight = net_weight  # type: ignore[assignment]
     return hyprgraph
 
 
@@ -510,8 +524,8 @@ def create_random_hgraph(N: int = 30, M: int = 26, eta: float = 0.1) -> Netlist:
     ugraph.graph["num_modules"] = N
     ugraph.graph["num_nets"] = M
     hyprgraph = Netlist(ugraph, range(N), range(N, N + M))
-    hyprgraph.module_weight = RepeatArray(1, N)
-    hyprgraph.net_weight = RepeatArray(1, M)
+    hyprgraph.module_weight = RepeatArray(1, N)  # type: ignore[assignment]
+    hyprgraph.net_weight = RepeatArray(1, M)  # type: ignore[assignment]
     # hyprgraph.net_weight = ShiftArray(1 for _ in range(M))
     # hyprgraph.net_weight.set_start(N)
     return hyprgraph

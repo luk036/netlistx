@@ -164,7 +164,7 @@ def min_vertex_cover(
 
 
 def min_hyper_vertex_cover(
-    hyprgraph, weight: MutableMapping, coverset: Optional[Set] = None
+    hyprgraph: Any, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     """
     The `min_hyper_vertex_cover` function performs minimum weighted vertex cover using a primal-dual
@@ -319,7 +319,7 @@ def min_cycle_cover(
     if coverset is None:
         coverset = set()
 
-    def find_cycle():
+    def find_cycle() -> Any:
         for info, parent, child in _generic_bfs_cycle(ugraph, coverset):
             return _construct_cycle(info, parent, child)
 
@@ -421,7 +421,7 @@ def min_odd_cycle_cover(
     if coverset is None:
         coverset = set()
 
-    def find_odd_cycle():
+    def find_odd_cycle() -> Any:
         for info, parent, child in _generic_bfs_cycle(ugraph, coverset):
             _, depth_child = info[child]
             _, depth_parent = info[parent]
