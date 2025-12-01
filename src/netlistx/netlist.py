@@ -46,6 +46,7 @@ class SimpleGraph(nx.Graph):
        o-----o
 
     """
+
     all_edge_dict = {"weight": 1}
 
     def single_edge_dict(self):
@@ -71,6 +72,7 @@ class TinyGraph(nx.Graph):
         o-o
 
     """
+
     num_nodes = 0
 
     def cheat_node_dict(self):
