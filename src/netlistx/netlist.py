@@ -151,7 +151,9 @@ class Netlist:
         self.num_modules = len(modules)
         self.num_nets = len(nets)
         # self.net_weight: Optional[Union[Dict, List[int]]] = None
-        self.module_weight: Union[RepeatArray, Dict, List[int]] = RepeatArray(1, self.num_modules)
+        self.module_weight: Union[RepeatArray, Dict, List[int]] = RepeatArray(
+            1, self.num_modules
+        )
         self.module_fixed: set = set()
         self.net_weight: Optional[Union[Dict, List[int]]] = None
 
@@ -218,7 +220,9 @@ class Netlist:
             # Convert the modules list to get the value by index
             if isinstance(self.modules, list):
                 module_key = self.modules[v]
-                return self.module_weight.get(module_key, 1)  # default to 1 if not found
+                return self.module_weight.get(
+                    module_key, 1
+                )  # default to 1 if not found
             else:
                 # If modules is a range, assume direct indexing
                 return self.module_weight.get(v, 1)
