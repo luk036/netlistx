@@ -21,11 +21,23 @@ def p1_graph() -> Any:
 def drawf_json() -> Any:
     """Fixture for loading the drawf.json file."""
     with open("testcases/drawf.json", "r") as fr:
-        return json.load(fr)
+        data = json.load(fr)
+    
+    # Convert 'links' to 'edges' for NetworkX compatibility
+    if 'links' in data and 'edges' not in data:
+        data['edges'] = data.pop('links')
+    
+    return data
 
 
 @pytest.fixture
 def p1_json() -> Any:
     """Fixture for loading the p1.json file."""
     with open("testcases/p1.json", "r") as fr:
-        return json.load(fr)
+        data = json.load(fr)
+    
+    # Convert 'links' to 'edges' for NetworkX compatibility
+    if 'links' in data and 'edges' not in data:
+        data['edges'] = data.pop('links')
+    
+    return data
