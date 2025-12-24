@@ -93,7 +93,7 @@ def pd_cover(
     total_dual_cost = 0
     gap = copy.copy(weight)
     for S in violate():
-        min_vtx = min(S, key=lambda vtx: gap[vtx])
+        min_vtx = min(S, key=lambda vertex: gap[vertex])
         min_val = gap[min_vtx]
         soln.add(min_vtx)
         total_prml_cost += weight[min_vtx]

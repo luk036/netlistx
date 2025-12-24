@@ -22,11 +22,11 @@ def drawf_json() -> Any:
     """Fixture for loading the drawf.json file."""
     with open("testcases/drawf.json", "r") as fr:
         data = json.load(fr)
-    
+
     # Convert 'links' to 'edges' for NetworkX compatibility
-    if 'links' in data and 'edges' not in data:
-        data['edges'] = data.pop('links')
-    
+    if "links" in data and "edges" not in data:
+        data["edges"] = data.pop("links")
+
     return data
 
 
@@ -35,9 +35,9 @@ def p1_json() -> Any:
     """Fixture for loading the p1.json file."""
     with open("testcases/p1.json", "r") as fr:
         data = json.load(fr)
-    
+
     # Convert 'links' to 'edges' for NetworkX compatibility
-    if 'links' in data and 'edges' not in data:
-        data['edges'] = data.pop('links')
-    
+    if "links" in data and "edges" not in data:
+        data["edges"] = data.pop("links")
+
     return data

@@ -274,11 +274,11 @@ def read_json(filename: str) -> Netlist:
     """
     with open(filename, "r") as fr:
         data = json.load(fr)
-    
+
     # Convert 'links' to 'edges' for NetworkX compatibility
-    if 'links' in data and 'edges' not in data:
-        data['edges'] = data.pop('links')
-    
+    if "links" in data and "edges" not in data:
+        data["edges"] = data.pop("links")
+
     ugraph = json_graph.node_link_graph(data)
     num_modules = ugraph.graph["num_modules"]
     num_nets = ugraph.graph["num_nets"]
@@ -294,13 +294,13 @@ def read_json(filename: str) -> Netlist:
 
 
 def create_inverter() -> Netlist:
-    gr = SimpleGraph()
-    gr.add_nodes_from(["a0", "p1", "p2", "n0", "n1"])
+    graph = SimpleGraph()
+    graph.add_nodes_from(["a0", "p1", "p2", "n0", "n1"])
     nets = ["n0", "n1"]
     modules = ["a0", "p1", "p2"]
     module_weight = {"a0": 1, "p1": 0, "p2": 0}
 
-    gr.add_edges_from(
+    graph.add_edges_from(
         [
             ("n0", "p1", {"dir": "I"}),
             ("n0", "a0", {"dir": "O"}),
@@ -308,10 +308,10 @@ def create_inverter() -> Netlist:
             ("n1", "p2", {"dir": "O"}),
         ]
     )
-    gr.graph["num_modules"] = 3
-    gr.graph["num_nets"] = 2
-    gr.graph["num_pads"] = 2
-    hyprgraph = Netlist(gr, modules, nets)
+    graph.graph["num_modules"] = 3
+    graph.graph["num_nets"] = 2
+    graph.graph["num_pads"] = 2
+    hyprgraph = Netlist(graph, modules, nets)
     hyprgraph.module_weight = module_weight  # type: ignore[assignment]
     hyprgraph.net_weight = RepeatArray(1, len(nets))  # type: ignore[assignment]
     hyprgraph.num_pads = 2
@@ -319,13 +319,13 @@ def create_inverter() -> Netlist:
 
 
 def create_inverter2() -> Netlist:
-    gr = SimpleGraph()
-    gr.add_nodes_from([0, 1, 2, 3, 4])
+    graph = SimpleGraph()
+    graph.add_nodes_from([0, 1, 2, 3, 4])
     nets = range(3, 5)
     modules = range(3)
     module_weight = [1, 0, 0]
 
-    gr.add_edges_from(
+    graph.add_edges_from(
         [
             (3, 1, {"dir": "I"}),
             (3, 0, {"dir": "O"}),
@@ -333,10 +333,10 @@ def create_inverter2() -> Netlist:
             (4, 2, {"dir": "O"}),
         ]
     )
-    gr.graph["num_modules"] = 3
-    gr.graph["num_nets"] = 2
-    gr.graph["num_pads"] = 2
-    hyprgraph = Netlist(gr, modules, nets)
+    graph.graph["num_modules"] = 3
+    graph.graph["num_nets"] = 2
+    graph.graph["num_pads"] = 2
+    hyprgraph = Netlist(graph, modules, nets)
     hyprgraph.module_weight = module_weight  # type: ignore[assignment]
     hyprgraph.net_weight = RepeatArray(1, len(nets))  # type: ignore[assignment]
     hyprgraph.num_pads = 2

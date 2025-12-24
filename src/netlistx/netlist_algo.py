@@ -43,7 +43,7 @@ def min_maximal_matching(
     hyprgraph: Netlist,
     weight: MutableMapping,
     matchset: Optional[Set[Any]] = None,
-    dep: Optional[Set[Any]] = None,
+    dependents: Optional[Set[Any]] = None,
 ) -> Tuple[Set[Any], Union[int, float]]:
     r"""
     The `min_maximal_matching` function performs minimum weighted maximal matching using a primal-dual
@@ -65,11 +65,11 @@ def min_maximal_matching(
 
     :type matchset: Optional[Set]
 
-    :param dep: The `dep` parameter is a set that represents the set of vertices that are covered by the
+    :param dependents: The `dependents` parameter is a set that represents the set of vertices that are covered by the
         current matching. It is initially set to an empty set, and is updated during the execution of the
         algorithm
 
-    :type dep: Optional[Set]
+    :type dependents: Optional[Set]
 
     :return: The function `min_maximal_matching` returns a tuple containing the matchset (a set of
         matched elements) and the total primal cost (an integer or float representing the total weight of
@@ -104,22 +104,22 @@ def min_maximal_matching(
         >>> hyprgraph = MockHyprgraph(["N1", "N2", "N3"], ugraph)
         >>> weight = {"N1": 1, "N2": 2, "N3": 1}
         >>> matchset = set()
-        >>> dep = set()
-        >>> result, cost = min_maximal_matching(hyprgraph, weight, matchset, dep)
+        >>> dependents = set()
+        >>> result, cost = min_maximal_matching(hyprgraph, weight, matchset, dependents)
         >>> result == {'N1', 'N3'} and cost == 2
         True
     """
     if matchset is None:
         matchset = set()
-    if dep is None:
-        dep = set()
+    if dependents is None:
+        dependents = set()
 
     def cover(net: Any) -> None:
         for vtx in hyprgraph.ugraph[net]:
-            dep.add(vtx)
+            dependents.add(vtx)
 
     def any_of_dep(net: Any) -> bool:
-        return any(vtx in dep for vtx in hyprgraph.ugraph[net])
+        return any(vtx in dependents for vtx in hyprgraph.ugraph[net])
 
     total_prml_cost = 0
     total_dual_cost = 0
