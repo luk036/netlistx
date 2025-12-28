@@ -2,7 +2,7 @@
 
 import hypothesis.strategies as st
 from hypothesis import given, assume
-from networkx import Graph, complete_graph, path_graph, cycle_graph, erdos_renyi_graph
+from networkx import Graph, complete_graph, path_graph, cycle_graph
 
 from netlistx.graph_algo import min_vertex_cover_fast, min_maximal_independant_set
 
@@ -26,8 +26,16 @@ def weighted_graph_strategy(draw):
     elif graph_type == "complete":
         graph = complete_graph(num_nodes)
     else:  # random
+        # Create a random graph without using NetworkX's erdos_renyi_graph
+        graph = Graph()
+        graph.add_nodes_from(range(num_nodes))
         edge_prob = draw(st.floats(min_value=0.1, max_value=0.9))
-        graph = erdos_renyi_graph(num_nodes, edge_prob)
+
+        # Add edges based on probability
+        for i in range(num_nodes):
+            for j in range(i + 1, num_nodes):
+                if draw(st.floats(min_value=0.0, max_value=1.0)) < edge_prob:
+                    graph.add_edge(i, j)
 
     # Generate weights
     weight_strategy = st.integers(min_value=1, max_value=10)
