@@ -96,7 +96,7 @@ def animate_pd_algorithm(ugraph, algorithm_type="vertex_cover"):
 
         ax.set_title(f"Algorithm: {algorithm_type}\nPhase: {stage}")
 
-    ani = FuncAnimation(fig, update, frames=len(history), repeat=False, interval=1000)
+    FuncAnimation(fig, update, frames=len(history), repeat=False, interval=1000)
     plt.show()
 
 

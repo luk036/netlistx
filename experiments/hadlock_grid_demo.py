@@ -63,7 +63,7 @@ def solve_hadlock_large_demo(grid_size=10):
     for u, v in matching:
         path = paths[u][v]
         for k in range(len(path) - 1):
-            e_dual = tuple(sorted((path[k], path[k + 1])))
+            tuple(sorted((path[k], path[k + 1])))
             e_primal = dual_G[path[k]][path[k + 1]]["primal"]
             excluded_edges.add(tuple(sorted(e_primal)))
 

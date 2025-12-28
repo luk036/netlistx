@@ -51,7 +51,7 @@ def solve_hadlock_refined(num_nodes=100):
     # 3. Every triangle is an odd cycle (length 3).
     # To make the graph bipartite, we must match ALL these faces.
     odd_faces = list(dual_G.nodes())
-    
+
     # If we have an odd number of faces, we need to handle this case
     # For Hadlock's algorithm, we should ensure we have an even number
     if len(odd_faces) % 2 != 0:
@@ -66,7 +66,7 @@ def solve_hadlock_refined(num_nodes=100):
 
     complete_odd_G = nx.Graph()
     complete_odd_G.add_nodes_from(odd_faces)
-    
+
     # Add edges between all pairs of odd faces with their shortest path distances
     for i in range(len(odd_faces)):
         for j in range(i + 1, len(odd_faces)):
@@ -105,7 +105,6 @@ def solve_hadlock_refined(num_nodes=100):
     if is_bipartite:
         cut_graph = nx.Graph()
         cut_graph.add_edges_from(max_cut_edges)
-        color_map = []
         # Handle disconnected components in the cut graph
         part_dict = {}
         for component in nx.connected_components(cut_graph):

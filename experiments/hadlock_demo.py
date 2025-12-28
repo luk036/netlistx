@@ -18,7 +18,7 @@ def solve_hadlock_max_cut():
 
     # Mapping dual edges to primal edges: (dual_u, dual_v) -> (primal_u, primal_v)
     # This is crucial for identifying which edges to remove from the cut.
-    dual_to_primal = {
+    {
         (tuple(sorted(("A", "B")))): (1, 3),
         (tuple(sorted(("A", "C")))): (1, 2),
         (tuple(sorted(("B", "C")))): (3, 4),

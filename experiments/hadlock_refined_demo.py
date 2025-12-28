@@ -56,7 +56,7 @@ def solve_hadlock_refined(num_nodes=100):
     # 3. Use biconnected components to optimize processing
     # This is the key refinement inspired by cover_ai.py
     biconnected_components = list(nx.biconnected_components(dual_G))
-    
+
     # Every triangle is an odd cycle (length 3).
     # To make the graph bipartite, we must match ALL these faces.
     odd_faces = list(dual_G.nodes())
@@ -70,7 +70,7 @@ def solve_hadlock_refined(num_nodes=100):
 
     complete_odd_G = nx.Graph()
     complete_odd_G.add_nodes_from(odd_faces)
-    
+
     # Add edges between all pairs of odd faces (same as working original)
     for i in range(len(odd_faces)):
         for j in range(i + 1, len(odd_faces)):
@@ -107,7 +107,6 @@ def solve_hadlock_refined(num_nodes=100):
     if is_bipartite:
         cut_graph = nx.Graph()
         cut_graph.add_edges_from(max_cut_edges)
-        color_map = []
         # Handle disconnected components in the cut graph
         part_dict = {}
         for component in nx.connected_components(cut_graph):
@@ -151,7 +150,7 @@ def solve_hadlock_refined(num_nodes=100):
     print(f"Number of max-cut edges: {len(max_cut_edges)}")
 
     # Additional analysis using biconnected components
-    print(f"\nBiconnected Component Analysis:")
+    print("\nBiconnected Component Analysis:")
     for i, component in enumerate(biconnected_components):
         print(f"  Component {i+1}: {len(component)} nodes")
 
@@ -167,7 +166,9 @@ if __name__ == "__main__":
         is_bipartite, weight = solve_hadlock_refined(size)
         print(f"Result for {size} nodes - Bipartite: {is_bipartite}, Weight: {weight}")
         if is_bipartite:
-            print(f"SUCCESS: {size} nodes - Bipartite: {is_bipartite}, Weight: {weight}")
+            print(
+                f"SUCCESS: {size} nodes - Bipartite: {is_bipartite}, Weight: {weight}"
+            )
         else:
             print(f"FAILED: {size} nodes - Not bipartite")
         # assert is_bipartite is True, f"Failed for size {size}"

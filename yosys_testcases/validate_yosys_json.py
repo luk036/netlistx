@@ -33,7 +33,6 @@ def read_yosys_json(filename: str) -> Netlist:
 
     # First, collect all cells/modules and nets
     modules_dict = {}  # module_name -> module_id
-    nets_set = set()  # net IDs
 
     # We'll process the first module (typically the top module)
     # Yosys JSON can have multiple modules, but we'll take the first one
