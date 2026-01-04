@@ -180,9 +180,9 @@ class TestHyperVertexCoverProperties:
         # Every net should have at least one connected module in the cover
         for net in hypergraph.nets:
             connected_modules = hypergraph.ugraph[net]
-            assert any(
-                module in cover for module in connected_modules
-            ), f"Net {net} not covered by any module in {cover}"
+            assert any(module in cover for module in connected_modules), (
+                f"Net {net} not covered by any module in {cover}"
+            )
 
     @given(data=st.data())
     def test_hyper_vertex_cover_weight_consistency(self, data: st.DataObject):
@@ -227,9 +227,9 @@ class TestCycleCoverProperties:
             from networkx.algorithms import cycles
 
             remaining_cycles = list(cycles.cycle_basis(remaining_graph))
-            assert (
-                len(remaining_cycles) == 0
-            ), f"Cycles found after removing cover: {remaining_cycles}"
+            assert len(remaining_cycles) == 0, (
+                f"Cycles found after removing cover: {remaining_cycles}"
+            )
         except ImportError:
             # Fallback: check if graph is a forest (no cycles)
             assert remaining_graph.number_of_edges() <= len(remaining_nodes) - 1
@@ -295,9 +295,9 @@ class TestOddCycleCoverProperties:
 
             remaining_cycles = list(cycles.cycle_basis(remaining_graph))
             for cycle in remaining_cycles:
-                assert (
-                    len(cycle) % 2 == 0
-                ), f"Odd cycle {cycle} found after removing cover"
+                assert len(cycle) % 2 == 0, (
+                    f"Odd cycle {cycle} found after removing cover"
+                )
         except ImportError:
             # Skip this test if cycles module not available
             pass

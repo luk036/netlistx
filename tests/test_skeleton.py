@@ -25,3 +25,19 @@ def test_main(capsys: Any) -> None:
     main(["7"])
     captured = capsys.readouterr()
     assert "The 7-th Fibonacci number is 13" in captured.out
+
+
+def test_main_as_script() -> None:
+    """Test running the module as a script to cover the __name__ == '__main__' guard."""
+    import subprocess
+    import sys
+
+    # Run the skeleton module as a script
+    result = subprocess.run(
+        [sys.executable, "-m", "netlistx.skeleton", "7"], capture_output=True, text=True
+    )
+
+    # Check that the command executed successfully
+    assert result.returncode == 0
+    # Check the output
+    assert "The 7-th Fibonacci number is 13" in result.stdout

@@ -61,3 +61,63 @@ def test_min_odd_cycle_cover_even_cycle() -> None:
     covered, cost = min_odd_cycle_cover(ugraph, weight, soln)
     assert len(covered) == 0
     assert cost == 0
+
+
+def test_min_cycle_cover_complex() -> None:
+    """Test min_cycle_cover with a more complex graph to exercise _construct_cycle."""
+    ugraph = nx.Graph()
+    # Create a graph with multiple cycles
+    ugraph.add_edges_from(
+        [
+            (0, 1),
+            (1, 2),
+            (2, 0),  # Triangle
+            (2, 3),
+            (3, 4),
+            (4, 2),  # Another triangle
+            (4, 5),
+            (5, 6),
+            (6, 4),  # Third triangle
+            (0, 7),
+            (7, 8),
+            (8, 1),  # Additional structure
+        ]
+    )
+    weight = {i: i + 1 for i in range(9)}  # Different weights
+    soln: set = set()
+    covered, cost = min_cycle_cover(ugraph, weight, soln)
+    # The result should be a valid cycle cover
+    assert isinstance(covered, set)
+    assert isinstance(cost, (int, float))
+    # Cost should be the sum of weights of selected vertices
+    expected_cost = sum(weight[v] for v in covered)
+    assert cost == expected_cost
+
+
+def test_min_odd_cycle_cover_complex() -> None:
+    """Test min_odd_cycle_cover with a more complex graph."""
+    ugraph = nx.Graph()
+    # Create a graph with both odd and even cycles
+    ugraph.add_edges_from(
+        [
+            (0, 1),
+            (1, 2),
+            (2, 0),  # Odd cycle (triangle)
+            (2, 3),
+            (3, 4),
+            (4, 5),
+            (5, 2),  # Even cycle (4 nodes)
+            (5, 6),
+            (6, 7),
+            (7, 5),  # Another odd cycle
+        ]
+    )
+    weight = {i: 1 for i in range(8)}
+    soln: set = set()
+    covered, cost = min_odd_cycle_cover(ugraph, weight, soln)
+    # The result should be a valid odd cycle cover
+    assert isinstance(covered, set)
+    assert isinstance(cost, (int, float))
+    # Cost should be the sum of weights of selected vertices
+    expected_cost = sum(weight[v] for v in covered)
+    assert cost == expected_cost

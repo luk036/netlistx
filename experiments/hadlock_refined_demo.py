@@ -137,7 +137,7 @@ def solve_hadlock_refined(num_nodes=100):
         f"Refined Planar MAX-CUT (Hadlock)\n"
         f"Bipartite Valid: {is_bipartite} | Cut Weight: {weight} | "
         f"Faces: {len(dual_G.nodes())} | Components: {len(biconnected_components)} | "
-        f"Matched Pairs: {len(matching)//2}"
+        f"Matched Pairs: {len(matching) // 2}"
     )
     plt.show()
 
@@ -145,14 +145,14 @@ def solve_hadlock_refined(num_nodes=100):
     print(f"Total Cut Weight: {weight}")
     print(f"Number of faces: {len(dual_G.nodes())}")
     print(f"Number of biconnected components: {len(biconnected_components)}")
-    print(f"Number of matched pairs: {len(matching)//2}")
+    print(f"Number of matched pairs: {len(matching) // 2}")
     print(f"Number of excluded edges: {len(excluded_edges)}")
     print(f"Number of max-cut edges: {len(max_cut_edges)}")
 
     # Additional analysis using biconnected components
     print("\nBiconnected Component Analysis:")
     for i, component in enumerate(biconnected_components):
-        print(f"  Component {i+1}: {len(component)} nodes")
+        print(f"  Component {i + 1}: {len(component)} nodes")
 
     return is_bipartite, weight
 
@@ -160,9 +160,9 @@ def solve_hadlock_refined(num_nodes=100):
 if __name__ == "__main__":
     # Test with one size for now
     for size in [50]:
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Testing Refined Hadlock's algorithm with {size} nodes")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         is_bipartite, weight = solve_hadlock_refined(size)
         print(f"Result for {size} nodes - Bipartite: {is_bipartite}, Weight: {weight}")
         if is_bipartite:

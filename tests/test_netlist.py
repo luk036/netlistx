@@ -78,3 +78,108 @@ def test_readjson(p1_graph: Any) -> None:
             count_rest += 1
     print(count_2, count_3, count_rest)
     assert count_2 == 494
+
+
+def test_netlist_module_weight_dict() -> None:
+    """Test netlist with dictionary module_weight to cover lines 217, 228-230."""
+    from netlistx.netlist import Netlist
+    import networkx as nx
+
+    # Create a simple netlist
+    G = nx.Graph()
+    G.add_nodes_from([0, 1, 2, 3, 4])
+    G.add_edges_from([(0, 3), (1, 3), (2, 4), (3, 4)])
+    G.graph["num_modules"] = 3
+    G.graph["num_nets"] = 2
+    G.graph["num_pads"] = 0
+
+    # Create netlist and set dictionary module_weight as attribute
+    modules = [0, 1, 2]
+    nets = [3, 4]
+    netlist = Netlist(G, modules, nets)
+    netlist.module_weight = {0: 5, 1: 10, 2: 15}
+
+    # Test get_module_weight method with dict module_weight
+    # When modules is a list, the module at index v is used as the key
+    assert netlist.get_module_weight(0) == 5  # modules[0] = 0, module_weight[0] = 5
+    assert netlist.get_module_weight(1) == 10  # modules[1] = 1, module_weight[1] = 10
+    assert netlist.get_module_weight(2) == 15  # modules[2] = 2, module_weight[2] = 15
+    # Test default weight for non-existent module - this will raise IndexError
+    # as we're trying to access modules[99] which doesn't exist
+
+
+def test_netlist_module_weight_dict_range() -> None:
+    """Test netlist with dictionary module_weight and range modules."""
+    from netlistx.netlist import Netlist
+    import networkx as nx
+
+    # Create a simple netlist
+    G = nx.Graph()
+    G.add_nodes_from([0, 1, 2, 3, 4])
+    G.add_edges_from([(0, 3), (1, 3), (2, 4), (3, 4)])
+    G.graph["num_modules"] = 3
+    G.graph["num_nets"] = 2
+    G.graph["num_pads"] = 0
+
+    # Create netlist with range modules and dict module_weight
+    modules = range(3)  # 0, 1, 2
+    nets = [3, 4]
+    netlist = Netlist(G, modules, nets)
+    netlist.module_weight = {0: 5, 1: 10, 2: 15}
+
+    # Test get_module_weight method with dict module_weight and range modules
+    assert netlist.get_module_weight(0) == 5  # module_weight[0] = 5
+    assert netlist.get_module_weight(1) == 10  # module_weight[1] = 10
+    assert netlist.get_module_weight(2) == 15  # module_weight[2] = 15
+    # Test default weight for non-existent module
+    assert netlist.get_module_weight(99) == 1  # module_weight.get(99, 1) = 1
+
+
+def test_netlist_module_weight_list() -> None:
+    """Test netlist with list module_weight to cover line 232."""
+    from netlistx.netlist import Netlist
+    import networkx as nx
+
+    # Create a simple netlist
+    G = nx.Graph()
+    G.add_nodes_from([0, 1, 2, 3, 4])
+    G.add_edges_from([(0, 3), (1, 3), (2, 4), (3, 4)])
+    G.graph["num_modules"] = 3
+    G.graph["num_nets"] = 2
+    G.graph["num_pads"] = 0
+
+    # Create netlist and set list module_weight as attribute
+    modules = [0, 1, 2]
+    nets = [3, 4]
+    netlist = Netlist(G, modules, nets)
+    netlist.module_weight = [5, 10, 15]
+
+    # Test get_module_weight method with list module_weight
+    assert netlist.get_module_weight(0) == 5
+    assert netlist.get_module_weight(1) == 10
+    assert netlist.get_module_weight(2) == 15
+
+
+def test_netlist_module_weight_none() -> None:
+    """Test netlist with None module_weight to cover line 232."""
+    from netlistx.netlist import Netlist
+    import networkx as nx
+
+    # Create a simple netlist
+    G = nx.Graph()
+    G.add_nodes_from([0, 1, 2, 3, 4])
+    G.add_edges_from([(0, 3), (1, 3), (2, 4), (3, 4)])
+    G.graph["num_modules"] = 3
+    G.graph["num_nets"] = 2
+    G.graph["num_pads"] = 0
+
+    # Create netlist and set None module_weight as attribute
+    modules = [0, 1, 2]
+    nets = [3, 4]
+    netlist = Netlist(G, modules, nets)
+    netlist.module_weight = None
+
+    # Test get_module_weight method with None module_weight
+    assert netlist.get_module_weight(0) == 1
+    assert netlist.get_module_weight(1) == 1
+    assert netlist.get_module_weight(2) == 1
