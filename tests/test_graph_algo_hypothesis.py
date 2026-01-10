@@ -203,9 +203,9 @@ class TestIndependentSetProperties:
         for u in indset:
             for v in indset:
                 if u != v:
-                    assert not graph.has_edge(u, v), (
-                        f"Edge ({u}, {v}) found in independent set"
-                    )
+                    assert not graph.has_edge(
+                        u, v
+                    ), f"Edge ({u}, {v}) found in independent set"
 
     @given(data=st.data())
     def test_independent_set_maximality(self, data: st.DataObject):
@@ -220,9 +220,9 @@ class TestIndependentSetProperties:
                 has_neighbor_in_indset = any(
                     graph.has_edge(node, ind_node) for ind_node in indset
                 )
-                assert has_neighbor_in_indset, (
-                    f"Node {node} can be added to independent set {indset}"
-                )
+                assert (
+                    has_neighbor_in_indset
+                ), f"Node {node} can be added to independent set {indset}"
 
     @given(data=st.data())
     def test_independent_set_weight_consistency(self, data: st.DataObject):
