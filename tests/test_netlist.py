@@ -2,11 +2,7 @@ from typing import Any
 
 from networkx.readwrite import json_graph
 
-from netlistx.netlist import (
-    create_inverter,
-    create_random_hgraph,
-    create_test_netlist,
-)
+from netlistx.netlist import create_inverter, create_random_hgraph, create_test_netlist
 
 
 def test_inverter() -> None:
@@ -82,8 +78,9 @@ def test_readjson(p1_graph: Any) -> None:
 
 def test_netlist_module_weight_dict() -> None:
     """Test netlist with dictionary module_weight to cover lines 217, 228-230."""
-    from netlistx.netlist import Netlist
     import networkx as nx
+
+    from netlistx.netlist import Netlist
 
     # Create a simple netlist
     G = nx.Graph()
@@ -110,8 +107,9 @@ def test_netlist_module_weight_dict() -> None:
 
 def test_netlist_module_weight_dict_range() -> None:
     """Test netlist with dictionary module_weight and range modules."""
-    from netlistx.netlist import Netlist
     import networkx as nx
+
+    from netlistx.netlist import Netlist
 
     # Create a simple netlist
     G = nx.Graph()
@@ -137,8 +135,9 @@ def test_netlist_module_weight_dict_range() -> None:
 
 def test_netlist_module_weight_list() -> None:
     """Test netlist with list module_weight to cover line 232."""
-    from netlistx.netlist import Netlist
     import networkx as nx
+
+    from netlistx.netlist import Netlist
 
     # Create a simple netlist
     G = nx.Graph()
@@ -162,8 +161,9 @@ def test_netlist_module_weight_list() -> None:
 
 def test_netlist_module_weight_none() -> None:
     """Test netlist with None module_weight to cover line 232."""
-    from netlistx.netlist import Netlist
     import networkx as nx
+
+    from netlistx.netlist import Netlist
 
     # Create a simple netlist
     G = nx.Graph()

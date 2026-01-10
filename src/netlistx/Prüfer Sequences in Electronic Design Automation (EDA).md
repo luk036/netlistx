@@ -113,7 +113,7 @@ As cited in recent research (e.g., *Pradhan & Bhattacharya*), feeding a graph in
 * **Context:** The position in the sequence tells the AI about the depth and connectivity of the gate within the logic cone.
 
 > **Note:** The degree of a node  in the tree is exactly its frequency in the Prüfer sequence plus one:
-> 
-> 
-> 
+>
+>
+>
 > This property allows a Neural Network to instantly identify **High Fan-out Nets** simply by counting the occurrence of a specific label in the input string! 🚀

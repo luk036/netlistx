@@ -41,16 +41,16 @@ This transformation is mathematically sound because:
 def hadlock_max_cut(planar_graph):
     # Step 1: Construct dual graph
     dual_graph = construct_dual_graph(planar_graph)
-    
+
     # Step 2: Identify odd faces
     odd_faces = find_odd_faces(dual_graph)
-    
+
     # Step 3: Minimum weight perfect matching
     matching = min_weight_perfect_matching(odd_faces, dual_graph)
-    
+
     # Step 4: Identify excluded edges
     excluded_edges = get_excluded_edges(matching, dual_graph)
-    
+
     # Step 5: Return max-cut edges
     return [e for e in planar_graph.edges() if e not in excluded_edges]
 ```
@@ -62,11 +62,11 @@ The dual graph construction is crucial for Hadlock's algorithm. For a triangulat
 ```python
 def construct_dual_graph(G, triangulation):
     dual = nx.Graph()
-    
+
     # Add vertices for each triangle
     for i in range(len(triangulation.simplices)):
         dual.add_node(i)
-    
+
     # Add edges between adjacent triangles
     for i, neighbors in enumerate(triangulation.neighbors):
         for j in neighbors:
@@ -74,7 +74,7 @@ def construct_dual_graph(G, triangulation):
                 shared = find_shared_edge(i, j, triangulation)
                 if shared:
                     u, v = shared
-                    dual.add_edge(i, j, 
+                    dual.add_edge(i, j,
                                 weight=G[u][v]['weight'],
                                 primal=(u, v))
     return dual
@@ -100,7 +100,7 @@ Inspired by `_generic_bfs_cycle()` from advanced graph algorithms, we can optimi
 def optimize_with_biconnected_components(dual_graph):
     # Identify biconnected components
     components = list(nx.biconnected_components(dual_graph))
-    
+
     # Process each component independently
     all_excluded_edges = set()
     for component in components:
@@ -108,7 +108,7 @@ def optimize_with_biconnected_components(dual_graph):
             subgraph = dual_graph.subgraph(component)
             component_excluded = process_component(subgraph)
             all_excluded_edges.update(component_excluded)
-    
+
     return all_excluded_edges
 ```
 
@@ -119,14 +119,14 @@ def optimize_with_biconnected_components(dual_graph):
 ```python
 def enhance_with_chain_decomposition(graph):
     chains = list(nx.chain_decomposition(graph))
-    
+
     # Each chain represents an "ear" in the ear decomposition
     # This helps identify critical edges for cycle breaking
     critical_edges = set()
     for chain in chains:
         for edge in chain:
             critical_edges.add(tuple(sorted(edge)))
-    
+
     return critical_edges
 ```
 
@@ -173,7 +173,7 @@ plt.figure(figsize=(12, 10))
 pos = nx.spring_layout(G, seed=42)
 
 # Draw max-cut edges in red
-nx.draw_networkx_edges(G, pos, edgelist=max_cut_edges, 
+nx.draw_networkx_edges(G, pos, edgelist=max_cut_edges,
                       edge_color='red', width=2)
 
 # Draw excluded edges in blue (dashed)
@@ -275,7 +275,7 @@ def memory_efficient_dual_construction(G):
     # Process edges in streaming fashion
     for edge in G.edges(data=True):
         process_edge_dual(edge)
-    
+
     # Use sparse matrix representations
     dual_adjacency = scipy.sparse.csr_matrix((data, (row, col)))
 ```
@@ -289,11 +289,11 @@ def memory_efficient_dual_construction(G):
 def parallel_hadlock(G):
     # Find connected components
     components = list(nx.connected_components(G))
-    
+
     # Process components in parallel
     with multiprocessing.Pool() as pool:
         results = pool.map(process_component, components)
-    
+
     # Combine results
     return combine_results(results)
 ```

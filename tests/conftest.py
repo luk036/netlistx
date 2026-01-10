@@ -1,7 +1,8 @@
+import json
 from typing import Any
 
 import pytest
-import json
+
 from netlistx.netlist import create_drawf, read_json
 
 

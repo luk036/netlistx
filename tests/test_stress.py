@@ -1,5 +1,5 @@
+from netlistx.graph_algo import min_maximal_independant_set, min_vertex_cover_fast
 from netlistx.netlist import create_random_hgraph
-from netlistx.graph_algo import min_vertex_cover_fast, min_maximal_independant_set
 
 
 def test_stress_min_vertex_cover() -> None:

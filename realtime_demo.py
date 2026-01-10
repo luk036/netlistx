@@ -1,8 +1,10 @@
+import random
+
 import matplotlib.pyplot as plt
 import networkx as nx
-import random
 from matplotlib.animation import FuncAnimation
-from netlistx.cover_ai import _generic_bfs_cycle, _construct_cycle
+
+from netlistx.cover_ai import _construct_cycle, _generic_bfs_cycle
 
 
 def animate_pd_algorithm(ugraph, algorithm_type="vertex_cover"):

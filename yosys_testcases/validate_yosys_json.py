@@ -1,10 +1,11 @@
 import json
-from jsonschema import validate
-import networkx as nx
+import os
 
 # from typing import Dict, List, Any, Set, Tuple
 import sys
-import os
+
+import networkx as nx
+from jsonschema import validate
 
 # Add the src directory to the path to import Netlist
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))

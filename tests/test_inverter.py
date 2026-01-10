@@ -1,6 +1,7 @@
 from typing import Any
 
 import pytest
+
 from netlistx.netlist import create_inverter, create_inverter2
 
 

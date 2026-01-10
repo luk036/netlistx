@@ -1,14 +1,14 @@
 """Property-based tests for covering algorithms using Hypothesis."""
 
 import hypothesis.strategies as st
-from hypothesis import given, assume
-from networkx import Graph, complete_graph, path_graph, cycle_graph
+from hypothesis import assume, given
+from networkx import Graph, complete_graph, cycle_graph, path_graph
 
 from netlistx.cover import (
-    min_vertex_cover,
-    min_hyper_vertex_cover,
     min_cycle_cover,
+    min_hyper_vertex_cover,
     min_odd_cycle_cover,
+    min_vertex_cover,
     pd_cover,
 )
 

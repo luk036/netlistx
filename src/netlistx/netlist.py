@@ -22,7 +22,7 @@ Overall, this code provides a foundation for working with netlists in Python. It
 
 import json
 import random
-from typing import Any, List, Union, Optional, Dict, Iterator
+from typing import Any, Dict, Iterator, List, Optional, Union
 
 import networkx as nx
 from mywheel.array_like import RepeatArray  # type: ignore

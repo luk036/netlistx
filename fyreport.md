@@ -147,12 +147,12 @@ def pd_cover(violate, weight, soln):
 def min_vertex_cover(ugraph, weight, coverset=None):
     if coverset is None:
         coverset = set()
-    
+
     def violate():
         for u, v in ugraph.edges():
             if u not in coverset and v not in coverset:
                 yield {u, v}
-    
+
     return pd_cover(violate, weight, coverset)
 ```
 
@@ -166,7 +166,7 @@ def min_vertex_cover(ugraph, weight, coverset=None):
 def min_cycle_cover(ugraph, weight, coverset=None):
     if coverset is None:
         coverset = set()
-    
+
     def find_cycles():
         # 使用BFS检测环
         for start in ugraph.nodes():
@@ -174,11 +174,11 @@ def min_cycle_cover(ugraph, weight, coverset=None):
                 continue
             # BFS实现环检测
             ...
-    
+
     def violate():
         for cycle in find_cycles():
             yield set(cycle)
-    
+
     return pd_cover(violate, weight, coverset)
 ```
 

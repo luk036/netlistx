@@ -1,10 +1,10 @@
 """Property-based tests for graph algorithms using Hypothesis."""
 
 import hypothesis.strategies as st
-from hypothesis import given, assume
-from networkx import Graph, complete_graph, path_graph, cycle_graph
+from hypothesis import assume, given
+from networkx import Graph, complete_graph, cycle_graph, path_graph
 
-from netlistx.graph_algo import min_vertex_cover_fast, min_maximal_independant_set
+from netlistx.graph_algo import min_maximal_independant_set, min_vertex_cover_fast
 
 
 @st.composite

@@ -1,6 +1,7 @@
-import networkx as nx
-import matplotlib.pyplot as plt
 import random
+
+import matplotlib.pyplot as plt
+import networkx as nx
 
 
 def calculate_total_distance(path, G):

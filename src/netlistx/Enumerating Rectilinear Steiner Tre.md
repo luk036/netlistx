@@ -90,13 +90,13 @@ graph LR
     T1((T1)) --- T2((T2))
     T2 --- T3((T3))
     end
-    
+
     subgraph Steiner_Tree
     ST1((T1)) --- S[S]
     ST2((T2)) --- S
     ST3((T3)) --- S
     end
-    
+
     style S fill:#00ff00,stroke:#000
 
 ```

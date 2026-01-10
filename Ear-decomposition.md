@@ -24,14 +24,14 @@ def find_ears(graph):
     depth = [-1] * n
     ear_id = [-1] * n  # Which ear each vertex belongs to
     ear_list = []  # List of ears, each ear is list of vertices
-    
+
     # Start with initial cycle (first ear)
     start = 0
     # Find a simple cycle containing start
     stack = [start]
     visited[start] = True
     depth[start] = 0
-    
+
     def dfs_find_cycle(u, target, path, visited_local):
         if u == target and len(path) > 2:
             return path[:]  # Found cycle
@@ -44,7 +44,7 @@ def find_ears(graph):
                     return result
                 path.pop()
         return None
-    
+
     # Find initial cycle for first ear
     for neighbor in graph[start]:
         cycle = dfs_find_cycle(start, start, [start], [False]*n)
@@ -53,7 +53,7 @@ def find_ears(graph):
             for v in cycle:
                 ear_id[v] = 0
             break
-    
+
     # DFS to find remaining ears
     def dfs_ears(u):
         visited[u] = True
@@ -77,11 +77,11 @@ def find_ears(graph):
                         else:
                             current = ear[-1]
                 dfs_ears(v)
-    
+
     for v in ear_list[0]:  # Start from vertices in first ear
         if not visited[v]:
             dfs_ears(v)
-    
+
     return ear_list, ear_id
 ```
 
@@ -93,19 +93,19 @@ Each articulation point separates ears into different biconnected components.
 def biconnected_components_by_ears(graph):
     ears, ear_id = find_ears(graph)
     n = len(graph)
-    
+
     # Step 1: Identify articulation points using ear decomposition
     # A vertex is an articulation point if it appears in multiple ears
     # and removing it disconnects the ear sequence
-    
+
     ear_vertices = {}  # vertex -> set of ear indices containing it
     for v in range(n):
         ear_vertices[v] = set()
-    
+
     for i, ear in enumerate(ears):
         for v in ear:
             ear_vertices[v].add(i)
-    
+
     # Find articulation points
     articulation_points = set()
     for v in range(n):
@@ -121,26 +121,26 @@ def biconnected_components_by_ears(graph):
                     if set(ears[i]) & set(ears[j]):
                         ear_graph[i].add(j)
                         ear_graph[j].add(i)
-            
+
             # Remove ears containing v and check connectivity
             # Simplified: v is articulation if its ears form ≥2 connected components
             # after removing v from consideration
             pass  # Implementation depends on specific ear structure
-    
+
     # Step 2: Group ears into biconnected components
     # Two ears are in same biconnected component if:
     # 1. They share a vertex that is NOT an articulation point
     # 2. They are connected through series of such shared vertices
-    
+
     ear_component = [-1] * len(ears)
     comp_id = 0
     stack = []
-    
+
     for i in range(len(ears)):
         if ear_component[i] == -1:
             stack.append(i)
             ear_component[i] = comp_id
-            
+
             while stack:
                 current_ear = stack.pop()
                 # Find ears sharing non-articulation vertices with current_ear
@@ -151,14 +151,14 @@ def biconnected_components_by_ears(graph):
                                 ear_component[other_ear] = comp_id
                                 stack.append(other_ear)
             comp_id += 1
-    
+
     # Step 3: Map vertices to biconnected components
     vertex_components = [set() for _ in range(n)]
     for v in range(n):
         for ear_idx in ear_vertices[v]:
             comp = ear_component[ear_idx]
             vertex_components[v].add(comp)
-    
+
     return ear_component, vertex_components, articulation_points
 ```
 
@@ -171,17 +171,17 @@ def traverse_component_by_ears(graph, target_comp, ear_component, ears, ear_vert
     Does not construct the subgraph explicitly.
     """
     # Find all ears in this component
-    component_ears = [i for i, comp in enumerate(ear_component) 
+    component_ears = [i for i, comp in enumerate(ear_component)
                       if comp == target_comp]
-    
+
     # Find all vertices in these ears
     component_vertices = set()
     for ear_idx in component_ears:
         component_vertices.update(ears[ear_idx])
-    
+
     # Traverse edges within these vertices
     visited_edges = set()
-    
+
     def traverse_vertex(u):
         for v in graph[u]:
             if v in component_vertices:
@@ -191,12 +191,12 @@ def traverse_component_by_ears(graph, target_comp, ear_component, ears, ear_vert
                     # Process edge as part of component
                     process_edge(u, v, target_comp)
                     traverse_vertex(v)
-    
+
     # Start from any vertex in the component
     if component_vertices:
         start = next(iter(component_vertices))
         traverse_vertex(start)
-    
+
     return list(visited_edges)
 ```
 
@@ -208,11 +208,11 @@ For cases where you just need to process edges of each component:
 def process_all_components_by_ears(graph):
     ear_component, vertex_components, articulation_points = biconnected_components_by_ears(graph)
     n = len(graph)
-    
+
     # Map each edge to its component
     edge_component = {}
     visited = set()
-    
+
     for u in range(n):
         for v in graph[u]:
             if u < v:  # Process each edge once
@@ -226,20 +226,20 @@ def process_all_components_by_ears(graph):
                     # Choose smallest component ID (arbitrary but consistent)
                     comp = min(common_comps)
                     edge_component[(u, v)] = comp
-    
+
     # Group edges by component
     component_edges = {}
     for edge, comp in edge_component.items():
         if comp not in component_edges:
             component_edges[comp] = []
         component_edges[comp].append(edge)
-    
+
     # Now you can traverse each component's edges
     for comp, edges in component_edges.items():
         # Process all edges in this component
         for u, v in edges:
             process_edge_in_component(u, v, comp)
-    
+
     return component_edges
 ```
 
@@ -251,7 +251,7 @@ For edges that are bridges (single-edge ears), they form their own biconnected c
 def handle_bridges_separately(graph, ears, ear_id):
     """Identify and process bridges as separate biconnected components."""
     n = len(graph)
-    
+
     # Count ear occurrences of each edge
     edge_ear_count = {}
     for i, ear in enumerate(ears):
@@ -259,7 +259,7 @@ def handle_bridges_separately(graph, ears, ear_id):
             u, v = ear[j], ear[j+1]
             key = (min(u, v), max(u, v))
             edge_ear_count[key] = edge_ear_count.get(key, 0) + 1
-    
+
     # Edges appearing in only one ear might be bridges
     bridges = []
     for edge, count in edge_ear_count.items():
@@ -269,7 +269,7 @@ def handle_bridges_separately(graph, ears, ear_id):
             # Remove edge temporarily and check connectivity
             # (Simplified - in practice use DFS)
             bridges.append(edge)
-    
+
     # Each bridge is its own biconnected component
     for bridge in bridges:
         process_bridge_component(bridge)
