@@ -276,8 +276,8 @@ def read_json(filename: str) -> Netlist:
         data = json.load(fr)
 
     # Convert 'links' to 'edges' for NetworkX compatibility
-    if "links" in data and "edges" not in data:
-        data["edges"] = data.pop("links")
+    # if "links" in data and "edges" not in data:
+    #     data["edges"] = data.pop("links")
 
     ugraph = json_graph.node_link_graph(data)
     num_modules = ugraph.graph["num_modules"]
