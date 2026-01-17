@@ -279,7 +279,7 @@ def read_json(filename: str) -> Netlist:
     # if "links" in data and "edges" not in data:
     #     data["edges"] = data.pop("links")
 
-    ugraph = json_graph.node_link_graph(data)
+    ugraph = json_graph.node_link_graph(data, edges="edges")
     num_modules = ugraph.graph["num_modules"]
     num_nets = ugraph.graph["num_nets"]
     num_pads = ugraph.graph["num_pads"]
