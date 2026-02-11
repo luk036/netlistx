@@ -1,5 +1,7 @@
 """Property-based tests for graph algorithms using Hypothesis."""
 
+from typing import Any, Dict, Union
+
 import hypothesis.strategies as st
 from hypothesis import assume, given
 from networkx import Graph, complete_graph, cycle_graph, path_graph
@@ -250,7 +252,7 @@ class TestIndependentSetProperties:
     def test_independent_set_empty_graph(self, data: st.DataObject):
         """Test independent set on empty graph."""
         graph = Graph()
-        weights = {}
+        weights: Dict[Any, Union[int, float]] = {}
 
         indset, total_weight = min_maximal_independant_set(graph, weights)
 

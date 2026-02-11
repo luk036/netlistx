@@ -3,6 +3,7 @@
 import json
 import tempfile
 from pathlib import Path
+from typing import Any, Dict
 
 import hypothesis.strategies as st
 from hypothesis import given
@@ -264,7 +265,7 @@ class TestNetlistJSON:
         num_pads = data.draw(st.integers(min_value=0, max_value=num_modules))
 
         # Create valid JSON data with integer nodes like read_json expects
-        json_data = {
+        json_data: Dict[str, Any] = {
             "directed": False,
             "multigraph": False,
             "graph": {

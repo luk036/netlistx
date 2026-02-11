@@ -1,5 +1,7 @@
 """Property-based tests for covering algorithms using Hypothesis."""
 
+from typing import Set
+
 import hypothesis.strategies as st
 from hypothesis import assume, given
 from networkx import Graph, complete_graph, cycle_graph, path_graph
@@ -345,7 +347,7 @@ class TestPDCoverProperties:
             yield [1, 2]
             yield [2, 3]
 
-        solution = set()
+        solution: Set[int] = set()
         result, total_weight = pd_cover(violate_simple, weights, solution)
 
         # Solution should be a set
@@ -372,7 +374,7 @@ class TestPDCoverProperties:
         def violate_empty():
             return iter([])  # No violations
 
-        solution = set()
+        solution: Set[int] = set()
         result, total_weight = pd_cover(violate_empty, weights, solution)
 
         # Should return empty solution with zero weight

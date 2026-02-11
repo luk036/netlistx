@@ -177,7 +177,7 @@ def test_netlist_module_weight_none() -> None:
     modules = [0, 1, 2]
     nets = [3, 4]
     netlist = Netlist(G, modules, nets)
-    netlist.module_weight = None
+    netlist.module_weight = None  # type: ignore[assignment]
 
     # Test get_module_weight method with None module_weight
     assert netlist.get_module_weight(0) == 1
