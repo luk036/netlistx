@@ -146,10 +146,23 @@ def min_maximal_matching(
         dependents = set()
 
     def cover(net: Any) -> None:
+        """
+        Mark all vertices of a net as dependents (covered).
+
+        :param net: The net whose vertices should be marked as covered.
+        """
         for vtx in hyprgraph.ugraph[net]:
             dependents.add(vtx)
 
     def any_of_dep(net: Any) -> bool:
+        """
+        Check if any vertex of a net is already covered.
+
+        :param net: The net to check.
+
+        :return: True if at least one vertex of the net is in dependents.
+        :rtype: bool
+        """
         return any(vtx in dependents for vtx in hyprgraph.ugraph[net])
 
     total_prml_cost = 0

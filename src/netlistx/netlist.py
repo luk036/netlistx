@@ -321,6 +321,20 @@ def read_json(filename: str) -> Netlist:
 
 
 def create_inverter() -> Netlist:
+    """
+    Create a simple inverter netlist.
+
+    The inverter consists of:
+    - One AND gate (a0)
+    - Two input pads (p1, p2)
+    - Two nets (n0, n1)
+
+    Net n0 connects input pad p1 to AND gate input, AND gate output.
+    Net n1 connects AND gate input to output pad p2.
+
+    :return: A Netlist representing the inverter circuit.
+    :rtype: Netlist
+    """
     graph = SimpleGraph()
     graph.add_nodes_from(["a0", "p1", "p2", "n0", "n1"])
     nets = ["n0", "n1"]
@@ -346,6 +360,15 @@ def create_inverter() -> Netlist:
 
 
 def create_inverter2() -> Netlist:
+    """
+    Create a simple inverter netlist using numeric node IDs.
+
+    Similar to create_inverter() but uses integer node IDs (0-4) instead of
+    string names. This variant uses modules 0-2 and nets 3-4.
+
+    :return: A Netlist representing the inverter circuit.
+    :rtype: Netlist
+    """
     graph = SimpleGraph()
     graph.add_nodes_from([0, 1, 2, 3, 4])
     nets = range(3, 5)
@@ -549,6 +572,22 @@ def form_graph(
 
 
 def create_random_hgraph(N: int = 30, M: int = 26, eta: float = 0.1) -> Netlist:
+    """
+    Create a random bipartite hypergraph for testing.
+
+    Uses van der Corput quasi-random sequences to distribute nodes
+    uniformly in 2D space, then creates edges based on distance threshold.
+
+    :param N: Number of module nodes (default: 30).
+    :type N: int
+    :param M: Number of net nodes (default: 26).
+    :type M: int
+    :param eta: Edge probability/density parameter (default: 0.1).
+    :type eta: float
+
+    :return: A Netlist with randomly distributed nodes and edges.
+    :rtype: Netlist
+    """
     T = N + M
     xbase = 2
     ybase = 3
