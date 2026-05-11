@@ -1,7 +1,8 @@
 """Unit tests for Hadlock's planar MAX-CUT algorithm."""
 
 import networkx as nx
-import numpy as np
+import random
+
 import pytest
 from scipy.spatial import Delaunay
 
@@ -38,15 +39,15 @@ def _grid_graph(rows: int = 2, cols: int = 2) -> nx.Graph:
 
 def _delaunay_graph(n: int = 15, seed: int = 42) -> nx.Graph:
     """Random planar graph via Delaunay triangulation."""
-    rng = np.random.default_rng(seed)
-    pts = rng.random((n, 2))
+    rng = random.Random(seed)
+    pts = [(rng.random(), rng.random()) for _ in range(n)]
     tri = Delaunay(pts)
     G = nx.Graph()
     for s in tri.simplices:
         for i in range(3):
             u, v = sorted((s[i], s[(i + 1) % 3]))
             if not G.has_edge(u, v):
-                G.add_edge(u, v, weight=int(rng.integers(1, 10)))
+                G.add_edge(u, v, weight=rng.randint(1, 9))
     return G
 
 
