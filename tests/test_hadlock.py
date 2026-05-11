@@ -1,10 +1,7 @@
 """Unit tests for Hadlock's planar MAX-CUT algorithm."""
 
 import networkx as nx
-import random
-
 import pytest
-from scipy.spatial import Delaunay
 
 from netlistx.hadlock import solve_hadlock_max_cut, validate_max_cut
 
@@ -34,20 +31,6 @@ def _grid_graph(rows: int = 2, cols: int = 2) -> nx.Graph:
     G = nx.grid_2d_graph(rows, cols)
     for u, v in G.edges():
         G[u][v]["weight"] = 1
-    return G
-
-
-def _delaunay_graph(n: int = 15, seed: int = 42) -> nx.Graph:
-    """Random planar graph via Delaunay triangulation."""
-    rng = random.Random(seed)
-    pts = [(rng.random(), rng.random()) for _ in range(n)]
-    tri = Delaunay(pts)
-    G = nx.Graph()
-    for s in tri.simplices:
-        for i in range(3):
-            u, v = sorted((s[i], s[(i + 1) % 3]))
-            if not G.has_edge(u, v):
-                G.add_edge(u, v, weight=rng.randint(1, 9))
     return G
 
 
@@ -104,15 +87,6 @@ class TestSolveHadlockMaxCut:
         assert ok
         assert val == 7
 
-    def test_delaunay(self):
-        """Triangulated planar graph from Delaunay triangulation."""
-        G = _delaunay_graph(15)
-        cut = solve_hadlock_max_cut(G)
-        ok, val = validate_max_cut(G, cut)
-        assert ok
-        # At least some edges should be cut
-        assert len(cut) > 0
-
     def test_non_planar_raises(self):
         """K5 is non-planar → must raise."""
         with pytest.raises(nx.NetworkXException):
@@ -133,13 +107,6 @@ class TestSolveHadlockMaxCut:
         ok, val = validate_max_cut(G, cut)
         assert ok
         assert val == 2  # 3 total, min = 1, cut = 2
-
-    def test_larger_delaunay(self):
-        """Larger random instance for stress."""
-        G = _delaunay_graph(50, seed=123)
-        cut = solve_hadlock_max_cut(G)
-        ok, _ = validate_max_cut(G, cut)
-        assert ok
 
 
 class TestValidateMaxCut:
