@@ -75,8 +75,8 @@ class SimpleGraph(nx.Graph):
         """Returns the default edge attribute dictionary."""
         return self.all_edge_dict
 
-    edge_attr_dict_factory = single_edge_dict # type: ignore
-    node_attr_dict_factory = single_edge_dict # type: ignore
+    edge_attr_dict_factory = single_edge_dict  # type: ignore
+    node_attr_dict_factory = single_edge_dict  # type: ignore
 
 
 # The TinyGraph class is a subclass of nx.Graph that initializes a graph with a specified number of

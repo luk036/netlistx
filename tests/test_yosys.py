@@ -56,11 +56,11 @@ def test_simple_and_gate() -> None:
     try:
         netlist = read_yosys_json(path)
 
-        assert netlist.number_of_modules() == 4   # 1 cell + 3 ports
+        assert netlist.number_of_modules() == 4  # 1 cell + 3 ports
         assert netlist.number_of_nets() == 3
-        assert netlist.number_of_nodes() == 7     # 4 modules + 3 nets
-        assert netlist.number_of_pins() == 6      # 3 cell-nets + 3 port-nets
-        assert netlist.num_pads == 3              # 3 I/O ports
+        assert netlist.number_of_nodes() == 7  # 4 modules + 3 nets
+        assert netlist.number_of_pins() == 6  # 3 cell-nets + 3 port-nets
+        assert netlist.num_pads == 3  # 3 I/O ports
 
         assert netlist.get_module_weight(0) == 1  # cells have weight 1
         for port_idx in range(1, 4):
@@ -69,6 +69,7 @@ def test_simple_and_gate() -> None:
         assert netlist.module_fixed == {4, 5, 6}  # port nodes are fixed
     finally:
         import os
+
         os.unlink(path)
 
 
@@ -99,6 +100,7 @@ def test_two_cells_with_shared_net() -> None:
         assert netlist.number_of_nodes() == 7  # 4 + 3
     finally:
         import os
+
         os.unlink(path)
 
 
@@ -137,6 +139,7 @@ def test_ignores_string_constant_nets() -> None:
         assert netlist.number_of_nets() == 3
     finally:
         import os
+
         os.unlink(path)
 
 
@@ -164,4 +167,5 @@ def test_no_netnames() -> None:
         assert netlist.num_pads == 2
     finally:
         import os
+
         os.unlink(path)

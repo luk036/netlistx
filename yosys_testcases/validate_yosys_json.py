@@ -10,7 +10,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from netlistx.netlist import read_yosys_json
 
-
 # Load schema and data
 with open("yosys_schema.json") as f:
     schema = json.load(f)
