@@ -217,7 +217,7 @@ Output:  cut 5+10+5+10 = 30  ✓
          excluded = 2 (the diagonal)
 ```
 
-![Hadlock Visualization](Hadlock.svg)
+![Hadlock Visualization](Hadlock.pdf)
 
 ---
 

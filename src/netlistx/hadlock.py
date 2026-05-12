@@ -54,9 +54,7 @@ def _find_faces(
             if (v, w) in visited:
                 continue
             mark: Set[Tuple[Any, Any]] = set()
-            face_nodes = list(
-                embedding.traverse_face(v, w, mark_half_edges=mark)
-            )
+            face_nodes = list(embedding.traverse_face(v, w, mark_half_edges=mark))
             visited.update(mark)
             faces.append(face_nodes)
     return faces
@@ -127,9 +125,7 @@ def _build_dual(
     return dual_G
 
 
-def solve_hadlock_max_cut(
-    G: nx.Graph, weight: str = "weight"
-) -> Set[Tuple[Any, Any]]:
+def solve_hadlock_max_cut(G: nx.Graph, weight: str = "weight") -> Set[Tuple[Any, Any]]:
     r"""Solve MAX-CUT for a planar graph using Hadlock's algorithm.
 
     Parameters
@@ -213,9 +209,7 @@ def solve_hadlock_max_cut(
                 complete_odd.add_edge(u, v, weight=dist[u][v])
 
     # ---- 7. minimum weight perfect matching ----
-    matching = nx.algorithms.matching.min_weight_matching(
-        complete_odd, weight="weight"
-    )
+    matching = nx.algorithms.matching.min_weight_matching(complete_odd, weight="weight")
 
     # ---- 8. excluded primal edges from matching paths ----
     excluded: Set[Tuple[Any, Any]] = set()
@@ -264,8 +258,6 @@ def validate_max_cut(
 
     is_bipartite = nx.is_bipartite(cut_graph)
 
-    cut_weight = sum(
-        G[u][v].get(weight, 1) for u, v in cut_edges
-    )
+    cut_weight = sum(G[u][v].get(weight, 1) for u, v in cut_edges)
 
     return is_bipartite, cut_weight
