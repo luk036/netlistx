@@ -8,14 +8,15 @@ import networkx as nx
 from netlistx.tsp import (
     calculate_total_distance,
     christofides_tsp,
+    make_l1_graph,
     solve_christofides_2opt_tsp,
     two_opt,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _make_metric_graph(n: int, seed: int = 42) -> nx.Graph:
     """Build a complete graph with random Euclidean (metric) edge weights."""
@@ -43,6 +44,7 @@ def _is_valid_hamiltonian_cycle(path: list, n: int) -> bool:
 # Tests for calculate_total_distance
 # ---------------------------------------------------------------------------
 
+
 class TestCalculateTotalDistance:
     def test_simple_triangle(self) -> None:
         G = nx.complete_graph(3)
@@ -69,6 +71,7 @@ class TestCalculateTotalDistance:
 # ---------------------------------------------------------------------------
 # Tests for two_opt
 # ---------------------------------------------------------------------------
+
 
 class TestTwoOpt:
     def test_no_improvement_for_optimal_tour(self) -> None:
@@ -112,6 +115,7 @@ class TestTwoOpt:
 # Tests for christofides_tsp
 # ---------------------------------------------------------------------------
 
+
 class TestChristofides:
     def test_small_graph(self) -> None:
         G = _make_metric_graph(5, seed=0)
@@ -153,6 +157,7 @@ class TestChristofides:
 # ---------------------------------------------------------------------------
 # Tests for solve_christofides_2opt_tsp (the combined function)
 # ---------------------------------------------------------------------------
+
 
 class TestSolveChristofides2Opt:
     def test_output_is_valid_cycle(self) -> None:
@@ -206,6 +211,58 @@ class TestSolveChristofides2Opt:
         assert tour[0] == tour[-1]
         assert len(tour) == 8
         assert len(set(tour[:-1])) == 7
+
+
+# ---------------------------------------------------------------------------
+# L1 (Manhattan) metric tests
+# ---------------------------------------------------------------------------
+
+
+class TestL1Metric:
+    """Verify that all algorithms work correctly with Manhattan (L1) distance."""
+
+    def test_make_l1_graph_basic(self) -> None:
+        G, pos = make_l1_graph(5, seed=0)
+        assert len(G.nodes()) == 5
+        # Manhattan distance between (x0,y0) and (x1,y1) = |dx|+|dy|
+        dx = abs(pos[0][0] - pos[1][0])
+        dy = abs(pos[0][1] - pos[1][1])
+        assert G[0][1]["weight"] == pytest.approx(dx + dy)
+
+    def test_l1_christofides_valid_cycle(self) -> None:
+        G, _pos = make_l1_graph(10, seed=7)
+        tour = christofides_tsp(G)
+        assert _is_valid_hamiltonian_cycle(tour, 10)
+
+    def test_l1_combined_valid_cycle(self) -> None:
+        G, _pos = make_l1_graph(15, seed=3)
+        tour = solve_christofides_2opt_tsp(G)
+        assert _is_valid_hamiltonian_cycle(tour, 15)
+
+    def test_l1_improvement_over_baseline(self) -> None:
+        """2-Opt should never make the L1 tour worse."""
+        G, _pos = make_l1_graph(12, seed=5)
+        christo_dist = calculate_total_distance(christofides_tsp(G), G)
+        combined_dist = calculate_total_distance(solve_christofides_2opt_tsp(G), G)
+        assert combined_dist <= christo_dist + 1e-10
+
+    def test_l1_three_node_triangle(self) -> None:
+        """Known L1 distances: verify triangle is correct."""
+        G = nx.complete_graph(3)
+        G[0][1]["weight"] = 1.0
+        G[1][2]["weight"] = 2.0
+        G[0][2]["weight"] = 3.0
+        tour = christofides_tsp(G)
+        assert _is_valid_hamiltonian_cycle(tour, 3)
+
+    def test_l1_approximation_bound(self) -> None:
+        """Verify 3/2 bound holds for L1 metric instance."""
+        G, _pos = make_l1_graph(10, seed=11)
+        mst = nx.minimum_spanning_tree(G, weight="weight")
+        mst_weight = mst.size(weight="weight")
+        tour = solve_christofides_2opt_tsp(G)
+        tour_weight = calculate_total_distance(tour, G)
+        assert tour_weight <= 1.5 * mst_weight + 1e-10
 
 
 # Need pytest.approx for floating comparisons

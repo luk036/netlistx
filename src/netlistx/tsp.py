@@ -37,9 +37,81 @@ References
       Approximation Algorithm for Metric TSP*. STOC 2021.
 """
 
-from typing import Any, List, Sequence, Tuple
+import math
+import random
+from typing import Any, Dict, List, Sequence, Tuple
 
 import networkx as nx
+
+
+def _build_graph_from_positions(
+    n: int, pos: Dict[Any, Tuple[float, float]], metric: str = "l2"
+) -> nx.Graph:
+    """Build a complete graph with pairwise distances computed from positions.
+
+    :param n: Number of nodes.
+    :param pos: Mapping ``{node: (x, y)}``.
+    :param metric: ``"l2"`` for Euclidean, ``"l1"`` for Manhattan.
+    :return: Complete graph with ``weight`` attributes.
+    """
+    G = nx.complete_graph(n)
+    for u, v in G.edges():
+        dx = pos[u][0] - pos[v][0]
+        dy = pos[u][1] - pos[v][1]
+        if metric == "l1":
+            G[u][v]["weight"] = abs(dx) + abs(dy)
+        else:
+            G[u][v]["weight"] = math.sqrt(dx * dx + dy * dy)
+    return G
+
+
+def make_l2_graph(
+    n: int, seed: int = 42
+) -> Tuple[nx.Graph, Dict[Any, Tuple[float, float]]]:
+    """Create a complete graph with random **Euclidean (L2)** edge weights.
+
+    The graph is a valid Metric TSP instance (triangle inequality holds).
+
+    :param n: Number of nodes (cities).
+    :param seed: Random seed for reproducibility.
+    :return: ``(G, pos)`` where *G* is the complete graph with ``weight``
+        attributes and *pos* maps node → ``(x, y)``.
+
+    Example:
+        >>> G, pos = make_l2_graph(5)
+        >>> len(G.nodes())
+        5
+        >>> G.number_of_edges()
+        10
+        >>> G[0][1]['weight'] > 0
+        True
+    """
+    random.seed(seed)
+    pos = {i: (random.uniform(0, 100), random.uniform(0, 100)) for i in range(n)}
+    return _build_graph_from_positions(n, pos, metric="l2"), pos
+
+
+def make_l1_graph(
+    n: int, seed: int = 42
+) -> Tuple[nx.Graph, Dict[Any, Tuple[float, float]]]:
+    """Create a complete graph with random **Manhattan (L1)** edge weights.
+
+    Manhattan distance :math:`|\\Delta x| + |\\Delta y|` satisfies the triangle
+    inequality, so the graph is a valid Metric TSP instance.
+
+    :param n: Number of nodes (cities).
+    :param seed: Random seed for reproducibility.
+    :return: ``(G, pos)`` where *G* is the complete graph with ``weight``
+        attributes and *pos* maps node → ``(x, y)``.
+
+    Example:
+        >>> G, pos = make_l1_graph(5)
+        >>> G[0][1]['weight'] >= 0
+        True
+    """
+    random.seed(seed)
+    pos = {i: (random.uniform(0, 100), random.uniform(0, 100)) for i in range(n)}
+    return _build_graph_from_positions(n, pos, metric="l1"), pos
 
 
 def calculate_total_distance(path: Sequence[Any], G: nx.Graph) -> float:
@@ -108,9 +180,7 @@ def two_opt(path: List[Any], G: nx.Graph) -> List[Any]:
                     continue  # adjacent edges → no change
 
                 # Reverse segment [i, j-1] to uncross
-                new_path = (
-                    best_path[:i] + best_path[i:j][::-1] + best_path[j:]
-                )
+                new_path = best_path[:i] + best_path[i:j][::-1] + best_path[j:]
 
                 if calculate_total_distance(new_path, G) < calculate_total_distance(
                     best_path, G

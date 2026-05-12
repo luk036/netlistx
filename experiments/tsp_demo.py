@@ -10,8 +10,9 @@ import os
 import random
 
 import matplotlib
+
 try:
-    import tkinter  # test for display
+    import tkinter  # noqa: F401  # test for display
 except ImportError:
     matplotlib.use("Agg")  # headless fallback
 import matplotlib.pyplot as plt

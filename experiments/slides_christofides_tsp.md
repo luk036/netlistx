@@ -45,13 +45,21 @@ graph LR
 
 ### The Triangle Inequality ✨
 
-Our demo uses **Euclidean distances** (a **metric**):
+Our demos support **two common metrics**:
 
-$$w_{ij} = \sqrt{(x_i - x_j)^2 + (y_i - y_j)^2}$$
+| Metric | Formula | `netlistx.tsp` factory |
+|:-------|:--------|:-----------------------|
+| **L2 (Euclidean)** 🟦 | $w_{ij} = \sqrt{\Delta x^2 + \Delta y^2}$ | `make_l2_graph(n, seed)` |
+| **L1 (Manhattan)** 🟨 | $w_{ij} = \lvert \Delta x \rvert + \lvert \Delta y \rvert$ | `make_l1_graph(n, seed)` |
 
 ```python
-dist = ((pos[u][0] - pos[v][0]) ** 2 + (pos[u][1] - pos[v][1]) ** 2) ** 0.5
+from netlistx.tsp import make_l2_graph, make_l1_graph
+
+G_l2, pos = make_l2_graph(20, seed=42)  # Euclidean
+G_l1, pos = make_l1_graph(20, seed=42)  # Manhattan
 ```
+
+Both satisfy the **triangle inequality**, so the 3/2 guarantee holds for either! ✨
 
 A **metric** satisfies:
 
@@ -260,7 +268,7 @@ eulerian_circuit = list(nx.eulerian_circuit(multigraph))
 graph LR
     subgraph "Eulerian Walk"
         direction LR
-        0 --> 1 --> 3 --> 2 --> 0 --> 2 ... 
+        0 --> 1 --> 3 --> 2 --> 0 --> 2 ...
     end
 ```
 
@@ -350,52 +358,63 @@ xychart-beta
 
 ---
 
-## Slide 11: 🧪 Demo Walkthrough — Christofides in Action
+## Slide 11: 🧪 Demo Walkthrough — L2 vs L1 (n = 20)
 
-### Our Experiment: $n = 20$ random cities 🏙️
+Both metrics share the **same code path** — only the distance formula differs:
 
 ```python
-from netlistx.tsp import christofides_tsp, solve_christofides_2opt_tsp
+from netlistx.tsp import make_l2_graph, make_l1_graph, christofides_tsp, solve_christofides_2opt_tsp
 
-tsp_path_initial = christofides_tsp(G)           # 3/2-approximation
-tsp_path_refined = solve_christofides_2opt_tsp(G) # + 2-Opt refinement
+G_l2, pos = make_l2_graph(20, seed=42)   # Euclidean
+G_l1, pos = make_l1_graph(20, seed=42)   # Manhattan
+
+refined_l2 = solve_christofides_2opt_tsp(G_l2)
+refined_l1 = solve_christofides_2opt_tsp(G_l1)
 ```
 
-### Output 👇
+### Results Comparison 📊
 
 ```
-Initial Distance (Christofides):         407.12
-Refined Distance (Christofides+2-Opt):   389.23
-Improvement:                              17.89
+L2 (Euclidean) — Initial: 407.12  →  Refined: 389.23  (Δ = 17.89)
+L1 (Manhattan) — Initial: 459.99  →  Refined: 444.69  (Δ = 15.30)
 ```
 
-### Generated Figure 🖼️
+| Metric | Christofides | +2-Opt | Improvement |
+|:-------|:------------:|:------:|:-----------:|
+| 🟦 L2 (Euclidean) | 407.12 | 389.23 | 17.89 |
+| 🟨 L1 (Manhattan) | 459.99 | 444.69 | 15.30 |
 
-![Christofides (red) vs Christofides+2-Opt (blue) for n=20](tsp_demo_n20.svg)
+> 🟦 L2 distances are **always ≤ L1** for the same points (Pythagoras), so absolute values differ — but **both improve** with 2-Opt! 🎯
 
-> 🔴 **Red** = Christofides initial tour &nbsp;·&nbsp; 🔵 **Blue** = after 2-Opt refinement
->
-> Note how 2-Opt removes crossing segments, producing a shorter, smoother tour.
+### Visual Comparison 🖼️
+
+| L2 (Euclidean) | L1 (Manhattan) |
+|:--------------:|:--------------:|
+| ![L2 n=20](tsp_demo_n20.svg) | ![L1 n=20](tsp_l1_demo_n20.svg) |
+
+> 🔴 Red = Christofides &nbsp;·&nbsp; 🔵 Blue = after 2-Opt
 
 ---
 
-## Slide 12: 🎨 Visualization — Larger Instance (n = 100)
+## Slide 12: 🎨 Larger Instances — L2 vs L1 (n = 100)
 
-The Christofides + 2-Opt combination scales to larger instances:
+Scaling the same comparison to 100 cities:
 
-![Refined TSP tour for n=100](tsp2opt_demo_n100.svg)
+| L2 (Euclidean) | L1 (Manhattan) |
+|:--------------:|:--------------:|
+| ![L2 n=100](tsp2opt_demo_n100.svg) | ![L1 n=100](tsp_l1_n100_demo.svg) |
 
-| Metric | Value |
-|:-------|:------|
-| 🏙 Cities | 100 randomly placed |
-| 📏 Initial distance (Christofides) | 875.50 |
-| 📏 Refined distance (+2-Opt) | 809.07 |
-| 📉 Improvement | **66.43 (7.6%)** |
+### Results 📊
+
+| Metric | Christofides | +2-Opt | Improvement |
+|:-------|:------------:|:------:|:-----------:|
+| 🟦 L2 (Euclidean) | 875.50 | 809.07 | **66.43 (7.6%)** |
+| 🟨 L1 (Manhattan) | 1112.35 | 1044.58 | **67.77 (6.1%)** |
 
 ### Observations 👁️
-- The tour is smooth with **no crossing edges** — 2-Opt guarantees this
-- Node labels are omitted for readability at this scale
-- The algorithm completes in a few seconds for $n = 100$
+- 🔵 Blue tours are smooth with **no crossing edges** — 2-Opt guarantees this
+- Both metrics produce valid, near-optimal TSP tours
+- The Christofides + 2-Opt combination is **metric-agnostic** — it works for any distance satisfying triangle inequality
 
 ---
 
@@ -500,19 +519,38 @@ timeline
 
 ## Slide 17: 🔬 Hands-on: Try It Yourself
 
-### Run the Demo 🖥
+### Run the Demos 🖥
 
 ```bash
-python experiments/tsp_demo.py
+# Euclidean (L2) demos
+python experiments/tsp_demo.py         # n=20
+python experiments/tsp2opt_demo.py     # n=100
+
+# Manhattan (L1) demos
+python experiments/tsp_l1_demo.py      # n=20
+python experiments/tsp_l1_n100_demo.py # n=100
+```
+
+### API Quick Reference 📖
+
+```python
+from netlistx.tsp import (
+    make_l2_graph,          # Factory: Euclidean metric
+    make_l1_graph,          # Factory: Manhattan metric
+    christofides_tsp,       # 3/2-approximation
+    solve_christofides_2opt_tsp,  # Christofides + 2-Opt
+    calculate_total_distance,      # Evaluate a tour
+)
 ```
 
 ### Experiment Ideas 🔧
 
-1. **Vary $n$**: try 10, 50, 100 cities — how does runtime scale?
-2. **Compare to Nearest Neighbor** heuristic (greedy):
+1. **Vary $n$**: try 10, 50, 100, 500 cities — how does runtime scale?
+2. **Compare L2 vs L1**: run both on the same random seed — how do tours differ?
+3. **Compare to Nearest Neighbor** heuristic (greedy):
    $$w(\text{NN}) / w(\text{OPT}) \approx O(\log n)$$
-3. **Break the triangle inequality** ➡ observe ratio degrade
-4. **Visualize each step** — add `plt.pause()` between steps for an animation!
+4. **Break the triangle inequality** ➡ observe ratio degrade
+5. **Visualize each step** — add `plt.pause()` between steps for an animation!
 
 ### Starter Code 🚀
 
@@ -607,11 +645,16 @@ graph LR
 
 | Resource | Location |
 |:---------|:---------|
-| 🔬 Demo code | `experiments/tsp_demo.py` (n=20) |
-| 🔬 Demo code | `experiments/tsp2opt_demo.py` (n=100) |
-| 🖼 Figure (n=20) | `experiments/tsp_demo_n20.svg` |
-| 🖼 Figure (n=100) | `experiments/tsp2opt_demo_n100.svg` |
-| 📦 Library | `netlistx` on [GitHub](https://github.com/luk036/netlistx) |
+| 🔬 Demo code | `experiments/tsp_demo.py` (L2, n=20) |
+| 🔬 Demo code | `experiments/tsp2opt_demo.py` (L2, n=100) |
+| 🔬 Demo code | `experiments/tsp_l1_demo.py` (L1, n=20) |
+| 🔬 Demo code | `experiments/tsp_l1_n100_demo.py` (L1, n=100) |
+| 🖼 Figure (L2 n=20) | `experiments/tsp_demo_n20.svg` |
+| 🖼 Figure (L2 n=100) | `experiments/tsp2opt_demo_n100.svg` |
+| 🖼 Figure (L1 n=20) | `experiments/tsp_l1_demo_n20.svg` |
+| 🖼 Figure (L1 n=100) | `experiments/tsp_l1_n100_demo.svg` |
+| 📦 Python lib | `netlistx.tsp` — `make_l2_graph()`, `make_l1_graph()` |
+| ⚡ C++ lib | `netlistx-cpp` — `EuclideanWeight`, `ManhattanWeight` |
 | 📊 Slides | `experiments/slides_christofides_tsp.md` |
 
 ### Questions? 🤔
