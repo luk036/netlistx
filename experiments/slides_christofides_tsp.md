@@ -268,7 +268,7 @@ eulerian_circuit = list(nx.eulerian_circuit(multigraph))
 graph LR
     subgraph "Eulerian Walk"
         direction LR
-        0 --> 1 --> 3 --> 2 --> 0 --> 2 ...
+        0 --> 1 --> 3 --> 2 --> 0 --> 2
     end
 ```
 
