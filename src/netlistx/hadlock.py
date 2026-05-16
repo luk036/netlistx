@@ -125,8 +125,118 @@ def _build_dual(
     return dual_G
 
 
+def _biconnected_components(G: nx.Graph) -> List[nx.Graph]:
+    """Decompose *G* into its biconnected components (blocks).
+
+    MAX-CUT is additive over biconnected components because edges in
+    different blocks share only articulation points and cannot form
+    cycles together.  Processing each block independently reduces the
+    size of the dual-graph shortest-path and MWPM subproblems.
+
+    Parameters
+    ----------
+    G : nx.Graph
+        The input graph.
+
+    Returns
+    -------
+    list of nx.Graph
+        Each entry is a subgraph of *G* representing one biconnected
+        component.  Components are node-induced subgraphs; articulation
+        points may appear in multiple components, but each edge belongs
+        to exactly one component.
+    """
+    return [G.subgraph(comp).copy() for comp in nx.biconnected_components(G)]
+
+
+def _solve_hadlock_component(
+    G: nx.Graph,
+    weight: str,
+) -> Set[Tuple[Any, Any]]:
+    """Solve MAX-CUT for a single planar (biconnected) component.
+
+    This is the core Hadlock logic factored out so it can be called
+    once per biconnected component in :func:`solve_hadlock_max_cut`.
+
+    Parameters
+    ----------
+    G : nx.Graph
+        A planar graph (or subgraph).
+    weight : str
+        Edge attribute name for weights.
+
+    Returns
+    -------
+    set of tuple
+        A set of ``(u, v)`` edges (sorted tuples) that form the
+        maximum cut of *G*.
+    """
+    # ---- 1. get planar embedding ----
+    _, embedding = nx.check_planarity(G)
+
+    # ---- 2. find faces ----
+    faces = _find_faces(embedding)
+    if not faces:
+        return set()
+
+    # ---- 3. build dual graph ----
+    dual_G = _build_dual(G, faces, weight)
+
+    # ---- 4. identify odd faces ----
+    odd_faces = [i for i, face in enumerate(faces) if len(face) % 2 == 1]
+
+    if len(odd_faces) < 2:
+        # Already bipartite — every edge can be in the cut
+        return {tuple(sorted(e)) for e in G.edges()}
+
+    if len(odd_faces) % 2 != 0:
+        # Handshaking lemma guarantees an even number of odd faces,
+        # but guard against edge cases.
+        odd_faces = odd_faces[:-1]
+        if len(odd_faces) < 2:
+            return {tuple(sorted(e)) for e in G.edges()}
+
+    # ---- 5. all-pairs shortest paths in the dual ----
+    dist = dict(nx.all_pairs_dijkstra_path_length(dual_G, weight="weight"))
+    paths = dict(nx.all_pairs_dijkstra_path(dual_G, weight="weight"))
+
+    # ---- 6. complete graph of odd faces with shortest-path weights ----
+    complete_odd = nx.Graph()
+    complete_odd.add_nodes_from(odd_faces)
+    for i in range(len(odd_faces)):
+        for j in range(i + 1, len(odd_faces)):
+            u, v = odd_faces[i], odd_faces[j]
+            if v in dist[u]:
+                complete_odd.add_edge(u, v, weight=dist[u][v])
+
+    # ---- 7. minimum weight perfect matching ----
+    matching = nx.algorithms.matching.min_weight_matching(
+        complete_odd, weight="weight"
+    )
+
+    # ---- 8. excluded primal edges from matching paths ----
+    excluded: Set[Tuple[Any, Any]] = set()
+    for u, v in matching:
+        path = paths[u][v]
+        for k in range(len(path) - 1):
+            primal_edge = dual_G[path[k]][path[k + 1]].get("primal")
+            if primal_edge is not None:
+                excluded.add(tuple(sorted(primal_edge)))
+
+    # ---- 9. max-cut = all primal edges \setminus excluded ----
+    all_edges = {tuple(sorted(e)) for e in G.edges()}
+    return all_edges - excluded
+
+
 def solve_hadlock_max_cut(G: nx.Graph, weight: str = "weight") -> Set[Tuple[Any, Any]]:
     r"""Solve MAX-CUT for a planar graph using Hadlock's algorithm.
+
+    The graph is first decomposed into **biconnected components**
+    (blocks), which are solved independently.  Because edges in
+    different blocks cannot belong to the same cycle, the MAX-CUT
+    is the disjoint union of the per-block cuts, and solving each
+    block separately is significantly faster (smaller dual graphs,
+    fewer odd faces, smaller MWPM instances).
 
     Parameters
     ----------
@@ -166,63 +276,22 @@ def solve_hadlock_max_cut(G: nx.Graph, weight: str = "weight") -> Set[Tuple[Any,
     >>> val  # should be total - min_weight = 18 - 3 = 15
     15
     """
-    # ---- 1. verify planarity & get embedding ----
-    is_planar, embedding = nx.check_planarity(G)
+    # ---- 1. verify planarity ----
+    is_planar, _ = nx.check_planarity(G)
     if not is_planar:
         raise nx.NetworkXException("Graph is not planar")
 
-    # ---- 2. find faces ----
-    faces = _find_faces(embedding)
-    if not faces:
-        # no faces → empty graph
+    # ---- 2. decompose into biconnected components & solve ----
+    components = _biconnected_components(G)
+    if not components:
         return set()
 
-    # ---- 3. build dual graph ----
-    dual_G = _build_dual(G, faces, weight)
+    cut_edges: Set[Tuple[Any, Any]] = set()
+    for comp in components:
+        comp_cut = _solve_hadlock_component(comp, weight)
+        cut_edges.update(comp_cut)
 
-    # ---- 4. identify odd faces ----
-    odd_faces = [i for i, face in enumerate(faces) if len(face) % 2 == 1]
-
-    if len(odd_faces) < 2:
-        # Already bipartite — every edge can be in the cut
-        return {tuple(sorted(e)) for e in G.edges()}
-
-    if len(odd_faces) % 2 != 0:
-        # The handshaking lemma for planar graphs guarantees an even
-        # number of odd faces, but we guard against numerical / edge
-        # cases by dropping the last odd face.
-        odd_faces = odd_faces[:-1]
-        if len(odd_faces) < 2:
-            return {tuple(sorted(e)) for e in G.edges()}
-
-    # ---- 5. all-pairs shortest paths in the dual ----
-    dist = dict(nx.all_pairs_dijkstra_path_length(dual_G, weight="weight"))
-    paths = dict(nx.all_pairs_dijkstra_path(dual_G, weight="weight"))
-
-    # ---- 6. complete graph of odd faces with shortest-path weights ----
-    complete_odd = nx.Graph()
-    complete_odd.add_nodes_from(odd_faces)
-    for i in range(len(odd_faces)):
-        for j in range(i + 1, len(odd_faces)):
-            u, v = odd_faces[i], odd_faces[j]
-            if v in dist[u]:
-                complete_odd.add_edge(u, v, weight=dist[u][v])
-
-    # ---- 7. minimum weight perfect matching ----
-    matching = nx.algorithms.matching.min_weight_matching(complete_odd, weight="weight")
-
-    # ---- 8. excluded primal edges from matching paths ----
-    excluded: Set[Tuple[Any, Any]] = set()
-    for u, v in matching:
-        path = paths[u][v]
-        for k in range(len(path) - 1):
-            primal_edge = dual_G[path[k]][path[k + 1]].get("primal")
-            if primal_edge is not None:
-                excluded.add(tuple(sorted(primal_edge)))
-
-    # ---- 9. max-cut = all primal edges \setminus excluded ----
-    all_edges = {tuple(sorted(e)) for e in G.edges()}
-    return all_edges - excluded
+    return cut_edges
 
 
 def validate_max_cut(
