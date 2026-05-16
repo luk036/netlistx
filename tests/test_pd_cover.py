@@ -1,7 +1,7 @@
 import networkx as nx
 import pytest
 
-from netlistx.cover_ai import min_cycle_cover, min_odd_cycle_cover, min_vertex_cover
+from netlistx.cover import min_cycle_cover, min_odd_cycle_cover, min_vertex_cover
 
 
 class TestCoverAlgorithms:

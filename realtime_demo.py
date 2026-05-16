@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from matplotlib.animation import FuncAnimation
 
-from netlistx.cover_ai import _construct_cycle, _generic_bfs_cycle
+from netlistx.cover import _construct_cycle, _generic_bfs_cycle
 
 
 def animate_pd_algorithm(ugraph, algorithm_type="vertex_cover"):

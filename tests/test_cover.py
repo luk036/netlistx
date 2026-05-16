@@ -20,7 +20,7 @@ def test_pd_cover() -> None:
     soln: set = set()
     covered, cost = pd_cover(violate_graph, weight, soln)
     assert covered == {0, 1}
-    assert cost == 4
+    assert cost == 3
 
 
 def test_min_vertex_cover_simple() -> None:

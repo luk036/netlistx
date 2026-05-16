@@ -8,6 +8,7 @@ distance instead of Euclidean (both satisfy the triangle inequality).
 import os
 
 import matplotlib
+
 try:
     import tkinter  # noqa: F401
 except ImportError:
@@ -42,7 +43,9 @@ print(f"Improvement:                               {dist_initial - dist_refined:
 
 # Visualization
 plt.figure(figsize=(8, 6))
-nx.draw(G, pos, with_labels=True, node_color="lightyellow", edge_color="gray", alpha=0.3)
+nx.draw(
+    G, pos, with_labels=True, node_color="lightyellow", edge_color="gray", alpha=0.3
+)
 
 edgelist_initial = [
     (tsp_path_initial[i], tsp_path_initial[i + 1])

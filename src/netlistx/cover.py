@@ -1,59 +1,27 @@
 """
-Cover.py
+Cover Algorithms with Reverse-Delete Post-Processing (cover.py)
 
-This code implements several algorithms for solving different types of covering
-problems in graphs. The main purpose is to find minimal sets of vertices or
-edges that "cover" certain structures in a graph, such as all edges, cycles,
-or odd cycles.
+This module implements primal-dual approximation algorithms for various covering
+problems in graphs, with enhanced post-processing using the reverse-delete technique.
 
-The code takes various inputs depending on the specific function being used.
-Generally, it requires a graph structure (either a regular graph or a
-hypergraph), a weight mapping for the vertices, and sometimes an optional
-initial cover set. The graphs are typically represented using the NetworkX
-library (nx.Graph).
+The main purpose is to find minimal sets of vertices that "cover" certain
+structures in a graph, such as all edges, cycles, or odd cycles.
 
-The outputs produced by these functions are usually a tuple containing two
-elements: a set representing the minimal cover found, and a number representing
-the total weight or cost of that cover.
+The algorithms use a two-phase approach:
+1. Primal-Dual Selection: Iteratively builds a solution by selecting elements
+   with minimum reduced cost (gap).
+2. Reverse-Delete Post-Processing: Removes redundant elements from the solution
+   in reverse order of selection to ensure minimality.
 
-The code achieves its purpose through several different algorithms, but they
-all follow a similar pattern called the primal-dual approximation method. This
-method iteratively builds a solution by selecting elements that violate certain
-conditions and adding them to the cover set.
+Key functions:
+- pd_cover: Core primal-dual algorithm with reverse-delete post-processing
+- min_vertex_cover: Find minimum weighted vertex cover in a graph
+- min_hyper_vertex_cover: Find minimum weighted vertex cover in a hypergraph
+- min_cycle_cover: Find minimum weighted set of vertices covering all cycles
+- min_odd_cycle_cover: Find minimum weighted set of vertices covering all odd cycles
 
-Here's a breakdown of the main functions:
-
-1. pd_cover: This is the core function that implements the primal-dual
-   approximation algorithm. It takes a "violate" function that generates sets
-   of violating elements, a weight mapping, and an initial solution set. It
-   iteratively adds elements to the solution until no violations remain.
-
-2. min_vertex_cover: This function finds a minimum weighted vertex cover in a
-   graph. It uses pd_cover with a violate function that yields edges not
-   covered by the current solution.
-
-3. min_hyper_vertex_cover: Similar to min_vertex_cover, but works on
-   hypergraphs where edges can connect more than two vertices.
-
-4. min_cycle_cover: This function finds a minimum weighted set of vertices
-   that cover all cycles in a graph. It uses a breadth-first search to find
-   cycles and then uses pd_cover to select vertices that break these cycles.
-
-5. min_odd_cycle_cover: Similar to min_cycle_cover, but specifically targets
-   odd cycles in the graph.
-
-The code uses several important data structures and algorithms. Graphs are
-represented using NetworkX, which provides efficient graph operations. The
-algorithms make heavy use of sets for storing covers and dictionaries for
-storing weights and other information. The cycle-finding algorithms use
-breadth-first search and clever bookkeeping to efficiently detect cycles in
-the graph.
-
-Overall, this code provides a toolkit for solving various covering problems on
-graphs, which have applications in many areas of computer science and
-operations research. The algorithms implemented here provide approximate
-solutions to these problems, which are often NP-hard and thus difficult to
-solve exactly for large instances.
+The algorithms are useful in electronic design automation (EDA) for problems
+like logic optimization and circuit analysis.
 """
 
 import copy
@@ -78,29 +46,26 @@ def pd_cover(
     violate: Callable, weight: MutableMapping, soln: Set
 ) -> Tuple[Set, Union[int, float]]:
     """
-    The function `pd_cover` implements a primal-dual approximation algorithm for
-    covering problems.
+    Primal-dual approximation algorithm with reverse-delete post-processing.
 
-    :param violate: The `violate` parameter is a callable function or oracle that
-        returns a set of violate elements. It is used to generate sets of elements
-        that violate the current solution. Each set represents a potential
-        improvement to the solution
+    This is a core algorithm that finds a minimal weighted cover by combining
+    primal-dual selection with reverse-delete refinement.
 
+    :param violate: A callable that returns a generator of violating sets.
+        Each set contains elements where at least one must be added to the cover.
     :type violate: Callable
-
-    :param weight: The `weight` parameter is a dictionary that represents the weight
-        of each element. The keys of the dictionary are the elements, and the values
-        are their corresponding weights
-
+    :param weight: A mutable mapping from elements to their weights.
     :type weight: MutableMapping
-
-    :param soln: The `soln` parameter is a set that represents the current solution
-        set. It initially contains no elements, and elements are added to it during
-        the algorithm
-
+    :param soln: The initial solution set (may be empty or contain pre-selected elements).
     :type soln: Set
 
-    :return: a tuple containing the updated solution set and the total primal cost.
+    :return: A tuple containing the minimal cover set and its total weight.
+    :rtype: Tuple[Set, Union[int, float]]
+
+    The algorithm maintains a "gap" for each element, representing the remaining
+    budget. In each iteration, it selects the element with minimum gap from a
+    violating set. After all violations are resolved, it performs reverse-delete
+    to remove any redundant elements.
 
     .. svgbob::
        :align: center
@@ -121,53 +86,61 @@ def pd_cover(
         >>> weight = {0: 1, 1: 2, 2: 3}
         >>> soln = set()
         >>> pd_cover(violate_graph, weight, soln)
-        ({0, 1}, 4)
+        ({0, 1}, 3)
     """
-    total_prml_cost = 0
     total_dual_cost = 0
     gap = copy.copy(weight)
+    added_order = []
+
+    # Phase 1: Primal-Dual Selection
     for S in violate():
         min_vtx = min(S, key=lambda vertex: gap[vertex])
         min_val = gap[min_vtx]
-        soln.add(min_vtx)
-        total_prml_cost += weight[min_vtx]
+
+        if min_vtx not in soln:
+            soln.add(min_vtx)
+            added_order.append(min_vtx)
+
         total_dual_cost += min_val
         for vtx in S:
             gap[vtx] -= min_val
-    assert total_dual_cost <= total_prml_cost
-    return soln, total_prml_cost
+
+    # Phase 2: Post-processing (Reverse-Delete)
+    # Removes redundant elements to ensure the cover is minimal.
+    for vtx in reversed(added_order):
+        soln.remove(vtx)
+        is_redundant = True
+        # Check if any structure remains uncovered without this vertex
+        for _ in violate():
+            is_redundant = False
+            break
+
+        if not is_redundant:
+            soln.add(vtx)
+
+    final_prml_cost = sum(weight[vtx] for vtx in soln)
+    assert total_dual_cost <= final_prml_cost
+    return soln, final_prml_cost
 
 
 def min_vertex_cover(
     ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     r"""
-    The `min_vertex_cover` function performs minimum weighted vertex cover using a
-    primal-dual approximation algorithm (without post-processing).
+    Find minimum weighted vertex cover using primal-dual with reverse-delete.
 
-    :param ugraph: The parameter `ugraph` is a `nx.Graph` object, which represents
-        the input graph. It is an undirected graph where each edge represents a
-        connection between two vertices
+    A vertex cover is a set of vertices where every edge in the graph has
+    at least one endpoint in the set.
 
+    :param ugraph: The input undirected graph.
     :type ugraph: nx.Graph
-
-    :param weight: The `weight` parameter is a dictionary that assigns a weight to
-        each vertex in the graph. The weights are used to determine the minimum
-        weighted vertex cover
-
+    :param weight: A mapping from vertices to their weights.
     :type weight: MutableMapping
-
-    :param coverset: The `coverset` parameter is an optional set that represents the
-        current vertex cover solution. It is used to keep track of the vertices that
-        are included in the cover. If no `coverset` is provided, an empty set is used
-        as the initial cover
-
+    :param coverset: Optional initial vertex cover (default: empty set).
     :type coverset: Optional[Set]
 
-    :return: The function `min_vertex_cover` returns a tuple containing two elements.
-        The first element is a set representing the minimum weighted vertex cover, and
-        the second element is either an integer or a float representing the weight of
-        the minimum vertex cover.
+    :return: A tuple of (minimum vertex cover set, total weight).
+    :rtype: Tuple[Set, Union[int, float]]
 
     .. svgbob::
        :align: center
@@ -187,7 +160,7 @@ def min_vertex_cover(
         >>> weight = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1}
         >>> soln = set()
         >>> min_vertex_cover(ugraph, weight, soln)
-        ({0, 1, 2, 3}, 4)
+        ({0, 2, 3}, 3)
     """
     if coverset is None:
         coverset = set()
@@ -205,30 +178,19 @@ def min_hyper_vertex_cover(
     hyprgraph: Any, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     """
-    The `min_hyper_vertex_cover` function performs minimum weighted vertex cover
-    using a primal-dual approximation algorithm (without post-processing).
+    Find minimum weighted vertex cover in a hypergraph using primal-dual.
 
-    :param hyprgraph: The `hyprgraph` parameter represents a hypergraph, which is a
-        generalization of a graph where an edge can connect more than two vertices.
-        It is likely represented as a data structure that contains information about
-        the vertices and edges of the hypergraph
+    In a hypergraph, each hyperedge (net) can connect multiple vertices.
+    A vertex cover must include at least one vertex from each hyperedge.
 
-    :param weight: The `weight` parameter is a mutable mapping that assigns a weight
-        to each vertex in the hypergraph. It is used to determine the minimum
-        weighted vertex cover
-
+    :param hyprgraph: The hypergraph with nets and modules attributes.
+    :param weight: A mapping from vertices to their weights.
     :type weight: MutableMapping
-
-    :param coverset: The `coverset` parameter is an optional set that represents the
-        current vertex cover. It contains the vertices that have been selected as
-        part of the cover. If no `coverset` is provided, it defaults to an empty set
-
+    :param coverset: Optional initial vertex cover (default: empty set).
     :type coverset: Optional[Set]
 
-    :return: The function `min_hyper_vertex_cover` returns a tuple containing two
-        elements. The first element is a set representing the minimum weighted
-        vertex cover, and the second element is either an integer or a float
-        representing the weight of the vertex cover.
+    :return: A tuple of (minimum vertex cover set, total weight).
+    :rtype: Tuple[Set, Union[int, float]]
 
     .. svgbob::
        :align: center
@@ -254,7 +216,7 @@ def min_hyper_vertex_cover(
         >>> weight = {0: 1, 1: 1, 2: 1}
         >>> soln = set()
         >>> min_hyper_vertex_cover(hyprgraph, weight, soln)
-        ({0, 1}, 2)
+        ({1}, 1)
     """
     if coverset is None:
         coverset = set()
@@ -272,23 +234,15 @@ def _construct_cycle(
     info: Dict[Any, Tuple[Any, int]], parent: Any, child: Any
 ) -> Deque[Any]:
     """
-    The `_construct_cycle` function constructs a cycle by traversing the
-    parent-child relationship in a dictionary.
+    Reconstruct a cycle path from BFS parent-child relationship.
 
-    :param info: The `info` parameter is a dictionary that contains information about
-        the nodes in a graph. Each key in the dictionary represents a node, and the
-        corresponding value is a tuple containing two elements: the parent node and
-        the depth of the node
+    :param info: Dictionary mapping each node to (parent, depth) tuple.
+    :type info: Dict[Any, Tuple[Any, int]]
+    :param parent: One endpoint of the detected cycle edge.
+    :param child: Other endpoint of the detected cycle edge.
 
-    :type info: Dict
-
-    :param parent: The parent parameter represents the parent node in a graph or tree
-        structure
-
-    :param child: The `child` parameter represents a node in a graph that is connected
-        to the `parent` node
-
-    :return: a deque object.
+    :return: A deque containing the cycle nodes in order.
+    :rtype: Deque[Any]
     """
     _, depth_now = info[parent]
     _, depth_child = info[child]
@@ -302,7 +256,6 @@ def _construct_cycle(
     while depth_a < depth_b:
         S.append(node_a)
         node_a, depth_a = info[node_a]
-    # depth_now == depth
     while node_a != node_b:
         S.append(node_a)
         S.appendleft(node_b)
@@ -312,32 +265,75 @@ def _construct_cycle(
     return S
 
 
+def _generic_bfs_cycle(
+    ugraph: nx.Graph, coverset: Set[Any]
+) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
+    """
+    Find cycles using BFS restricted to cyclable edges.
+
+    This function uses biconnected components and chain (ear) decomposition
+    to identify edges that can form cycles, then performs BFS to detect them.
+
+    :param ugraph: The input undirected graph.
+    :type ugraph: nx.Graph
+    :param coverset: Set of nodes to exclude from cycle detection.
+    :type coverset: Set[Any]
+
+    :yields: Tuples of (info, parent, child) where info is the BFS parent/depth
+             dictionary, and parent-child is the back edge forming a cycle.
+    :rtype: Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]
+    """
+    # Identify edges that can actually form cycles
+    cyclable_edges = set()
+    for component in nx.biconnected_components(ugraph):
+        if len(component) >= 3:
+            subgraph = ugraph.subgraph(component)
+            # Use chain (ear) decomposition to find cycle-forming edges
+            for chain in nx.chain_decomposition(subgraph):
+                for edge in chain:
+                    cyclable_edges.add(tuple(sorted(edge)))
+
+    depth_limit = len(ugraph)
+    nodelist = list(ugraph.nodes())
+    for source in nodelist:
+        if source in coverset:
+            continue
+        info = {source: (source, depth_limit)}
+        queue = deque([source])
+        while queue:
+            parent = queue.popleft()
+            succ, depth_now = info[parent]
+            for child in ugraph.neighbors(parent):
+                edge = tuple(sorted((parent, child)))
+                if child in coverset or edge not in cyclable_edges:
+                    continue
+                if child not in info:
+                    info[child] = (parent, depth_now - 1)
+                    queue.append(child)
+                    continue
+                if succ == child:
+                    continue
+                yield info, parent, child
+
+
 def min_cycle_cover(
     ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     r"""
-    The `min_cycle_cover` function performs minimum cycle cover using a primal-dual approximation
-        algorithm (without post-processing).
+    Find minimum weighted set of vertices covering all cycles.
 
-    :param ugraph: The `ugraph` parameter is a `nx.Graph` object representing the input graph. It contains the
-        nodes and edges of the graph
+    A cycle cover is a set of vertices such that removing them from the graph
+    eliminates all cycles.
 
+    :param ugraph: The input undirected graph.
     :type ugraph: nx.Graph
-
-    :param weight: The `weight` parameter is a dictionary that assigns a weight to each node in the
-        graph. The weights are used to determine the minimum cycle cover
-
+    :param weight: A mapping from vertices to their weights.
     :type weight: MutableMapping
-
-    :param coverset: The `coverset` parameter is an optional set that contains the nodes that are
-        already covered by previous cycles. It is used to keep track of the nodes that have already been
-        included in the minimum cycle cover. If no `coverset` is provided, it is initialized as an empty set
-
+    :param coverset: Optional initial cycle cover (default: empty set).
     :type coverset: Optional[Set]
 
-    :return: The function `min_cycle_cover` returns a tuple containing a set and either an integer or a
-        float. The set represents the minimum cycle cover, and the integer or float represents the weight of
-        the minimum cycle cover.
+    :return: A tuple of (minimum cycle cover set, total weight).
+    :rtype: Tuple[Set, Union[int, float]]
 
     .. svgbob::
        :align: center
@@ -357,7 +353,7 @@ def min_cycle_cover(
         >>> weight = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1}
         >>> soln = set()
         >>> min_cycle_cover(ugraph, weight, soln)
-        ({0, 1, 2}, 3)
+        ({2}, 1)
     """
     if coverset is None:
         coverset = set()
@@ -376,70 +372,24 @@ def min_cycle_cover(
     return pd_cover(violate, weight, coverset)
 
 
-def _generic_bfs_cycle(
-    ugraph: nx.Graph, coverset: Set[Any]
-) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
-    """
-    The function `_generic_bfs_cycle` performs a breadth-first search on a graph to find cycles,
-    excluding nodes in a given `coverset`.
-
-    :param ugraph: The parameter `ugraph` is a graph object that represents a directed graph. It should have a
-        method `neighbors(node)` that returns the neighbors of a given node in the graph. The graph can be
-        represented using any graph library or data structure that supports this method
-
-    :param coverset: The `coverset` parameter is a set of nodes that should be excluded from the BFS
-        traversal. These nodes will not be considered as potential starting points for the BFS algorithm
-    """
-    depth_limit = len(ugraph)
-    neighbors = ugraph.neighbors
-    nodelist = list(ugraph.nodes())
-    for source in nodelist:
-        if source in coverset:
-            continue
-        info = {source: (source, depth_limit)}
-        queue = deque([source])
-        while queue:
-            parent = queue.popleft()
-            succ, depth_now = info[parent]
-            for child in neighbors(parent):
-                if child in coverset:
-                    continue
-                if child not in info:
-                    info[child] = (parent, depth_now - 1)
-                    queue.append(child)
-                    continue
-                if succ == child:
-                    continue
-                # cycle found
-                yield info, parent, child
-
-
 def min_odd_cycle_cover(
     ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
     r"""
-    The `min_odd_cycle_cover` function performs minimum odd cycle cover using a primal-dual
-    approximation algorithm (without post-processing).
+    Find minimum weighted set of vertices covering all odd cycles.
 
-    :param ugraph: The `ugraph` parameter is a `nx.Graph` object representing the input graph. It is used to
-        define the graph structure and find cycles in the graph
+    An odd cycle cover is a set of vertices such that removing them from the
+    graph eliminates all cycles with odd length.
 
+    :param ugraph: The input undirected graph.
     :type ugraph: nx.Graph
-
-    :param weight: The `weight` parameter is a dictionary that assigns a weight to each node in the
-        graph
-
+    :param weight: A mapping from vertices to their weights.
     :type weight: MutableMapping
-
-    :param coverset: The `coverset` parameter is an optional set that represents the initial set of
-        vertices that are covered by the minimum odd cycle cover. This set can be empty if no vertices are
-        initially covered
-
+    :param coverset: Optional initial odd cycle cover (default: empty set).
     :type coverset: Optional[Set]
 
-    :return: The function `min_odd_cycle_cover` returns a tuple containing a set and either an integer
-        or a float. The set represents the minimum odd cycle cover, and the integer or float represents the
-        weight of the cover.
+    :return: A tuple of (minimum odd cycle cover set, total weight).
+    :rtype: Tuple[Set, Union[int, float]]
 
     .. svgbob::
        :align: center
@@ -459,7 +409,7 @@ def min_odd_cycle_cover(
         >>> weight = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1}
         >>> soln = set()
         >>> min_odd_cycle_cover(ugraph, weight, soln)
-        ({0, 1, 2}, 3)
+        ({2}, 1)
     """
     if coverset is None:
         coverset = set()

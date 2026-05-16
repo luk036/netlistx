@@ -7,7 +7,7 @@ from netlistx.netlist_algo import min_maximal_matching
 def test_min_vertex_cover(drawf_graph: Any) -> None:
     weight = {node: 1 for node in drawf_graph.modules}
     _, rslt = min_hyper_vertex_cover(drawf_graph, weight)
-    assert rslt == 6
+    assert rslt == 3
 
 
 def test_min_maximal_matching(drawf_graph: Any) -> None:

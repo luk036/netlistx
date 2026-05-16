@@ -1,5 +1,5 @@
 """
-Cover Algorithms with Reverse-Delete Post-Processing (cover_ai.py)
+Cover Algorithms with Reverse-Delete Post-Processing (cover.py)
 
 This module implements primal-dual approximation algorithms for various covering
 problems in graphs, with enhanced post-processing using the reverse-delete technique.

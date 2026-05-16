@@ -8,6 +8,7 @@ Manhattan distance.
 import os
 
 import matplotlib
+
 try:
     import tkinter  # noqa: F401
 except ImportError:
@@ -42,7 +43,9 @@ print(f"Improvement:                               {initial_dist - combined_dist
 
 # Visualization of refined path
 plt.figure(figsize=(8, 6))
-nx.draw(G, pos, with_labels=True, node_color="lightyellow", edge_color="gray", alpha=0.2)
+nx.draw(
+    G, pos, with_labels=True, node_color="lightyellow", edge_color="gray", alpha=0.2
+)
 edgelist = [
     (combined_path[i], combined_path[i + 1]) for i in range(len(combined_path) - 1)
 ]

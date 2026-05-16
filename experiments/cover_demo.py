@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from netlistx.cover_ai import min_cycle_cover, min_vertex_cover
+from netlistx.cover import min_cycle_cover, min_vertex_cover
 
 
 def run_graphical_demo():
