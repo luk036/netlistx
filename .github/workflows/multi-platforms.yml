@@ -33,6 +33,7 @@ jobs:
           conda install pytest
           conda install setuptools wheel setuptools_scm
           conda install numpy numba hypothesis jsonschema
+          conda install pip
           pip install git+https://github.com/luk036/mywheel.git
-          python setup.py develop
+          pip install -e .
           pytest
