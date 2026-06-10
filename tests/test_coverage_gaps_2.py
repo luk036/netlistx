@@ -10,13 +10,7 @@ from pathlib import Path
 
 import networkx as nx
 
-from netlistx.netlist import (
-    Netlist,
-    SimpleGraph,
-    TinyGraph,
-    form_graph,
-    read_yosys_json,
-)
+from netlistx.netlist import SimpleGraph, TinyGraph, form_graph, read_yosys_json
 
 
 class TestTinyGraph:

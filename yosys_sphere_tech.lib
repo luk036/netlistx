@@ -1,0 +1,365 @@
+library(yosys_derived) {
+  technology ("cmos") ;
+  time_unit : "1ns" ;
+  voltage_unit : "1V" ;
+  current_unit : "1mA" ;
+  capacitive_load_unit (1, "pf") ;
+  leakage_power_unit : "1nW" ;
+  delay_model : "table_lookup" ;
+
+  operating_conditions (typical) {
+    process : 1.0 ;
+    temperature : 25.0 ;
+    voltage : 1.2 ;
+    tree_type : "balanced_tree" ;
+  }
+
+  lu_table_template (delay_template_2x2) {
+    variable_1 : "input_net_transition" ;
+    variable_2 : "total_output_net_capacitance" ;
+    index_1 ("0.1, 1.0") ;
+    index_2 ("0.05, 0.5") ;
+  }
+
+  cell (_dollar__AND_) {
+    area : 1.0 ;
+
+    pin (A) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (B) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (Y) {
+      direction : "output" ;
+      capacitance : 0.5 ;
+      function : "(A & B)" ;
+      max_capacitance : 2.0 ;
+
+      timing () {
+        related_pin : "A" ;
+        timing_sense : positive_unate ;
+        cell_rise (delay_template_2x2) {
+          values ("0.1, 0.2", "0.3, 0.4") ;
+        }
+        rise_transition (delay_template_2x2) {
+          values ("0.05, 0.1", "0.2, 0.3") ;
+        }
+        cell_fall (delay_template_2x2) {
+          values ("0.08, 0.18", "0.25, 0.35") ;
+        }
+        fall_transition (delay_template_2x2) {
+          values ("0.04, 0.09", "0.18, 0.28") ;
+        }
+      }
+    }
+
+    leakage_power () {
+      value : 0.001 ;
+    }
+  }
+
+  cell (_dollar__DFF_N_) {
+    area : 1.0 ;
+    ff : "IQ" ;
+
+    pin (C) {
+      direction : "input" ;
+      clock : true ;
+      capacitance : 0.5 ;
+    }
+
+    pin (D) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (Q) {
+      direction : "output" ;
+      capacitance : 0.5 ;
+      function : "IQ" ;
+      max_capacitance : 2.0 ;
+
+      timing () {
+        related_pin : "C" ;
+        timing_sense : positive_unate ;
+        cell_rise (delay_template_2x2) {
+          values ("0.1, 0.2", "0.3, 0.4") ;
+        }
+        rise_transition (delay_template_2x2) {
+          values ("0.05, 0.1", "0.2, 0.3") ;
+        }
+        cell_fall (delay_template_2x2) {
+          values ("0.08, 0.18", "0.25, 0.35") ;
+        }
+        fall_transition (delay_template_2x2) {
+          values ("0.04, 0.09", "0.18, 0.28") ;
+        }
+      }
+    }
+
+    leakage_power () {
+      value : 0.001 ;
+    }
+  }
+
+  cell (_dollar__DFF_P_) {
+    area : 1.0 ;
+    ff : "IQ" ;
+
+    pin (C) {
+      direction : "input" ;
+      clock : true ;
+      capacitance : 0.5 ;
+    }
+
+    pin (D) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (Q) {
+      direction : "output" ;
+      capacitance : 0.5 ;
+      function : "IQ" ;
+      max_capacitance : 2.0 ;
+
+      timing () {
+        related_pin : "C" ;
+        timing_sense : positive_unate ;
+        cell_rise (delay_template_2x2) {
+          values ("0.1, 0.2", "0.3, 0.4") ;
+        }
+        rise_transition (delay_template_2x2) {
+          values ("0.05, 0.1", "0.2, 0.3") ;
+        }
+        cell_fall (delay_template_2x2) {
+          values ("0.08, 0.18", "0.25, 0.35") ;
+        }
+        fall_transition (delay_template_2x2) {
+          values ("0.04, 0.09", "0.18, 0.28") ;
+        }
+      }
+    }
+
+    leakage_power () {
+      value : 0.001 ;
+    }
+  }
+
+  cell (_dollar__DLATCH_P_) {
+    area : 1.0 ;
+    ff : "IQ" ;
+
+    pin (D) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (E) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (Q) {
+      direction : "output" ;
+      capacitance : 0.5 ;
+      function : "IQ" ;
+      max_capacitance : 2.0 ;
+
+      timing () {
+        related_pin : "D" ;
+        timing_sense : positive_unate ;
+        cell_rise (delay_template_2x2) {
+          values ("0.1, 0.2", "0.3, 0.4") ;
+        }
+        rise_transition (delay_template_2x2) {
+          values ("0.05, 0.1", "0.2, 0.3") ;
+        }
+        cell_fall (delay_template_2x2) {
+          values ("0.08, 0.18", "0.25, 0.35") ;
+        }
+        fall_transition (delay_template_2x2) {
+          values ("0.04, 0.09", "0.18, 0.28") ;
+        }
+      }
+    }
+
+    leakage_power () {
+      value : 0.001 ;
+    }
+  }
+
+  cell (_dollar__MUX_) {
+    area : 1.0 ;
+
+    pin (A) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (B) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (S) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (Y) {
+      direction : "output" ;
+      capacitance : 0.5 ;
+      function : "(A & B & S)" ;
+      max_capacitance : 2.0 ;
+
+      timing () {
+        related_pin : "A" ;
+        timing_sense : positive_unate ;
+        cell_rise (delay_template_2x2) {
+          values ("0.1, 0.2", "0.3, 0.4") ;
+        }
+        rise_transition (delay_template_2x2) {
+          values ("0.05, 0.1", "0.2, 0.3") ;
+        }
+        cell_fall (delay_template_2x2) {
+          values ("0.08, 0.18", "0.25, 0.35") ;
+        }
+        fall_transition (delay_template_2x2) {
+          values ("0.04, 0.09", "0.18, 0.28") ;
+        }
+      }
+    }
+
+    leakage_power () {
+      value : 0.001 ;
+    }
+  }
+
+  cell (_dollar__NOT_) {
+    area : 1.0 ;
+
+    pin (A) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (Y) {
+      direction : "output" ;
+      capacitance : 0.5 ;
+      function : "(A)" ;
+      max_capacitance : 2.0 ;
+
+      timing () {
+        related_pin : "A" ;
+        timing_sense : positive_unate ;
+        cell_rise (delay_template_2x2) {
+          values ("0.1, 0.2", "0.3, 0.4") ;
+        }
+        rise_transition (delay_template_2x2) {
+          values ("0.05, 0.1", "0.2, 0.3") ;
+        }
+        cell_fall (delay_template_2x2) {
+          values ("0.08, 0.18", "0.25, 0.35") ;
+        }
+        fall_transition (delay_template_2x2) {
+          values ("0.04, 0.09", "0.18, 0.28") ;
+        }
+      }
+    }
+
+    leakage_power () {
+      value : 0.001 ;
+    }
+  }
+
+  cell (_dollar__OR_) {
+    area : 1.0 ;
+
+    pin (A) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (B) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (Y) {
+      direction : "output" ;
+      capacitance : 0.5 ;
+      function : "(A & B)" ;
+      max_capacitance : 2.0 ;
+
+      timing () {
+        related_pin : "A" ;
+        timing_sense : positive_unate ;
+        cell_rise (delay_template_2x2) {
+          values ("0.1, 0.2", "0.3, 0.4") ;
+        }
+        rise_transition (delay_template_2x2) {
+          values ("0.05, 0.1", "0.2, 0.3") ;
+        }
+        cell_fall (delay_template_2x2) {
+          values ("0.08, 0.18", "0.25, 0.35") ;
+        }
+        fall_transition (delay_template_2x2) {
+          values ("0.04, 0.09", "0.18, 0.28") ;
+        }
+      }
+    }
+
+    leakage_power () {
+      value : 0.001 ;
+    }
+  }
+
+  cell (_dollar__XOR_) {
+    area : 1.0 ;
+
+    pin (A) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (B) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (Y) {
+      direction : "output" ;
+      capacitance : 0.5 ;
+      function : "(A & B)" ;
+      max_capacitance : 2.0 ;
+
+      timing () {
+        related_pin : "A" ;
+        timing_sense : positive_unate ;
+        cell_rise (delay_template_2x2) {
+          values ("0.1, 0.2", "0.3, 0.4") ;
+        }
+        rise_transition (delay_template_2x2) {
+          values ("0.05, 0.1", "0.2, 0.3") ;
+        }
+        cell_fall (delay_template_2x2) {
+          values ("0.08, 0.18", "0.25, 0.35") ;
+        }
+        fall_transition (delay_template_2x2) {
+          values ("0.04, 0.09", "0.18, 0.28") ;
+        }
+      }
+    }
+
+    leakage_power () {
+      value : 0.001 ;
+    }
+  }
+
+}

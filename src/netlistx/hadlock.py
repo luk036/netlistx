@@ -210,9 +210,7 @@ def _solve_hadlock_component(
                 complete_odd.add_edge(u, v, weight=dist[u][v])
 
     # ---- 7. minimum weight perfect matching ----
-    matching = nx.algorithms.matching.min_weight_matching(
-        complete_odd, weight="weight"
-    )
+    matching = nx.algorithms.matching.min_weight_matching(complete_odd, weight="weight")
 
     # ---- 8. excluded primal edges from matching paths ----
     excluded: Set[Tuple[Any, Any]] = set()

@@ -1,0 +1,345 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/liberty-json-schema.json",
+  "title": "Synopsys Liberty JSON Conversion Schema",
+  "description": "JSON Schema for Liberty (.lib) files converted to JSON via liberty-parser custom serialization (Method 2). The schema models the recursive group structure of Liberty: every node has a type name, arguments array, optional attributes dict, and optional nested groups array.",
+
+  "definitions": {
+    "attribute_value": {
+      "description": "A Liberty attribute value: string, number, boolean, or array thereof.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "number" },
+              { "type": "boolean" }
+            ]
+          }
+        }
+      ]
+    },
+
+    "any_group": {
+      "description": "Recursive base: any Liberty group. Has type, args, optional attributes and optional nested groups.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "args": { "type": "array" },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        },
+        "groups": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/any_group" }
+        }
+      },
+      "required": ["type", "args"],
+      "additionalProperties": false
+    },
+
+    "timing_table_group": {
+      "description": "A delay/transition/constraint lookup table (e.g. cell_rise, rise_transition). References a lu_table_template by string name in args[0].",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 0
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "index_1": { "$ref": "#/definitions/attribute_value" },
+            "index_2": { "$ref": "#/definitions/attribute_value" },
+            "values": { "$ref": "#/definitions/attribute_value" }
+          },
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        }
+      },
+      "required": ["type", "args"],
+      "additionalProperties": false
+    },
+
+    "timing_group": {
+      "description": "A timing arc describing delay/transition/constraint behaviour relative to a related_pin.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "timing" },
+        "args": { "type": "array" },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "related_pin": { "type": "string" },
+            "timing_sense": {
+              "type": "string",
+              "enum": ["positive_unate", "negative_unate", "non_unate", ""]
+            },
+            "timing_type": { "type": "string" }
+          },
+          "required": ["related_pin"],
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        },
+        "groups": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/timing_table_group" }
+        }
+      },
+      "required": ["type", "args", "attributes"],
+      "additionalProperties": false
+    },
+
+    "power_table_group": {
+      "description": "A rise_power or fall_power table inside internal_power.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["rise_power", "fall_power"]
+        },
+        "args": { "type": "array" },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "values": { "$ref": "#/definitions/attribute_value" }
+          },
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        }
+      },
+      "required": ["type", "args"],
+      "additionalProperties": false
+    },
+
+    "internal_power_group": {
+      "description": "Internal power consumption keyed by related_pin.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "internal_power" },
+        "args": { "type": "array" },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "related_pin": { "type": "string" }
+          },
+          "required": ["related_pin"],
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        },
+        "groups": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/power_table_group" }
+        }
+      },
+      "required": ["type", "args", "attributes"],
+      "additionalProperties": false
+    },
+
+    "leakage_power_group": {
+      "description": "Static leakage power value for a cell.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "leakage_power" },
+        "args": { "type": "array" },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "value": { "type": "number" }
+          },
+          "required": ["value"],
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        }
+      },
+      "required": ["type", "args", "attributes"],
+      "additionalProperties": false
+    },
+
+    "pin_group": {
+      "description": "A cell pin with direction, capacitance, function, and timing arcs.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "pin" },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "direction": {
+              "type": "string",
+              "enum": ["input", "output", "inout"]
+            },
+            "capacitance": { "type": "number" },
+            "clock": { "$ref": "#/definitions/attribute_value" },
+            "fanout_load": { "type": "number" },
+            "max_capacitance": { "type": "number" },
+            "function": { "type": "string" },
+            "max_transition": { "type": "number" }
+          },
+          "required": ["direction"],
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/timing_group" },
+              { "$ref": "#/definitions/internal_power_group" },
+              { "$ref": "#/definitions/leakage_power_group" },
+              { "$ref": "#/definitions/any_group" }
+            ]
+          }
+        }
+      },
+      "required": ["type", "args", "attributes"],
+      "additionalProperties": false
+    },
+
+    "lu_table_template_group": {
+      "description": "Lookup table template defining index variables and breakpoints.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "lu_table_template" },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "variable_1": { "type": "string" },
+            "variable_2": { "type": "string" },
+            "variable_3": { "type": "string" },
+            "index_1": { "$ref": "#/definitions/attribute_value" },
+            "index_2": { "$ref": "#/definitions/attribute_value" },
+            "index_3": { "$ref": "#/definitions/attribute_value" }
+          },
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        }
+      },
+      "required": ["type", "args", "attributes"],
+      "additionalProperties": false
+    },
+
+    "operating_conditions_group": {
+      "description": "PVT (Process, Voltage, Temperature) operating condition definition.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "operating_conditions" },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "process": { "type": "number" },
+            "temperature": { "type": "number" },
+            "voltage": { "type": "number" },
+            "tree_type": { "type": "string" }
+          },
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        }
+      },
+      "required": ["type", "args", "attributes"],
+      "additionalProperties": false
+    },
+
+    "cell_group": {
+      "description": "A standard cell or macro with pins, timing arcs, and power data.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "cell" },
+        "args": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "area": { "type": "number" },
+            "is_macro": { "$ref": "#/definitions/attribute_value" },
+            "ff": { "type": "string" },
+            "dont_use": { "$ref": "#/definitions/attribute_value" },
+            "dont_touch": { "$ref": "#/definitions/attribute_value" }
+          },
+          "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/pin_group" },
+              { "$ref": "#/definitions/timing_group" },
+              { "$ref": "#/definitions/internal_power_group" },
+              { "$ref": "#/definitions/leakage_power_group" },
+              { "$ref": "#/definitions/any_group" }
+            ]
+          }
+        }
+      },
+      "required": ["type", "args", "attributes"],
+      "additionalProperties": false
+    }
+  },
+
+  "type": "object",
+  "properties": {
+    "type": { "const": "library" },
+    "args": {
+      "description": "The library name.",
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "attributes": {
+      "description": "Library-level attributes: technology, units, defaults, PVT corners.",
+      "type": "object",
+      "properties": {
+        "technology": { "$ref": "#/definitions/attribute_value" },
+        "time_unit": { "type": "string" },
+        "voltage_unit": { "type": "string" },
+        "current_unit": { "type": "string" },
+        "capacitive_load_unit": { "$ref": "#/definitions/attribute_value" },
+        "leakage_power_unit": { "type": "string" },
+        "pulling_resistance_unit": { "type": "string" },
+        "default_fanout_load": { "type": "number" },
+        "default_input_pin_cap": { "type": "number" },
+        "default_output_pin_cap": { "type": "number" },
+        "default_inout_pin_cap": { "type": "number" },
+        "default_max_transition": { "type": "number" },
+        "delay_model": {
+          "type": "string",
+          "enum": ["table_lookup", "polynomial", "cm2", "dcm", "piecewise_cmos"]
+        },
+        "nom_process": { "type": "number" },
+        "nom_temperature": { "type": "number" },
+        "nom_voltage": { "type": "number" }
+      },
+      "additionalProperties": { "$ref": "#/definitions/attribute_value" }
+    },
+    "groups": {
+      "description": "Top-level groups: operating conditions, templates, and cells.",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/definitions/operating_conditions_group" },
+          { "$ref": "#/definitions/lu_table_template_group" },
+          { "$ref": "#/definitions/cell_group" },
+          { "$ref": "#/definitions/any_group" }
+        ]
+      }
+    }
+  },
+  "required": ["type", "args"],
+  "additionalProperties": false
+}

@@ -1,0 +1,230 @@
+library(example_minimal) {
+    /* Library Header */
+    technology ("cmos") ;
+    time_unit : "1ns" ;
+    voltage_unit : "1V" ;
+    current_unit : "1mA" ;
+    capacitive_load_unit (1, "pf") ;
+    default_fanout_load : 1.0 ;
+    default_input_pin_cap : 0.5 ;
+    delay_model : "table_lookup" ;
+
+    /* Operating Conditions (PVT) */
+    nom_process : 1.0 ;
+    nom_temperature : 25.0 ;
+    nom_voltage : 1.2 ;
+
+    operating_conditions (typical) {
+        process : 1.0 ;
+        temperature : 25.0 ;
+        voltage : 1.2 ;
+        tree_type : "balanced_tree" ;
+    }
+
+    /* Lookup Table Templates */
+    lu_table_template (delay_template_2x2) {
+        variable_1 : "input_net_transition" ;
+        variable_2 : "total_output_net_capacitance" ;
+        index_1 ("0.1, 1.0") ;
+        index_2 ("0.05, 0.5") ;
+    }
+
+    lu_table_template (power_template_1x1) {
+        variable_1 : "input_net_transition" ;
+        variable_2 : "total_output_net_capacitance" ;
+        index_1 ("0.1") ;
+        index_2 ("0.05") ;
+    }
+
+    lu_table_template (constraint_template_2x1) {
+        variable_1 : "related_constraint" ;
+        variable_2 : "related_pin_transition" ;
+        index_1 ("0.1, 1.0") ;
+        index_2 ("0.05") ;
+    }
+
+    /* Combinational Cell: 2-input AND gate */
+    cell (AND2_X1) {
+        area : 5.0 ;
+        is_macro : false ;
+
+        pin (A) {
+            direction : input ;
+            capacitance : 0.8 ;
+            fanout_load : 1.0 ;
+        }
+
+        pin (B) {
+            direction : input ;
+            capacitance : 0.8 ;
+            fanout_load : 1.0 ;
+        }
+
+        pin (Z) {
+            direction : output ;
+            function : "(A & B)" ;
+            max_capacitance : 1.5 ;
+
+            timing () {
+                related_pin : "A" ;
+                timing_sense : positive_unate ;
+
+                cell_rise (delay_template_2x2) {
+                    index_1 ("0.1, 1.0") ;
+                    index_2 ("0.05, 0.5") ;
+                    values ("0.12, 0.24", "0.38, 0.52") ;
+                }
+
+                rise_transition (delay_template_2x2) {
+                    index_1 ("0.1, 1.0") ;
+                    index_2 ("0.05, 0.5") ;
+                    values ("0.09, 0.18", "0.70, 0.95") ;
+                }
+
+                cell_fall (delay_template_2x2) {
+                    index_1 ("0.1, 1.0") ;
+                    index_2 ("0.05, 0.5") ;
+                    values ("0.10, 0.20", "0.32, 0.45") ;
+                }
+
+                fall_transition (delay_template_2x2) {
+                    index_1 ("0.1, 1.0") ;
+                    index_2 ("0.05, 0.5") ;
+                    values ("0.08, 0.16", "0.65, 0.88") ;
+                }
+            }
+
+            timing () {
+                related_pin : "B" ;
+                timing_sense : positive_unate ;
+
+                cell_rise (delay_template_2x2) {
+                    index_1 ("0.1, 1.0") ;
+                    index_2 ("0.05, 0.5") ;
+                    values ("0.14, 0.26", "0.40, 0.55") ;
+                }
+
+                rise_transition (delay_template_2x2) {
+                    index_1 ("0.1, 1.0") ;
+                    index_2 ("0.05, 0.5") ;
+                    values ("0.10, 0.20", "0.72, 0.98") ;
+                }
+            }
+        }
+
+        /* Power Modeling */
+        internal_power () {
+            related_pin : "A" ;
+            rise_power (power_template_1x1) { values ("0.05") ; }
+            fall_power (power_template_1x1) { values ("0.04") ; }
+        }
+
+        leakage_power () {
+            value : 0.002 ;
+        }
+    }
+
+    /* Sequential Cell: D Flip-Flop */
+    cell (DFF_X1) {
+        area : 15.0 ;
+        ff : "IQ" ;
+
+        pin (CK) {
+            direction : input ;
+            clock : true ;
+            capacitance : 0.7 ;
+        }
+
+        pin (D) {
+            direction : input ;
+            capacitance : 0.6 ;
+        }
+
+        pin (Q) {
+            direction : output ;
+            function : "IQ" ;
+
+            timing () {
+                related_pin : "CK" ;
+                timing_type : "rising_edge" ;
+                cell_rise (delay_template_2x2) {
+                    values ("0.35, 0.62", "0.51, 0.78") ;
+                }
+                rise_transition (delay_template_2x2) {
+                    values ("0.25, 0.45", "0.55, 0.82") ;
+                }
+            }
+        }
+
+        pin (QN) {
+            direction : output ;
+            function : "!IQ" ;
+
+            timing () {
+                related_pin : "CK" ;
+                timing_type : "rising_edge" ;
+                cell_fall (delay_template_2x2) {
+                    values ("0.30, 0.55", "0.48, 0.72") ;
+                }
+                fall_transition (delay_template_2x2) {
+                    values ("0.22, 0.40", "0.50, 0.76") ;
+                }
+            }
+        }
+
+        /* Timing Constraints */
+        timing () {
+            related_pin : "CK" ;
+            timing_type : "setup_rising" ;
+            rise_constraint (constraint_template_2x1) {
+                values ("0.15, 0.22") ;
+            }
+        }
+
+        timing () {
+            related_pin : "CK" ;
+            timing_type : "hold_rising" ;
+            rise_constraint (constraint_template_2x1) {
+                values ("0.05, 0.10") ;
+            }
+        }
+
+        leakage_power () { value : 0.01 ; }
+    }
+
+    /* Combinational Cell: Inverter */
+    cell (INV_X1) {
+        area : 3.0 ;
+        is_macro : false ;
+
+        pin (A) {
+            direction : input ;
+            capacitance : 0.5 ;
+        }
+
+        pin (ZN) {
+            direction : output ;
+            function : "(!A)" ;
+            max_capacitance : 2.0 ;
+
+            timing () {
+                related_pin : "A" ;
+                timing_sense : negative_unate ;
+                cell_rise (delay_template_2x2) {
+                    values ("0.08, 0.18", "0.30, 0.42") ;
+                }
+                rise_transition (delay_template_2x2) {
+                    values ("0.06, 0.14", "0.55, 0.78") ;
+                }
+                cell_fall (delay_template_2x2) {
+                    values ("0.07, 0.16", "0.28, 0.38") ;
+                }
+                fall_transition (delay_template_2x2) {
+                    values ("0.05, 0.12", "0.50, 0.72") ;
+                }
+            }
+        }
+
+        leakage_power () { value : 0.001 ; }
+    }
+}

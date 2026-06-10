@@ -1,0 +1,573 @@
+{
+  "type": "library",
+  "args": [
+    "example_minimal"
+  ],
+  "attributes": {
+    "technology": [
+      "cmos"
+    ],
+    "time_unit": "1ns",
+    "voltage_unit": "1V",
+    "current_unit": "1mA",
+    "capacitive_load_unit": [
+      1,
+      "pf"
+    ],
+    "default_fanout_load": 1.0,
+    "default_input_pin_cap": 0.5,
+    "delay_model": "table_lookup",
+    "nom_process": 1.0,
+    "nom_temperature": 25.0,
+    "nom_voltage": 1.2
+  },
+  "groups": [
+    {
+      "type": "operating_conditions",
+      "args": [
+        "typical"
+      ],
+      "attributes": {
+        "process": 1.0,
+        "temperature": 25.0,
+        "voltage": 1.2,
+        "tree_type": "balanced_tree"
+      }
+    },
+    {
+      "type": "lu_table_template",
+      "args": [
+        "delay_template_2x2"
+      ],
+      "attributes": {
+        "variable_1": "input_net_transition",
+        "variable_2": "total_output_net_capacitance",
+        "index_1": [
+          "0.1, 1.0"
+        ],
+        "index_2": [
+          "0.05, 0.5"
+        ]
+      }
+    },
+    {
+      "type": "lu_table_template",
+      "args": [
+        "power_template_1x1"
+      ],
+      "attributes": {
+        "variable_1": "input_net_transition",
+        "variable_2": "total_output_net_capacitance",
+        "index_1": [
+          "0.1"
+        ],
+        "index_2": [
+          "0.05"
+        ]
+      }
+    },
+    {
+      "type": "lu_table_template",
+      "args": [
+        "constraint_template_2x1"
+      ],
+      "attributes": {
+        "variable_1": "related_constraint",
+        "variable_2": "related_pin_transition",
+        "index_1": [
+          "0.1, 1.0"
+        ],
+        "index_2": [
+          "0.05"
+        ]
+      }
+    },
+    {
+      "type": "cell",
+      "args": [
+        "AND2_X1"
+      ],
+      "attributes": {
+        "area": 5.0,
+        "is_macro": "false"
+      },
+      "groups": [
+        {
+          "type": "pin",
+          "args": [
+            "A"
+          ],
+          "attributes": {
+            "direction": "input",
+            "capacitance": 0.8,
+            "fanout_load": 1.0
+          }
+        },
+        {
+          "type": "pin",
+          "args": [
+            "B"
+          ],
+          "attributes": {
+            "direction": "input",
+            "capacitance": 0.8,
+            "fanout_load": 1.0
+          }
+        },
+        {
+          "type": "pin",
+          "args": [
+            "Z"
+          ],
+          "attributes": {
+            "direction": "output",
+            "function": "(A & B)",
+            "max_capacitance": 1.5
+          },
+          "groups": [
+            {
+              "type": "timing",
+              "args": [],
+              "attributes": {
+                "related_pin": "A",
+                "timing_sense": "positive_unate"
+              },
+              "groups": [
+                {
+                  "type": "cell_rise",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "index_1": [
+                      "0.1, 1.0"
+                    ],
+                    "index_2": [
+                      "0.05, 0.5"
+                    ],
+                    "values": [
+                      "0.12, 0.24",
+                      "0.38, 0.52"
+                    ]
+                  }
+                },
+                {
+                  "type": "rise_transition",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "index_1": [
+                      "0.1, 1.0"
+                    ],
+                    "index_2": [
+                      "0.05, 0.5"
+                    ],
+                    "values": [
+                      "0.09, 0.18",
+                      "0.70, 0.95"
+                    ]
+                  }
+                },
+                {
+                  "type": "cell_fall",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "index_1": [
+                      "0.1, 1.0"
+                    ],
+                    "index_2": [
+                      "0.05, 0.5"
+                    ],
+                    "values": [
+                      "0.10, 0.20",
+                      "0.32, 0.45"
+                    ]
+                  }
+                },
+                {
+                  "type": "fall_transition",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "index_1": [
+                      "0.1, 1.0"
+                    ],
+                    "index_2": [
+                      "0.05, 0.5"
+                    ],
+                    "values": [
+                      "0.08, 0.16",
+                      "0.65, 0.88"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "type": "timing",
+              "args": [],
+              "attributes": {
+                "related_pin": "B",
+                "timing_sense": "positive_unate"
+              },
+              "groups": [
+                {
+                  "type": "cell_rise",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "index_1": [
+                      "0.1, 1.0"
+                    ],
+                    "index_2": [
+                      "0.05, 0.5"
+                    ],
+                    "values": [
+                      "0.14, 0.26",
+                      "0.40, 0.55"
+                    ]
+                  }
+                },
+                {
+                  "type": "rise_transition",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "index_1": [
+                      "0.1, 1.0"
+                    ],
+                    "index_2": [
+                      "0.05, 0.5"
+                    ],
+                    "values": [
+                      "0.10, 0.20",
+                      "0.72, 0.98"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "internal_power",
+          "args": [],
+          "attributes": {
+            "related_pin": "A"
+          },
+          "groups": [
+            {
+              "type": "rise_power",
+              "args": [
+                "power_template_1x1"
+              ],
+              "attributes": {
+                "values": [
+                  "0.05"
+                ]
+              }
+            },
+            {
+              "type": "fall_power",
+              "args": [
+                "power_template_1x1"
+              ],
+              "attributes": {
+                "values": [
+                  "0.04"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "leakage_power",
+          "args": [],
+          "attributes": {
+            "value": 0.002
+          }
+        }
+      ]
+    },
+    {
+      "type": "cell",
+      "args": [
+        "DFF_X1"
+      ],
+      "attributes": {
+        "area": 15.0,
+        "ff": "IQ"
+      },
+      "groups": [
+        {
+          "type": "pin",
+          "args": [
+            "CK"
+          ],
+          "attributes": {
+            "direction": "input",
+            "clock": "true",
+            "capacitance": 0.7
+          }
+        },
+        {
+          "type": "pin",
+          "args": [
+            "D"
+          ],
+          "attributes": {
+            "direction": "input",
+            "capacitance": 0.6
+          }
+        },
+        {
+          "type": "pin",
+          "args": [
+            "Q"
+          ],
+          "attributes": {
+            "direction": "output",
+            "function": "IQ"
+          },
+          "groups": [
+            {
+              "type": "timing",
+              "args": [],
+              "attributes": {
+                "related_pin": "CK",
+                "timing_type": "rising_edge"
+              },
+              "groups": [
+                {
+                  "type": "cell_rise",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "values": [
+                      "0.35, 0.62",
+                      "0.51, 0.78"
+                    ]
+                  }
+                },
+                {
+                  "type": "rise_transition",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "values": [
+                      "0.25, 0.45",
+                      "0.55, 0.82"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "pin",
+          "args": [
+            "QN"
+          ],
+          "attributes": {
+            "direction": "output",
+            "function": "!IQ"
+          },
+          "groups": [
+            {
+              "type": "timing",
+              "args": [],
+              "attributes": {
+                "related_pin": "CK",
+                "timing_type": "rising_edge"
+              },
+              "groups": [
+                {
+                  "type": "cell_fall",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "values": [
+                      "0.30, 0.55",
+                      "0.48, 0.72"
+                    ]
+                  }
+                },
+                {
+                  "type": "fall_transition",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "values": [
+                      "0.22, 0.40",
+                      "0.50, 0.76"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "timing",
+          "args": [],
+          "attributes": {
+            "related_pin": "CK",
+            "timing_type": "setup_rising"
+          },
+          "groups": [
+            {
+              "type": "rise_constraint",
+              "args": [
+                "constraint_template_2x1"
+              ],
+              "attributes": {
+                "values": [
+                  "0.15, 0.22"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "timing",
+          "args": [],
+          "attributes": {
+            "related_pin": "CK",
+            "timing_type": "hold_rising"
+          },
+          "groups": [
+            {
+              "type": "rise_constraint",
+              "args": [
+                "constraint_template_2x1"
+              ],
+              "attributes": {
+                "values": [
+                  "0.05, 0.10"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "leakage_power",
+          "args": [],
+          "attributes": {
+            "value": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "type": "cell",
+      "args": [
+        "INV_X1"
+      ],
+      "attributes": {
+        "area": 3.0,
+        "is_macro": "false"
+      },
+      "groups": [
+        {
+          "type": "pin",
+          "args": [
+            "A"
+          ],
+          "attributes": {
+            "direction": "input",
+            "capacitance": 0.5
+          }
+        },
+        {
+          "type": "pin",
+          "args": [
+            "ZN"
+          ],
+          "attributes": {
+            "direction": "output",
+            "function": "(!A)",
+            "max_capacitance": 2.0
+          },
+          "groups": [
+            {
+              "type": "timing",
+              "args": [],
+              "attributes": {
+                "related_pin": "A",
+                "timing_sense": "negative_unate"
+              },
+              "groups": [
+                {
+                  "type": "cell_rise",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "values": [
+                      "0.08, 0.18",
+                      "0.30, 0.42"
+                    ]
+                  }
+                },
+                {
+                  "type": "rise_transition",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "values": [
+                      "0.06, 0.14",
+                      "0.55, 0.78"
+                    ]
+                  }
+                },
+                {
+                  "type": "cell_fall",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "values": [
+                      "0.07, 0.16",
+                      "0.28, 0.38"
+                    ]
+                  }
+                },
+                {
+                  "type": "fall_transition",
+                  "args": [
+                    "delay_template_2x2"
+                  ],
+                  "attributes": {
+                    "values": [
+                      "0.05, 0.12",
+                      "0.50, 0.72"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "leakage_power",
+          "args": [],
+          "attributes": {
+            "value": 0.001
+          }
+        }
+      ]
+    }
+  ]
+}

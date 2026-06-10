@@ -5,18 +5,15 @@ Missing branches: [[221, 224], [249, 250]]
 """
 
 from collections import deque
-from typing import Any, Generator
 
 import networkx as nx
 
 from netlistx.cover import (
     _construct_cycle,
-    _generic_bfs_cycle,
     min_cycle_cover,
     min_hyper_vertex_cover,
     min_odd_cycle_cover,
     min_vertex_cover,
-    pd_cover,
 )
 
 
@@ -37,6 +34,7 @@ class TestMinHyperVertexCoverWithCoverset:
 
     def test_with_non_none_coverset(self) -> None:
         """Provide a pre-existing coverset to trigger the else branch (coverset is not None)."""
+
         class MockHyprgraph:
             def __init__(self, nets, ugraph):
                 self.nets = nets
@@ -59,10 +57,10 @@ class TestCycleCoverBfsDepthCondition:
 
     def test_cycle_cover_with_shortcut_creates_depth_condition(self) -> None:
         """Create a graph where a deeper node has a back edge to a shallower node.
-        
+
         Graph: 0-1-2-3-4 (path) plus 4-0 (chord from deep node back to source).
         BFS from source 0 discovers 4 via the chord, but after the first cycle cover
-        is found and its vertex is added to the cover, subsequent BFS runs may 
+        is found and its vertex is added to the cover, subsequent BFS runs may
         discover the back edge from deeper nodes to shallower ones.
         """
         ugraph = nx.Graph()

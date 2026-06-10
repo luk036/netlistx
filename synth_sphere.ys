@@ -1,0 +1,23 @@
+# Read the Verilog source
+read_verilog yosys_testcases/sphere_netlist.v
+
+# Elaborate the top-level module
+hierarchy -top circle_fsm_32bit_simple_fixed
+
+# Read the tech-level Liberty library (registers cells for later mapping)
+read_liberty -lib yosys_sphere_tech.lib
+
+# Synthesize to generic cells then techmap to primitives
+proc; opt; techmap; opt
+
+# Map flip-flops to Liberty cells
+dfflibmap -liberty yosys_sphere_tech.lib
+
+# Final cleanup
+opt; clean
+
+# Write JSON output
+write_json yosys_syn_techmapped.json
+
+# Show statistics
+stat

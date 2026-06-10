@@ -5,7 +5,6 @@ skeleton.py missing lines: [139]  (run())
 rand_cover.py missing lines: [186]  (empty net branch)
 """
 
-import networkx as nx
 
 from netlistx.rand_cover import rand_hyper_vertex_cover
 from netlistx.skeleton import run
@@ -50,6 +49,7 @@ class TestSkeletonRun:
     def test_run_calls_main(self, monkeypatch) -> None:
         """Test that run() calls main with sys.argv[1:]."""
         import sys
+
         monkeypatch.setattr(sys, "argv", ["skeleton", "7"])
         # Should not raise
         run()
@@ -60,15 +60,14 @@ class TestRandCoverEmptyNet:
 
     def test_hyper_vertex_cover_empty_net(self) -> None:
         """Hypergraph with an empty net should trigger the continue at line 186."""
+
         class MockHyprgraph:
             def __init__(self, nets, ugraph):
                 self.nets = nets
                 self.ugraph = ugraph
 
         # Net "N2" is empty (no vertices)
-        hyprgraph = MockHyprgraph(
-            ["N1", "N2"], {"N1": [0, 1], "N2": []}
-        )
+        hyprgraph = MockHyprgraph(["N1", "N2"], {"N1": [0, 1], "N2": []})
         weight = {0: 1, 1: 1}
         soln, cost = rand_hyper_vertex_cover(hyprgraph, weight, seed=42)
         # Empty net doesn't need covering, so only N1 needs coverage

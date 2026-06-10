@@ -55,7 +55,7 @@ class TestHadlockOddFaceGuard:
 
     def test_single_odd_face_guard(self) -> None:
         """A graph with a single odd face (if handshaking lemma is violated).
-        
+
         This is very hard to trigger in practice since handshaking always holds.
         We test a simple case that works through the normal path.
         """

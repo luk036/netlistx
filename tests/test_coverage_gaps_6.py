@@ -26,11 +26,11 @@ class TestReadNetdEdgeCases:
         Declare 1 pin but provide more entries - should break early.
         """
         content = [
-            "0\n",      # dummy line 0
-            "1\n",      # 1 pin
-            "1\n",      # 1 net
-            "2\n",      # 2 modules
-            "0\n",      # pad offset 0
+            "0\n",  # dummy line 0
+            "1\n",  # 1 pin
+            "1\n",  # 1 net
+            "2\n",  # 2 modules
+            "0\n",  # pad offset 0
             "a0 s 0\n",  # first entry
             "a1 l 0\n",  # second entry (should trigger break)
         ]
@@ -49,8 +49,8 @@ class TestReadNetdEdgeCases:
             "1\n",
             "2\n",
             "0\n",
-            "\n",          # empty line → continue
-            "a0 s 0\n",    # first pin entry
+            "\n",  # empty line → continue
+            "a0 s 0\n",  # first pin entry
         ]
         path = self._make_net_file(content)
         try:
@@ -95,7 +95,7 @@ class TestReadAreEdgeCases:
         """Trigger line 73 continue when line is empty."""
         content = [
             "a0 10\n",
-            "\n",        # empty line → continue
+            "\n",  # empty line → continue
             "a1 20\n",
         ]
         are_path = self._make_are_file(content)
@@ -112,9 +112,7 @@ class TestReadAreEdgeCases:
                 "a0 s 0\n",
                 "a1 l 0\n",
             ]
-            tmp_net = tempfile.NamedTemporaryFile(
-                mode="w", suffix=".net", delete=False
-            )
+            tmp_net = tempfile.NamedTemporaryFile(mode="w", suffix=".net", delete=False)
             tmp_net.writelines(net_content)
             tmp_net.close()
             tmp_net_path = tmp_net.name
@@ -148,9 +146,7 @@ class TestReadAreEdgeCases:
                 "a0 s 0\n",
                 "a1 l 0\n",
             ]
-            tmp_net = tempfile.NamedTemporaryFile(
-                mode="w", suffix=".net", delete=False
-            )
+            tmp_net = tempfile.NamedTemporaryFile(mode="w", suffix=".net", delete=False)
             tmp_net.writelines(net_content)
             tmp_net.close()
             tmp_net_path = tmp_net.name

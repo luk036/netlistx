@@ -1,0 +1,444 @@
+{
+  "library": {
+    "name": "library",
+    "technology": [
+      "cmos"
+    ],
+    "time_unit": "1ns",
+    "voltage_unit": "1V"
+  },
+  "operating_conditions": {
+    "typical": {
+      "process": 1.0,
+      "temperature": 25.0,
+      "voltage": 1.2
+    }
+  },
+  "cells": {
+    "AND2_X1": {
+      "area": 5.0,
+      "is_sequential": false,
+      "pins": {
+        "A": {
+          "direction": "input",
+          "capacitance": 0.8,
+          "clock": false,
+          "max_capacitance": null,
+          "function": null,
+          "timing_arcs": []
+        },
+        "B": {
+          "direction": "input",
+          "capacitance": 0.8,
+          "clock": false,
+          "max_capacitance": null,
+          "function": null,
+          "timing_arcs": []
+        },
+        "Z": {
+          "direction": "output",
+          "capacitance": 0.0,
+          "clock": false,
+          "max_capacitance": 1.5,
+          "function": "(A & B)",
+          "timing_arcs": [
+            {
+              "related_pin": "A",
+              "timing_sense": "positive_unate",
+              "timing_type": "",
+              "cell_rise": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.12,
+                "max": 0.52,
+                "mean": 0.315,
+                "std": 0.1499166435056495,
+                "values": [
+                  [
+                    0.12,
+                    0.24
+                  ],
+                  [
+                    0.38,
+                    0.52
+                  ]
+                ]
+              },
+              "cell_fall": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.1,
+                "max": 0.45,
+                "mean": 0.2675,
+                "std": 0.1310295768137866,
+                "values": [
+                  [
+                    0.1,
+                    0.2
+                  ],
+                  [
+                    0.32,
+                    0.45
+                  ]
+                ]
+              },
+              "rise_transition": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.09,
+                "max": 0.95,
+                "mean": 0.48,
+                "std": 0.35756118357562244,
+                "values": [
+                  [
+                    0.09,
+                    0.18
+                  ],
+                  [
+                    0.7,
+                    0.95
+                  ]
+                ]
+              },
+              "fall_transition": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.08,
+                "max": 0.88,
+                "mean": 0.4425,
+                "std": 0.3337944726924039,
+                "values": [
+                  [
+                    0.08,
+                    0.16
+                  ],
+                  [
+                    0.65,
+                    0.88
+                  ]
+                ]
+              }
+            },
+            {
+              "related_pin": "B",
+              "timing_sense": "positive_unate",
+              "timing_type": "",
+              "cell_rise": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.14,
+                "max": 0.55,
+                "mean": 0.3375,
+                "std": 0.15335824073065002,
+                "values": [
+                  [
+                    0.14,
+                    0.26
+                  ],
+                  [
+                    0.4,
+                    0.55
+                  ]
+                ]
+              },
+              "rise_transition": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.1,
+                "max": 0.98,
+                "mean": 0.5,
+                "std": 0.36359317925395684,
+                "values": [
+                  [
+                    0.1,
+                    0.2
+                  ],
+                  [
+                    0.72,
+                    0.98
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "leakage_power": 0.002,
+      "internal_power": [
+        {
+          "related_pin": "A",
+          "rise_power": {
+            "mean": 0.05,
+            "values": [
+              [
+                0.05
+              ]
+            ]
+          },
+          "fall_power": {
+            "mean": 0.04,
+            "values": [
+              [
+                0.04
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    "DFF_X1": {
+      "area": 15.0,
+      "is_sequential": true,
+      "pins": {
+        "CK": {
+          "direction": "input",
+          "capacitance": 0.7,
+          "clock": "true",
+          "max_capacitance": null,
+          "function": null,
+          "timing_arcs": []
+        },
+        "D": {
+          "direction": "input",
+          "capacitance": 0.6,
+          "clock": false,
+          "max_capacitance": null,
+          "function": null,
+          "timing_arcs": []
+        },
+        "Q": {
+          "direction": "output",
+          "capacitance": 0.0,
+          "clock": false,
+          "max_capacitance": null,
+          "function": "IQ",
+          "timing_arcs": [
+            {
+              "related_pin": "CK",
+              "timing_sense": "",
+              "timing_type": "rising_edge",
+              "cell_rise": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.35,
+                "max": 0.78,
+                "mean": 0.565,
+                "std": 0.1569235482647522,
+                "values": [
+                  [
+                    0.35,
+                    0.62
+                  ],
+                  [
+                    0.51,
+                    0.78
+                  ]
+                ]
+              },
+              "rise_transition": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.25,
+                "max": 0.82,
+                "mean": 0.5175,
+                "std": 0.20535031044534602,
+                "values": [
+                  [
+                    0.25,
+                    0.45
+                  ],
+                  [
+                    0.55,
+                    0.82
+                  ]
+                ]
+              }
+            }
+          ]
+        },
+        "QN": {
+          "direction": "output",
+          "capacitance": 0.0,
+          "clock": false,
+          "max_capacitance": null,
+          "function": "!IQ",
+          "timing_arcs": [
+            {
+              "related_pin": "CK",
+              "timing_sense": "",
+              "timing_type": "rising_edge",
+              "cell_fall": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.3,
+                "max": 0.72,
+                "mean": 0.5125,
+                "std": 0.15056144924913548,
+                "values": [
+                  [
+                    0.3,
+                    0.55
+                  ],
+                  [
+                    0.48,
+                    0.72
+                  ]
+                ]
+              },
+              "fall_transition": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.22,
+                "max": 0.76,
+                "mean": 0.47000000000000003,
+                "std": 0.19519221295943134,
+                "values": [
+                  [
+                    0.22,
+                    0.4
+                  ],
+                  [
+                    0.5,
+                    0.76
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "leakage_power": 0.01,
+      "internal_power": []
+    },
+    "INV_X1": {
+      "area": 3.0,
+      "is_sequential": false,
+      "pins": {
+        "A": {
+          "direction": "input",
+          "capacitance": 0.5,
+          "clock": false,
+          "max_capacitance": null,
+          "function": null,
+          "timing_arcs": []
+        },
+        "ZN": {
+          "direction": "output",
+          "capacitance": 0.0,
+          "clock": false,
+          "max_capacitance": 2.0,
+          "function": "(!A)",
+          "timing_arcs": [
+            {
+              "related_pin": "A",
+              "timing_sense": "negative_unate",
+              "timing_type": "",
+              "cell_rise": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.08,
+                "max": 0.42,
+                "mean": 0.245,
+                "std": 0.12757350822173072,
+                "values": [
+                  [
+                    0.08,
+                    0.18
+                  ],
+                  [
+                    0.3,
+                    0.42
+                  ]
+                ]
+              },
+              "cell_fall": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.07,
+                "max": 0.38,
+                "mean": 0.2225,
+                "std": 0.11755317945508748,
+                "values": [
+                  [
+                    0.07,
+                    0.16
+                  ],
+                  [
+                    0.28,
+                    0.38
+                  ]
+                ]
+              },
+              "rise_transition": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.06,
+                "max": 0.78,
+                "mean": 0.3825,
+                "std": 0.29532820725423437,
+                "values": [
+                  [
+                    0.06,
+                    0.14
+                  ],
+                  [
+                    0.55,
+                    0.78
+                  ]
+                ]
+              },
+              "fall_transition": {
+                "shape": [
+                  2,
+                  2
+                ],
+                "min": 0.05,
+                "max": 0.72,
+                "mean": 0.3475,
+                "std": 0.27489770824799536,
+                "values": [
+                  [
+                    0.05,
+                    0.12
+                  ],
+                  [
+                    0.5,
+                    0.72
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "leakage_power": 0.001,
+      "internal_power": []
+    }
+  }
+}
