@@ -1,8 +1,10 @@
 """
-Cover Algorithms with Reverse-Delete Post-Processing (cover.py)
+Cover Algorithms with Reverse-Delete Post-Processing (cover_ai.py)
 
 This module implements primal-dual approximation algorithms for various covering
-problems in graphs, with enhanced post-processing using the reverse-delete technique.
+problems in graphs, with enhanced post-processing using the reverse-delete
+technique. It is a variant of :mod:`netlistx.cover` with an alternative
+implementation structure.
 
 The main purpose is to find minimal sets of vertices that "cover" certain
 structures in a graph, such as all edges, cycles, or odd cycles.

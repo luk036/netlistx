@@ -613,16 +613,18 @@ def create_test_netlist() -> Netlist:
 
 
 def vdc(n: int, base: int = 2) -> float:
-    """[summary]
+    """Compute the n-th van der Corput sequence value.
 
-    Arguments:
-        n ([type]): [description]
+    The van der Corput sequence is a low-discrepancy sequence that
+    generates points uniformly in the [0, 1) interval by reversing
+    the base-*base* representation of *n*.
 
-    Keyword Arguments:
-        base (int): [description] (default: {2})
-
-    Returns:
-        [type]: [description]
+    :param n: Non-negative integer index.
+    :type n: int
+    :param base: Numeric base for digit reversal (default: 2).
+    :type base: int
+    :return: The n-th van der Corput value in [0, 1).
+    :rtype: float
 
     Examples:
         >>> vdc(0)
@@ -643,16 +645,17 @@ def vdc(n: int, base: int = 2) -> float:
 
 
 def vdcorput(n: int, base: int = 2) -> List[float]:
-    """[summary]
+    """Generate the first *n* values of the van der Corput sequence.
 
-    Arguments:
-        n (int): number of vectors
+    Convenience wrapper around :func:`vdc` that returns a list of
+    sequence values for indices ``0`` through ``n-1``.
 
-    Keyword Arguments:
-        base (int): [description] (default: {2})
-
-    Returns:
-        [type]: [description]
+    :param n: Number of sequence values to generate.
+    :type n: int
+    :param base: Numeric base for digit reversal (default: 2).
+    :type base: int
+    :return: List of the first *n* van der Corput values.
+    :rtype: List[float]
 
     Examples:
         >>> vdcorput(4)
@@ -664,19 +667,24 @@ def vdcorput(n: int, base: int = 2) -> List[float]:
 def form_graph(
     N: int, M: int, _: Any, eta: float, seed: Optional[int] = None
 ) -> nx.Graph:
-    """Form N by N grid of nodes, connect nodes within eta.
-        mu and eta are relative to 1/(N-1)
+    """Generate a random bipartite graph with *N* and *M* nodes.
 
-    Arguments:
-        t (float): the best-so-far optimal value
-        pos ([type]): [description]
-        eta ([type]): [description]
+    Uses :func:`networkx.algorithms.bipartite.random_graph` to create
+    a bipartite graph where each possible edge between the two partitions
+    exists independently with probability *eta*.
 
-    Keyword Arguments:
-        seed ([type]): [description] (default: {None})
-
-    Returns:
-        [type]: [description]
+    :param N: Number of nodes in the first partition (modules).
+    :type N: int
+    :param M: Number of nodes in the second partition (nets).
+    :type M: int
+    :param _: Unused positional parameter (for API compatibility).
+    :type _: Any
+    :param eta: Edge probability for the random bipartite graph.
+    :type eta: float
+    :param seed: Optional random seed for reproducibility.
+    :type seed: Optional[int]
+    :return: A random bipartite graph.
+    :rtype: nx.Graph
     """
     if seed:
         random.seed(seed)
