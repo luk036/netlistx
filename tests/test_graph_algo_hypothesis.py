@@ -10,7 +10,7 @@ from netlistx.graph_algo import min_maximal_independant_set, min_vertex_cover_fa
 
 
 @st.composite
-def weighted_graph_strategy(draw):
+def weighted_graph_strategy(draw: st.DrawFn) -> tuple:
     """Generate a weighted graph for testing."""
     # Generate graph size
     num_nodes = draw(st.integers(min_value=1, max_value=10))
@@ -47,7 +47,7 @@ def weighted_graph_strategy(draw):
 
 
 @st.composite
-def edge_list_strategy(draw):
+def edge_list_strategy(draw: st.DrawFn) -> tuple:
     """Generate an edge list and corresponding weights."""
     num_nodes = draw(st.integers(min_value=2, max_value=8))
     nodes = list(range(num_nodes))
@@ -82,7 +82,7 @@ class TestVertexCoverProperties:
     """Property-based tests for minimum vertex cover algorithm."""
 
     @given(data=st.data())
-    def test_vertex_cover_covers_all_edges(self, data: st.DataObject):
+    def test_vertex_cover_covers_all_edges(self, data: st.DataObject) -> None:
         """Test that vertex cover actually covers all edges."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)  # Ensure graph has edges
@@ -94,7 +94,7 @@ class TestVertexCoverProperties:
             assert u in cover or v in cover, f"Edge ({u}, {v}) not covered by {cover}"
 
     @given(data=st.data())
-    def test_vertex_cover_weight_consistency(self, data: st.DataObject):
+    def test_vertex_cover_weight_consistency(self, data: st.DataObject) -> None:
         """Test that reported weight matches sum of vertex weights."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)
@@ -106,7 +106,7 @@ class TestVertexCoverProperties:
         assert total_weight == expected_weight
 
     @given(data=st.data())
-    def test_vertex_cover_subset_property(self, data: st.DataObject):
+    def test_vertex_cover_subset_property(self, data: st.DataObject) -> None:
         """Test that vertex cover is a subset of graph nodes."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)
@@ -118,7 +118,7 @@ class TestVertexCoverProperties:
             assert node in graph.nodes()
 
     @given(data=st.data())
-    def test_vertex_cover_monotonicity(self, data: st.DataObject):
+    def test_vertex_cover_monotonicity(self, data: st.DataObject) -> None:
         """Test that adding edges cannot reduce vertex cover size."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)
@@ -138,7 +138,7 @@ class TestVertexCoverProperties:
                 assert weight2 >= weight1 * 0.5  # Allow some variation due to algorithm
 
     @given(data=st.data())
-    def test_vertex_cover_empty_graph(self, data: st.DataObject):
+    def test_vertex_cover_empty_graph(self, data: st.DataObject) -> None:
         """Test vertex cover on graph with no edges."""
         graph = Graph()
         graph.add_nodes_from([0, 1, 2])
@@ -151,7 +151,7 @@ class TestVertexCoverProperties:
         assert total_weight == 0
 
     @given(data=st.data())
-    def test_vertex_cover_single_edge(self, data: st.DataObject):
+    def test_vertex_cover_single_edge(self, data: st.DataObject) -> None:
         """Test vertex cover on graph with single edge."""
         graph = Graph()
         graph.add_edge(0, 1)
@@ -168,7 +168,7 @@ class TestVertexCoverProperties:
         assert total_weight == weights[next(iter(cover))]
 
     @given(data=st.data())
-    def test_vertex_cover_preexisting_cover(self, data: st.DataObject):
+    def test_vertex_cover_preexisting_cover(self, data: st.DataObject) -> None:
         """Test algorithm with pre-existing cover set."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)
@@ -195,7 +195,7 @@ class TestIndependentSetProperties:
     """Property-based tests for minimum maximal independent set algorithm."""
 
     @given(data=st.data())
-    def test_independent_set_independence(self, data: st.DataObject):
+    def test_independent_set_independence(self, data: st.DataObject) -> None:
         """Test that independent set has no internal edges."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -210,7 +210,7 @@ class TestIndependentSetProperties:
                     ), f"Edge ({u}, {v}) found in independent set"
 
     @given(data=st.data())
-    def test_independent_set_maximality(self, data: st.DataObject):
+    def test_independent_set_maximality(self, data: st.DataObject) -> None:
         """Test that independent set is maximal."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -227,7 +227,7 @@ class TestIndependentSetProperties:
                 ), f"Node {node} can be added to independent set {indset}"
 
     @given(data=st.data())
-    def test_independent_set_weight_consistency(self, data: st.DataObject):
+    def test_independent_set_weight_consistency(self, data: st.DataObject) -> None:
         """Test that reported weight matches sum of vertex weights."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -238,7 +238,7 @@ class TestIndependentSetProperties:
         assert total_weight == expected_weight
 
     @given(data=st.data())
-    def test_independent_set_subset_property(self, data: st.DataObject):
+    def test_independent_set_subset_property(self, data: st.DataObject) -> None:
         """Test that independent set is a subset of graph nodes."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -249,7 +249,7 @@ class TestIndependentSetProperties:
             assert node in graph.nodes()
 
     @given(data=st.data())
-    def test_independent_set_empty_graph(self, data: st.DataObject):
+    def test_independent_set_empty_graph(self, data: st.DataObject) -> None:
         """Test independent set on empty graph."""
         graph = Graph()
         weights: Dict[Any, Union[int, float]] = {}
@@ -261,7 +261,7 @@ class TestIndependentSetProperties:
         assert total_weight == 0
 
     @given(data=st.data())
-    def test_independent_set_single_node(self, data: st.DataObject):
+    def test_independent_set_single_node(self, data: st.DataObject) -> None:
         """Test independent set on single node graph."""
         graph = Graph()
         graph.add_node(0)
@@ -275,7 +275,7 @@ class TestIndependentSetProperties:
         assert total_weight == weights[0]
 
     @given(data=st.data())
-    def test_independent_set_preexisting_set(self, data: st.DataObject):
+    def test_independent_set_preexisting_set(self, data: st.DataObject) -> None:
         """Test algorithm with pre-existing independent and dependent sets."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -300,7 +300,7 @@ class TestIndependentSetProperties:
         assert len(indset.intersection(initial_dep)) == 0
 
     @given(data=st.data())
-    def test_independent_set_complementarity(self, data: st.DataObject):
+    def test_independent_set_complementarity(self, data: st.DataObject) -> None:
         """Test relationship between independent set and vertex cover."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)
@@ -318,7 +318,7 @@ class TestGraphAlgorithmInvariants:
     """Tests for fundamental invariants of graph algorithms."""
 
     @given(data=st.data())
-    def test_weight_non_negative(self, data: st.DataObject):
+    def test_weight_non_negative(self, data: st.DataObject) -> None:
         """Test that all weights in solutions are non-negative."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -331,7 +331,7 @@ class TestGraphAlgorithmInvariants:
         assert ind_weight >= 0
 
     @given(data=st.data())
-    def test_algorithm_determinism(self, data: st.DataObject):
+    def test_algorithm_determinism(self, data: st.DataObject) -> None:
         """Test that algorithms are deterministic for same input."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -350,7 +350,7 @@ class TestGraphAlgorithmInvariants:
         assert ind_weight1 == ind_weight2
 
     @given(data=st.data())
-    def test_symmetry_property(self, data: st.DataObject):
+    def test_symmetry_property(self, data: st.DataObject) -> None:
         """Test that algorithms respect graph symmetry."""
         graph, weights = data.draw(weighted_graph_strategy())
 

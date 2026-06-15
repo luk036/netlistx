@@ -4,17 +4,19 @@ Missing lines: [185, 186, 193, 194, 195, 198]
 Missing branches: [[184, 185], [191, 193], [194, 172], [194, 195], [195, 194], [195, 198]]
 """
 
+from typing import Any
+
 from netlistx.netlist_algo import min_maximal_matching
 
 
 class MockUgraph:
     """Mock graph for testing min_maximal_matching."""
 
-    def __init__(self, net_to_modules, module_to_nets):
+    def __init__(self, net_to_modules: dict, module_to_nets: dict) -> None:
         self.net_to_modules = net_to_modules
         self.module_to_nets = module_to_nets
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Any) -> list:
         if key in self.net_to_modules:
             return self.net_to_modules[key]
         return self.module_to_nets[key]
@@ -23,7 +25,7 @@ class MockUgraph:
 class MockHyprgraph:
     """Mock hypergraph for testing."""
 
-    def __init__(self, nets, ugraph):
+    def __init__(self, nets: list, ugraph: Any) -> None:
         self.nets = nets
         self.ugraph = ugraph
 

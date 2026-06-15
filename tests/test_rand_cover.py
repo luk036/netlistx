@@ -133,7 +133,7 @@ def test_rand_vertex_cover_drawf(drawf_graph: Any) -> None:
 class MockHyprgraph:
     """Minimal mock hypergraph for testing."""
 
-    def __init__(self, nets, ugraph):
+    def __init__(self, nets: list, ugraph: dict) -> None:
         self.nets = nets
         self.ugraph = ugraph
 

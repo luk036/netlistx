@@ -36,7 +36,7 @@ class TestMinHyperVertexCoverWithCoverset:
         """Provide a pre-existing coverset to trigger the else branch (coverset is not None)."""
 
         class MockHyprgraph:
-            def __init__(self, nets, ugraph):
+            def __init__(self, nets: list, ugraph: dict) -> None:
                 self.nets = nets
                 self.ugraph = ugraph
 

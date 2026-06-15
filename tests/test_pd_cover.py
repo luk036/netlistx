@@ -1,12 +1,14 @@
 import networkx as nx
 import pytest
 
+from typing import Any
+
 from netlistx.cover import min_cycle_cover, min_odd_cycle_cover, min_vertex_cover
 
 
 class TestCoverAlgorithms:
     @pytest.fixture
-    def triangle_graph(self):
+    def triangle_graph(self) -> tuple:
         """A simple 3-node cycle."""
         G = nx.Graph()
         G.add_edges_from([(0, 1), (1, 2), (2, 0)])
@@ -14,14 +16,14 @@ class TestCoverAlgorithms:
         return G, weight
 
     @pytest.fixture
-    def tree_graph(self):
+    def tree_graph(self) -> tuple:
         """A graph with no cycles (should return empty cycle covers)."""
         G = nx.Graph()
         G.add_edges_from([(0, 1), (1, 2), (2, 3)])
         weight = {i: 1 for i in range(4)}
         return G, weight
 
-    def test_minimal_vertex_cover(self, triangle_graph):
+    def test_minimal_vertex_cover(self, triangle_graph: tuple) -> None:
         G, weight = triangle_graph
         soln, cost = min_vertex_cover(G, weight)
         # Any 2 nodes cover all edges in a triangle.
@@ -29,14 +31,14 @@ class TestCoverAlgorithms:
         assert len(soln) == 2
         assert cost == 2
 
-    def test_cycle_cover_filtering(self, tree_graph):
+    def test_cycle_cover_filtering(self, tree_graph: tuple) -> None:
         """Tests that _generic_bfs_cycle ignores edges in a tree."""
         G, weight = tree_graph
         soln, cost = min_cycle_cover(G, weight)
         assert len(soln) == 0
         assert cost == 0
 
-    def test_odd_cycle_cover(self):
+    def test_odd_cycle_cover(self) -> None:
         """Test detection of odd vs even cycles."""
         G = nx.Graph()
         # Square (even) and Triangle (odd)
@@ -49,7 +51,7 @@ class TestCoverAlgorithms:
         assert any(node in soln for node in [4, 5, 6])
         assert not any(node in soln for node in [0, 1, 2, 3])
 
-    def test_post_processing_minimality(self):
+    def test_post_processing_minimality(self) -> None:
         """Explicitly check if the cover is minimal."""
         G = nx.complete_graph(5)
         weight = {i: 1 for i in range(5)}

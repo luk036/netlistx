@@ -1,6 +1,6 @@
 """Property-based tests for covering algorithms using Hypothesis."""
 
-from typing import Set
+from typing import Any, Iterator, List, Set
 
 import hypothesis.strategies as st
 from hypothesis import assume, given
@@ -16,7 +16,7 @@ from netlistx.cover import (
 
 
 @st.composite
-def weighted_graph_strategy(draw):
+def weighted_graph_strategy(draw: st.DrawFn) -> tuple:
     """Generate a weighted graph for testing."""
     # Generate graph size
     num_nodes = draw(st.integers(min_value=1, max_value=8))
@@ -53,7 +53,7 @@ def weighted_graph_strategy(draw):
 
 
 @st.composite
-def hypergraph_strategy(draw):
+def hypergraph_strategy(draw: st.DrawFn) -> tuple:
     """Generate a hypergraph-like structure for testing."""
     num_modules = draw(st.integers(min_value=1, max_value=6))
     num_nets = draw(st.integers(min_value=1, max_value=6))
@@ -87,7 +87,7 @@ def hypergraph_strategy(draw):
 
     # Create mock hypergraph
     class MockHypergraph:
-        def __init__(self, nets, ugraph):
+        def __init__(self, nets: List[str], ugraph: Any) -> None:
             self.nets = nets
             self.ugraph = ugraph
 
@@ -99,7 +99,7 @@ class TestVertexCoverProperties:
     """Property-based tests for vertex cover algorithm."""
 
     @given(data=st.data())
-    def test_vertex_cover_covers_all_edges(self, data: st.DataObject):
+    def test_vertex_cover_covers_all_edges(self, data: st.DataObject) -> None:
         """Test that vertex cover actually covers all edges."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)  # Ensure graph has edges
@@ -111,7 +111,7 @@ class TestVertexCoverProperties:
             assert u in cover or v in cover, f"Edge ({u}, {v}) not covered by {cover}"
 
     @given(data=st.data())
-    def test_vertex_cover_weight_consistency(self, data: st.DataObject):
+    def test_vertex_cover_weight_consistency(self, data: st.DataObject) -> None:
         """Test that reported weight matches sum of vertex weights."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)
@@ -123,7 +123,7 @@ class TestVertexCoverProperties:
         assert total_weight == expected_weight
 
     @given(data=st.data())
-    def test_vertex_cover_subset_property(self, data: st.DataObject):
+    def test_vertex_cover_subset_property(self, data: st.DataObject) -> None:
         """Test that vertex cover is a subset of graph nodes."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)
@@ -135,7 +135,7 @@ class TestVertexCoverProperties:
             assert node in graph.nodes()
 
     @given(data=st.data())
-    def test_vertex_cover_empty_graph(self, data: st.DataObject):
+    def test_vertex_cover_empty_graph(self, data: st.DataObject) -> None:
         """Test vertex cover on graph with no edges."""
         graph = Graph()
         graph.add_nodes_from([0, 1, 2])
@@ -148,7 +148,7 @@ class TestVertexCoverProperties:
         assert total_weight == 0
 
     @given(data=st.data())
-    def test_vertex_cover_preexisting_cover(self, data: st.DataObject):
+    def test_vertex_cover_preexisting_cover(self, data: st.DataObject) -> None:
         """Test algorithm with pre-existing cover set."""
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)
@@ -173,7 +173,7 @@ class TestHyperVertexCoverProperties:
     """Property-based tests for hypergraph vertex cover algorithm."""
 
     @given(data=st.data())
-    def test_hyper_vertex_cover_covers_all_nets(self, data: st.DataObject):
+    def test_hyper_vertex_cover_covers_all_nets(self, data: st.DataObject) -> None:
         """Test that hypergraph vertex cover covers all nets."""
         hypergraph, weights = data.draw(hypergraph_strategy())
 
@@ -187,7 +187,7 @@ class TestHyperVertexCoverProperties:
             ), f"Net {net} not covered by any module in {cover}"
 
     @given(data=st.data())
-    def test_hyper_vertex_cover_weight_consistency(self, data: st.DataObject):
+    def test_hyper_vertex_cover_weight_consistency(self, data: st.DataObject) -> None:
         """Test that reported weight matches sum of module weights."""
         hypergraph, weights = data.draw(hypergraph_strategy())
 
@@ -198,7 +198,7 @@ class TestHyperVertexCoverProperties:
         assert total_weight == expected_weight
 
     @given(data=st.data())
-    def test_hyper_vertex_cover_modules_only(self, data: st.DataObject):
+    def test_hyper_vertex_cover_modules_only(self, data: st.DataObject) -> None:
         """Test that hypergraph vertex cover only contains modules."""
         hypergraph, weights = data.draw(hypergraph_strategy())
 
@@ -214,7 +214,7 @@ class TestCycleCoverProperties:
     """Property-based tests for cycle cover algorithm."""
 
     @given(data=st.data())
-    def test_cycle_cover_breaks_all_cycles(self, data: st.DataObject):
+    def test_cycle_cover_breaks_all_cycles(self, data: st.DataObject) -> None:
         """Test that cycle cover breaks all cycles in the graph."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -237,7 +237,7 @@ class TestCycleCoverProperties:
             assert remaining_graph.number_of_edges() <= len(remaining_nodes) - 1
 
     @given(data=st.data())
-    def test_cycle_cover_weight_consistency(self, data: st.DataObject):
+    def test_cycle_cover_weight_consistency(self, data: st.DataObject) -> None:
         """Test that reported weight matches sum of vertex weights."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -248,7 +248,7 @@ class TestCycleCoverProperties:
         assert total_weight == expected_weight
 
     @given(data=st.data())
-    def test_cycle_cover_acyclic_graph(self, data: st.DataObject):
+    def test_cycle_cover_acyclic_graph(self, data: st.DataObject) -> None:
         """Test cycle cover on acyclic graph."""
         # Create a tree (acyclic graph)
         graph = path_graph(5)
@@ -261,7 +261,7 @@ class TestCycleCoverProperties:
         assert total_weight == 0
 
     @given(data=st.data())
-    def test_cycle_cover_cycle_graph(self, data: st.DataObject):
+    def test_cycle_cover_cycle_graph(self, data: st.DataObject) -> None:
         """Test cycle cover on a simple cycle."""
         cycle_length = data.draw(st.integers(min_value=3, max_value=8))
         graph = cycle_graph(cycle_length)
@@ -281,7 +281,7 @@ class TestOddCycleCoverProperties:
     """Property-based tests for odd cycle cover algorithm."""
 
     @given(data=st.data())
-    def test_odd_cycle_cover_breaks_all_odd_cycles(self, data: st.DataObject):
+    def test_odd_cycle_cover_breaks_all_odd_cycles(self, data: st.DataObject) -> None:
         """Test that odd cycle cover breaks all odd cycles."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -305,7 +305,7 @@ class TestOddCycleCoverProperties:
             pass
 
     @given(data=st.data())
-    def test_odd_cycle_cover_weight_consistency(self, data: st.DataObject):
+    def test_odd_cycle_cover_weight_consistency(self, data: st.DataObject) -> None:
         """Test that reported weight matches sum of vertex weights."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -316,7 +316,7 @@ class TestOddCycleCoverProperties:
         assert total_weight == expected_weight
 
     @given(data=st.data())
-    def test_odd_cycle_cover_even_cycle_preserved(self, data: st.DataObject):
+    def test_odd_cycle_cover_even_cycle_preserved(self, data: st.DataObject) -> None:
         """Test that even cycles might be preserved by odd cycle cover."""
         # Create an even cycle
         graph = cycle_graph(4)  # 4-cycle
@@ -333,7 +333,7 @@ class TestPDCoverProperties:
     """Property-based tests for primal-dual cover framework."""
 
     @given(data=st.data())
-    def test_pd_cover_basic_properties(self, data: st.DataObject):
+    def test_pd_cover_basic_properties(self, data: st.DataObject) -> None:
         """Test basic properties of pd_cover function."""
         # Create a simple violate function
         elements = [0, 1, 2, 3]
@@ -341,7 +341,7 @@ class TestPDCoverProperties:
             i: data.draw(st.integers(min_value=1, max_value=10)) for i in elements
         }
 
-        def violate_simple():
+        def violate_simple() -> Iterator[List[int]]:
             # Yield violating sets
             yield [0, 1]
             yield [1, 2]
@@ -364,14 +364,14 @@ class TestPDCoverProperties:
             assert total_weight >= min_weight_in_result
 
     @given(data=st.data())
-    def test_pd_cover_empty_violate(self, data: st.DataObject):
+    def test_pd_cover_empty_violate(self, data: st.DataObject) -> None:
         """Test pd_cover with no violations."""
         elements = [0, 1, 2]
         weights = {
             i: data.draw(st.integers(min_value=1, max_value=10)) for i in elements
         }
 
-        def violate_empty():
+        def violate_empty() -> Iterator[List[int]]:
             return iter([])  # No violations
 
         solution: Set[int] = set()
@@ -382,14 +382,14 @@ class TestPDCoverProperties:
         assert total_weight == 0
 
     @given(data=st.data())
-    def test_pd_cover_preexisting_solution(self, data: st.DataObject):
+    def test_pd_cover_preexisting_solution(self, data: st.DataObject) -> None:
         """Test pd_cover with pre-existing solution."""
         elements = [0, 1, 2, 3]
         weights = {
             i: data.draw(st.integers(min_value=1, max_value=10)) for i in elements
         }
 
-        def violate_simple():
+        def violate_simple() -> Iterator[List[int]]:
             yield [0, 1]
             yield [2, 3]
 
@@ -406,7 +406,7 @@ class TestCoveringAlgorithmInvariants:
     """Tests for fundamental invariants of covering algorithms."""
 
     @given(data=st.data())
-    def test_algorithm_determinism(self, data: st.DataObject):
+    def test_algorithm_determinism(self, data: st.DataObject) -> None:
         """Test that algorithms are deterministic for same input."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -418,7 +418,7 @@ class TestCoveringAlgorithmInvariants:
         assert weight1 == weight2
 
     @given(data=st.data())
-    def test_weight_non_negative(self, data: st.DataObject):
+    def test_weight_non_negative(self, data: st.DataObject) -> None:
         """Test that all weights in solutions are non-negative."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -435,7 +435,7 @@ class TestCoveringAlgorithmInvariants:
         assert odd_cycle_weight >= 0
 
     @given(data=st.data())
-    def test_subset_relationships(self, data: st.DataObject):
+    def test_subset_relationships(self, data: st.DataObject) -> None:
         """Test subset relationships between different covers."""
         graph, weights = data.draw(weighted_graph_strategy())
 
@@ -450,7 +450,7 @@ class TestCoveringAlgorithmInvariants:
         assert odd_cycle_cover.issubset(all_nodes)
 
     @given(data=st.data())
-    def test_monotonicity_with_weights(self, data: st.DataObject):
+    def test_monotonicity_with_weights(self, data: st.DataObject) -> None:
         """Test that weight changes are reasonable for approximation algorithms."""
         graph, base_weights = data.draw(weighted_graph_strategy())
 

@@ -12,7 +12,7 @@ from netlistx.netlist import Netlist, SimpleGraph, create_random_hgraph, read_js
 
 
 @st.composite
-def netlist_strategy(draw):
+def netlist_strategy(draw: st.DrawFn) -> Netlist:
     """Generate a valid netlist for testing."""
     # Generate modules and nets
     num_modules = draw(st.integers(min_value=1, max_value=10))
@@ -73,32 +73,32 @@ class TestNetlistProperties:
     """Property-based tests for Netlist class."""
 
     @given(netlist=netlist_strategy())
-    def test_module_count_consistency(self, netlist: Netlist):
+    def test_module_count_consistency(self, netlist: Netlist) -> None:
         """Test that module count is consistent across different methods."""
         assert netlist.number_of_modules() == len(netlist.modules)
         assert netlist.number_of_modules() == netlist.num_modules
 
     @given(netlist=netlist_strategy())
-    def test_net_count_consistency(self, netlist: Netlist):
+    def test_net_count_consistency(self, netlist: Netlist) -> None:
         """Test that net count is consistent across different methods."""
         assert netlist.number_of_nets() == len(netlist.nets)
         assert netlist.number_of_nets() == netlist.num_nets
 
     @given(netlist=netlist_strategy())
-    def test_node_count_consistency(self, netlist: Netlist):
+    def test_node_count_consistency(self, netlist: Netlist) -> None:
         """Test that total node count matches modules + nets."""
         expected_nodes = netlist.number_of_modules() + netlist.number_of_nets()
         assert netlist.number_of_nodes() == expected_nodes
         assert netlist.ugraph.number_of_nodes() == expected_nodes
 
     @given(netlist=netlist_strategy())
-    def test_pin_count_non_negative(self, netlist: Netlist):
+    def test_pin_count_non_negative(self, netlist: Netlist) -> None:
         """Test that pin count is non-negative."""
         assert netlist.number_of_pins() >= 0
         assert netlist.number_of_pins() == netlist.ugraph.number_of_edges()
 
     @given(netlist=netlist_strategy())
-    def test_max_degree_properties(self, netlist: Netlist):
+    def test_max_degree_properties(self, netlist: Netlist) -> None:
         """Test properties of maximum degree."""
         max_deg = netlist.get_max_degree()
         assert max_deg >= 0
@@ -108,7 +108,7 @@ class TestNetlistProperties:
             assert netlist.ugraph.degree[module] <= max_deg
 
     @given(netlist=netlist_strategy())
-    def test_module_weight_bounds(self, netlist: Netlist):
+    def test_module_weight_bounds(self, netlist: Netlist) -> None:
         """Test that module weights are within expected bounds."""
         for i, module in enumerate(netlist.modules):
             weight = netlist.get_module_weight(i)
@@ -116,7 +116,7 @@ class TestNetlistProperties:
             assert weight >= 0
 
     @given(netlist=netlist_strategy())
-    def test_net_weight_consistency(self, netlist: Netlist):
+    def test_net_weight_consistency(self, netlist: Netlist) -> None:
         """Test that net weights are consistent."""
         for net in netlist.nets:
             weight = netlist.get_net_weight(net)
@@ -124,14 +124,14 @@ class TestNetlistProperties:
             assert weight >= 0
 
     @given(netlist=netlist_strategy())
-    def test_iterator_returns_modules(self, netlist: Netlist):
+    def test_iterator_returns_modules(self, netlist: Netlist) -> None:
         """Test that iterator returns all modules."""
         iterated_modules = list(netlist)
         assert set(iterated_modules) == set(netlist.modules)
         assert len(iterated_modules) == len(netlist.modules)
 
     @given(data=st.data())
-    def test_random_hgraph_properties(self, data: st.DataObject):
+    def test_random_hgraph_properties(self, data: st.DataObject) -> None:
         """Test properties of randomly generated hypergraphs."""
         N = data.draw(st.integers(min_value=1, max_value=20))
         M = data.draw(st.integers(min_value=1, max_value=20))
@@ -156,7 +156,7 @@ class TestNetlistProperties:
             assert i in netlist.nets
 
     @given(netlist=netlist_strategy())
-    def test_bipartite_property(self, netlist: Netlist):
+    def test_bipartite_property(self, netlist: Netlist) -> None:
         """Test that the netlist graph maintains bipartite properties between modules and nets."""
         modules_set = set(netlist.modules)
         nets_set = set(netlist.nets)
@@ -176,7 +176,7 @@ class TestNetlistJSON:
     """Property-based tests for JSON serialization/deserialization."""
 
     @given(data=st.data())
-    def test_json_roundtrip(self, data: st.DataObject):
+    def test_json_roundtrip(self, data: st.DataObject) -> None:
         """Test that netlist can be serialized to JSON and read back."""
         # Create a simple netlist with integer modules/nets like read_json expects
         num_modules = data.draw(st.integers(min_value=1, max_value=5))
@@ -257,7 +257,7 @@ class TestNetlistJSON:
             Path(temp_path).unlink()
 
     @given(data=st.data())
-    def test_json_structure_validity(self, data: st.DataObject):
+    def test_json_structure_validity(self, data: st.DataObject) -> None:
         """Test that JSON files have valid structure."""
         # Generate valid JSON structure
         num_modules = data.draw(st.integers(min_value=1, max_value=5))
@@ -304,7 +304,7 @@ class TestNetlistInvariants:
     """Tests for fundamental netlist invariants."""
 
     @given(netlist=netlist_strategy())
-    def test_weighted_degree_consistency(self, netlist: Netlist):
+    def test_weighted_degree_consistency(self, netlist: Netlist) -> None:
         """Test that weighted degrees are consistent."""
         total_module_weight = sum(
             netlist.get_module_weight(i) for i in range(len(netlist.modules))
@@ -315,7 +315,7 @@ class TestNetlistInvariants:
         assert total_net_weight >= 0
 
     @given(netlist=netlist_strategy())
-    def test_module_fixed_set_property(self, netlist: Netlist):
+    def test_module_fixed_set_property(self, netlist: Netlist) -> None:
         """Test properties of the fixed module set."""
         assert isinstance(netlist.module_fixed, set)
         # All elements in module_fixed should be valid modules
@@ -323,13 +323,13 @@ class TestNetlistInvariants:
             assert fixed_module in netlist.modules
 
     @given(netlist=netlist_strategy())
-    def test_cost_model_property(self, netlist: Netlist):
+    def test_cost_model_property(self, netlist: Netlist) -> None:
         """Test cost model property."""
         assert isinstance(netlist.cost_model, int)
         assert netlist.cost_model >= 0
 
     @given(netlist=netlist_strategy())
-    def test_graph_connectivity_properties(self, netlist: Netlist):
+    def test_graph_connectivity_properties(self, netlist: Netlist) -> None:
         """Test basic graph connectivity properties."""
         # Every module should be a node in the graph
         for module in netlist.modules:

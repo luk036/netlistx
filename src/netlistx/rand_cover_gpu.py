@@ -27,14 +27,14 @@ THREADS_PER_BLOCK = 64
 
 @cuda.jit
 def _pitt_kernel(
-    edges,
-    num_edges,
-    weights,
-    num_vertices,
-    cover_words,
-    costs,
-    seeds,
-):
+    edges: np.ndarray,
+    num_edges: int,
+    weights: np.ndarray,
+    num_vertices: int,
+    cover_words: np.ndarray,
+    costs: np.ndarray,
+    seeds: np.ndarray,
+) -> None:
     """
     CUDA kernel: each thread runs one independent Pitt trial.
 

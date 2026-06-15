@@ -13,7 +13,7 @@ from netlistx.readwrite import read_are, read_netd
 class TestReadNetdEdgeCases:
     """Cover lines 38 (early break) and 41 (empty lines)."""
 
-    def _make_net_file(self, lines):
+    def _make_net_file(self, lines: list[str]) -> str:
         """Create a temp .net file with given lines."""
         tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".net", delete=False)
         tmp.writelines(lines)
@@ -84,7 +84,7 @@ class TestReadNetdEdgeCases:
 class TestReadAreEdgeCases:
     """Cover lines 73 (empty lines) and 76 (short lines)."""
 
-    def _make_are_file(self, lines):
+    def _make_are_file(self, lines: list[str]) -> str:
         """Create a temp .are file with given lines."""
         tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".are", delete=False)
         tmp.writelines(lines)
