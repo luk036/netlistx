@@ -20,7 +20,7 @@ from typing import Dict, MutableMapping, Optional, Set, Tuple, Union
 
 import networkx as nx
 import numpy as np
-from numba import cuda
+from numba import cuda  # type: ignore[import-untyped]
 
 THREADS_PER_BLOCK = 64
 

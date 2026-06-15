@@ -56,7 +56,7 @@ class TestMinMaximalMatchingUnequalWeights:
         )
         hyprgraph = MockHyprgraph(["N1", "N2", "N3"], ugraph)
         weight = {"N1": 1, "N2": 5, "N3": 1}
-        matchset, cost = min_maximal_matching(hyprgraph, weight)
+        matchset, cost = min_maximal_matching(hyprgraph, weight)  # type: ignore[arg-type]
         assert isinstance(matchset, set)
         # N2 is heavy, so it should NOT be in the matching
         assert "N2" not in matchset
@@ -84,7 +84,7 @@ class TestMinMaximalMatchingUnequalWeights:
         )
         hyprgraph = MockHyprgraph(["N1", "N2", "N3"], ugraph)
         weight = {"N1": 3, "N2": 2, "N3": 1}
-        matchset, cost = min_maximal_matching(hyprgraph, weight)
+        matchset, cost = min_maximal_matching(hyprgraph, weight)  # type: ignore[arg-type]
         assert isinstance(matchset, set)
         # With descending weights, the algorithm should pick lighter nets
         assert cost <= 3
@@ -112,7 +112,7 @@ class TestMinMaximalMatchingUnequalWeights:
         )
         hyprgraph = MockHyprgraph(["N1", "N2", "N3", "N4"], ugraph)
         weight = {"N1": 10, "N2": 1, "N3": 10, "N4": 10}
-        matchset, cost = min_maximal_matching(hyprgraph, weight)
+        matchset, cost = min_maximal_matching(hyprgraph, weight)  # type: ignore[arg-type]
         assert isinstance(matchset, set)
         # N2 (weight 1) should be selected, others should depend on iteration order
         assert "N2" in matchset

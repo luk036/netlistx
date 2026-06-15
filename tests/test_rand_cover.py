@@ -70,7 +70,7 @@ def test_rand_vertex_cover_weighted() -> None:
 def test_rand_vertex_cover_empty_graph() -> None:
     """Empty graph should return empty cover."""
     ugraph = nx.Graph()
-    weight = {}
+    weight: dict[int, int] = {}
     soln, cost = rand_vertex_cover(ugraph, weight, seed=0)
     assert len(soln) == 0
     assert cost == 0
@@ -192,7 +192,7 @@ def test_rand_hyper_vertex_cover_weighted() -> None:
 def test_rand_hyper_vertex_cover_empty() -> None:
     """Empty hypergraph should return empty cover."""
     hyprgraph = MockHyprgraph([], {})
-    weight = {}
+    weight: dict[int, int] = {}
     soln, cost = rand_hyper_vertex_cover(hyprgraph, weight, seed=0)
     assert len(soln) == 0
     assert cost == 0

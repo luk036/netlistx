@@ -2,7 +2,7 @@ from typing import Any
 
 import networkx as nx
 import pytest
-from numba import cuda
+from numba import cuda  # type: ignore[import-untyped]
 
 from netlistx.rand_cover_gpu import rand_vertex_cover_gpu
 
@@ -60,7 +60,7 @@ def test_gpu_vertex_cover_weighted() -> None:
 def test_gpu_vertex_cover_empty_graph() -> None:
     """Empty graph returns empty cover."""
     ugraph = nx.Graph()
-    weight = {}
+    weight: dict[int, int] = {}
     soln, cost = rand_vertex_cover_gpu(ugraph, weight, num_trials=64, seed=0)
     assert len(soln) == 0
     assert cost == 0

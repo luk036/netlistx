@@ -1,7 +1,7 @@
 """Tests for read_yosys_json function."""
 import json
 import tempfile
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from netlistx.netlist import read_yosys_json
 
@@ -9,7 +9,7 @@ from netlistx.netlist import read_yosys_json
 def _make_yosys_json(
     cells: Dict[str, Dict[str, Any]],
     ports: Dict[str, Dict[str, Any]],
-    netnames: Dict[str, Dict[str, Any]] = None,
+    netnames: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> str:
     """Create a temporary Yosys JSON file and return its path."""
     data: Dict[str, Any] = {
