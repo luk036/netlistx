@@ -58,15 +58,22 @@ def main():
             timing_groups = pin_group.get_groups("timing")
             for timing in timing_groups:
                 related_pin = timing.get_attribute("related_pin", "N/A")
-                for table_name in ["cell_rise", "cell_fall", "rise_transition",
-                                   "fall_transition", "rise_constraint"]:
+                for table_name in [
+                    "cell_rise",
+                    "cell_fall",
+                    "rise_transition",
+                    "fall_transition",
+                    "rise_constraint",
+                ]:
                     tbl_grp = timing.get_groups(table_name)
                     if tbl_grp:
                         delay_table = tbl_grp[0].get_array("values")
-                        print(f"    {table_name}({related_pin}): "
-                              f"shape={delay_table.shape}, "
-                              f"min={delay_table.min():.4f}, "
-                              f"max={delay_table.max():.4f}")
+                        print(
+                            f"    {table_name}({related_pin}): "
+                            f"shape={delay_table.shape}, "
+                            f"min={delay_table.min():.4f}, "
+                            f"max={delay_table.max():.4f}"
+                        )
 
     # ---------------------------------------------------------------
     # 3. Extract a specific delay table as a NumPy array
@@ -101,12 +108,13 @@ def main():
     for cell_group in library.get_groups("cell"):
         is_seq = "ff" in cell_group
         has_clock = any(
-            pin.get_attribute("clock", False)
-            for pin in cell_group.get_groups("pin")
+            pin.get_attribute("clock", False) for pin in cell_group.get_groups("pin")
         )
         if is_seq or has_clock:
-            print(f"  {cell_group.args[0]}: "
-                  f"sequential={is_seq}, has_clock_pin={has_clock}")
+            print(
+                f"  {cell_group.args[0]}: "
+                f"sequential={is_seq}, has_clock_pin={has_clock}"
+            )
 
     # ---------------------------------------------------------------
     # 5. Extract library-level attributes
@@ -116,9 +124,16 @@ def main():
     print("=" * 60)
 
     lib_attrs = [
-        "technology", "time_unit", "voltage_unit", "current_unit",
-        "delay_model", "default_fanout_load", "default_input_pin_cap",
-        "nom_process", "nom_temperature", "nom_voltage",
+        "technology",
+        "time_unit",
+        "voltage_unit",
+        "current_unit",
+        "delay_model",
+        "default_fanout_load",
+        "default_input_pin_cap",
+        "nom_process",
+        "nom_temperature",
+        "nom_voltage",
     ]
     for attr in lib_attrs:
         if attr in library:

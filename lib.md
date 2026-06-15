@@ -38,7 +38,7 @@ The **Synopsys Liberty (.lib) format** is the industry-standard ASCII format for
 /* Comments use C-style syntax */
 group_name (optional_name) {
     attribute_name : attribute_value ;
-    
+
     subgroup_name (subgroup_params) {
         /* nested content */
         attribute_name : attribute_value ;
@@ -62,19 +62,19 @@ library(example_minimal) {
     default_fanout_load : 1.0 ;
     default_input_pin_cap : 0.5 ;
     delay_model : "table_lookup" ;
-    
+
     /* Operating Conditions (PVT) */
     nom_process : 1.0 ;
     nom_temperature : 25.0 ;
     nom_voltage : 1.2 ;
-    
+
     operating_conditions (typical) {
         process : 1.0 ;
         temperature : 25.0 ;
         voltage : 1.2 ;
         tree_type : "balanced_tree" ;
     }
-    
+
     /* Lookup Table Templates */
     lu_table_template (delay_template_2x2) {
         variable_1 : "input_net_transition" ;
@@ -96,68 +96,68 @@ library(example_minimal) {
         index_1 ("0.1, 1.0") ;
         index_2 ("0.05") ;
     }
-    
+
     /* Combinational Cell: 2-input AND gate */
     cell (AND2_X1) {
         area : 5.0 ;
         is_macro : false ;
-        
+
         pin (A) {
             direction : input ;
             capacitance : 0.8 ;
             fanout_load : 1.0 ;
         }
-        
+
         pin (B) {
             direction : input ;
             capacitance : 0.8 ;
             fanout_load : 1.0 ;
         }
-        
+
         pin (Z) {
             direction : output ;
             function : "(A & B)" ;
             max_capacitance : 1.5 ;
-            
+
             timing () {
                 related_pin : "A" ;
                 timing_sense : positive_unate ;
-                
+
                 cell_rise (delay_template_2x2) {
                     index_1 ("0.1, 1.0") ;
                     index_2 ("0.05, 0.5") ;
                     values ("0.12, 0.24", "0.38, 0.52") ;
                 }
-                
+
                 rise_transition (delay_template_2x2) {
                     index_1 ("0.1, 1.0") ;
                     index_2 ("0.05, 0.5") ;
                     values ("0.09, 0.18", "0.70, 0.95") ;
                 }
-                
+
                 cell_fall (delay_template_2x2) {
                     index_1 ("0.1, 1.0") ;
                     index_2 ("0.05, 0.5") ;
                     values ("0.10, 0.20", "0.32, 0.45") ;
                 }
-                
+
                 fall_transition (delay_template_2x2) {
                     index_1 ("0.1, 1.0") ;
                     index_2 ("0.05, 0.5") ;
                     values ("0.08, 0.16", "0.65, 0.88") ;
                 }
             }
-            
+
             timing () {
                 related_pin : "B" ;
                 timing_sense : positive_unate ;
-                
+
                 cell_rise (delay_template_2x2) {
                     index_1 ("0.1, 1.0") ;
                     index_2 ("0.05, 0.5") ;
                     values ("0.14, 0.26", "0.40, 0.55") ;
                 }
-                
+
                 rise_transition (delay_template_2x2) {
                     index_1 ("0.1, 1.0") ;
                     index_2 ("0.05, 0.5") ;
@@ -165,39 +165,39 @@ library(example_minimal) {
                 }
             }
         }
-        
+
         /* Power Modeling */
         internal_power () {
             related_pin : "A" ;
             rise_power (power_template_1x1) { values ("0.05") ; }
             fall_power (power_template_1x1) { values ("0.04") ; }
         }
-        
+
         leakage_power () {
             value : 0.002 ;
         }
     }
-    
+
     /* Sequential Cell: D Flip-Flop */
     cell (DFF_X1) {
         area : 15.0 ;
         ff : "IQ" ;
-        
+
         pin (CK) {
             direction : input ;
             clock : true ;
             capacitance : 0.7 ;
         }
-        
+
         pin (D) {
             direction : input ;
             capacitance : 0.6 ;
         }
-        
+
         pin (Q) {
             direction : output ;
             function : "IQ" ;
-            
+
             timing () {
                 related_pin : "CK" ;
                 timing_type : "rising_edge" ;
@@ -225,7 +225,7 @@ library(example_minimal) {
                 }
             }
         }
-        
+
         /* Timing Constraints */
         timing () {
             related_pin : "CK" ;
@@ -242,7 +242,7 @@ library(example_minimal) {
                 values ("0.05, 0.10") ;
             }
         }
-        
+
         leakage_power () { value : 0.01 ; }
     }
 
@@ -332,14 +332,14 @@ with open("your_library.lib", "r") as f:
 for cell_group in library.get_groups('cell'):
     cell_name = cell_group.args[0]
     print(f"Cell: {cell_name}")
-    
+
     # Examine pins
     for pin_group in cell_group.get_groups('pin'):
         pin_name = pin_group.args[0]
-        
+
         if 'direction' in pin_group:
             print(f"  Pin {pin_name}: {pin_group['direction']}")
-        
+
         # Extract timing tables as NumPy arrays
         timing = pin_group.get_groups('timing')
         if timing:
@@ -378,15 +378,15 @@ use std::io::BufReader;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let f = File::open("library.lib")?;
     let mut buf = BufReader::new(f);
-    
+
     // Parse library
     let library = liberty_io::read_liberty_bytes(&mut buf)?;
-    
+
     // Access cells
     for group in &library.groups {
         if group.name == "cell" {
             println!("Cell: {}", group.arguments[0]);
-            
+
             // Find pins
             for pin in &group.groups {
                 if pin.name == "pin" {
@@ -395,15 +395,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
-    
+
     // Modify and write back
     library.groups.push(
         liberty_io::liberty::Group::new("comment", vec!["Modified by script"])
     );
-    
+
     let output = File::create("modified.lib")?;
     liberty_io::write_liberty(&library, output)?;
-    
+
     Ok(())
 }
 ```
@@ -429,19 +429,19 @@ public:
 int main() {
     // Parse Liberty file
     Liberty::Library* lib = Liberty::readLibertyFile("library.lib");
-    
+
     if (lib) {
         // Traverse the parsed data
         MyLibertyVisitor visitor;
         lib->accept(&visitor);
-        
+
         // Access attributes
         const auto& cells = lib->cells();
         for (auto* cell : cells) {
             std::cout << "Cell area: " << cell->area() << std::endl;
         }
     }
-    
+
     return 0;
 }
 ```
@@ -499,10 +499,10 @@ def liberty_to_dict(group):
         attrs[a.name] = _json_safe(a.value)
     if attrs:
         result["attributes"] = attrs
-    
+
     if group.groups:
         result["groups"] = [liberty_to_dict(g) for g in group.groups]
-    
+
     return result
 
 # Parse and convert
@@ -573,9 +573,9 @@ def _json_safe(value):
 def extract_timing_data(lib_file):
     with open(lib_file, "r") as f:
         library = parse_liberty(f.read())
-    
+
     timing_data = {}
-    
+
     for cell in library.get_groups('cell'):
         cell_name = cell.args[0]
         timing_data[cell_name] = {
@@ -583,14 +583,14 @@ def extract_timing_data(lib_file):
             "is_sequential": 'ff' in cell,
             "pins": {}
         }
-        
+
         for pin in cell.get_groups('pin'):
             pin_name = pin.args[0]
             pin_info = {
                 "direction": _json_safe(pin.get_attribute('direction', 'unknown')),
                 "capacitance": float(pin.get_attribute('capacitance', 0))
             }
-            
+
             # Extract timing arcs
             arcs = []
             for timing in pin.get_groups('timing'):
@@ -612,18 +612,18 @@ def extract_timing_data(lib_file):
                             "values": table.tolist(),
                         }
                 arcs.append(arc)
-            
+
             if arcs:
                 pin_info["timing_arcs"] = arcs
             timing_data[cell_name]["pins"][pin_name] = pin_info
-        
+
         # Extract leakage power
         leakage = cell.get_groups('leakage_power')
         if leakage:
             timing_data[cell_name]["leakage_power"] = float(
                 leakage[0].get_attribute('value', 0)
             )
-    
+
     return timing_data
 
 data = extract_timing_data("library.lib")

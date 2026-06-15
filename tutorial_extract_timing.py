@@ -13,6 +13,7 @@ Based on the tutorial section: "Method 3: Selective JSON Extraction"
 """
 
 import json
+
 import numpy as np
 from liberty.parser import parse_liberty
 from liberty.types import EscapedString
@@ -33,7 +34,6 @@ def _get_attr(group, key, default=None):
 
 
 def extract_detailed_timing(lib_file):
-
     with open(lib_file, "r") as f:
         library = parse_liberty(f.read())
 
@@ -68,9 +68,7 @@ def extract_detailed_timing(lib_file):
 
         lp = cell.get_groups("leakage_power")
         if lp:
-            cell_info["leakage_power"] = float(
-                lp[0].get_attribute("value", 0)
-            )
+            cell_info["leakage_power"] = float(lp[0].get_attribute("value", 0))
 
         for ip in cell.get_groups("internal_power"):
             related = _get_attr(ip, "related_pin", "unknown")
@@ -104,9 +102,12 @@ def extract_detailed_timing(lib_file):
                 }
 
                 for table_key in [
-                    "cell_rise", "cell_fall",
-                    "rise_transition", "fall_transition",
-                    "rise_constraint", "fall_constraint",
+                    "cell_rise",
+                    "cell_fall",
+                    "rise_transition",
+                    "fall_transition",
+                    "rise_constraint",
+                    "fall_constraint",
                 ]:
                     tbl_grp = timing.get_groups(table_key)
                     if tbl_grp:
@@ -136,23 +137,28 @@ def print_timing_summary(report):
     print(f"Units: time={lib['time_unit']}, voltage={lib['voltage_unit']}")
 
     for oc_name, oc in report["operating_conditions"].items():
-        print(f"Operating Conditions ({oc_name}): "
-              f"{oc['process']}p, {oc['temperature']}°C, {oc['voltage']}V")
+        print(
+            f"Operating Conditions ({oc_name}): "
+            f"{oc['process']}p, {oc['temperature']}°C, {oc['voltage']}V"
+        )
 
     print()
     for cell_name, info in report["cells"].items():
         seq_marker = " [FF]" if info["is_sequential"] else ""
         lp = info["leakage_power"] or 0
-        print(f"Cell: {cell_name}{seq_marker}  "
-              f"area={info['area']}, leakage={lp}")
+        print(f"Cell: {cell_name}{seq_marker}  " f"area={info['area']}, leakage={lp}")
 
         for pin_name, pin in info["pins"].items():
             func = f" fn={pin['function']}" if pin["function"] else ""
             clock = " [CLK]" if pin["clock"] else ""
-            maxcap = f" maxcap={pin['max_capacitance']}" if pin["max_capacitance"] else ""
-            print(f"  Pin: {pin_name}  "
-                  f"dir={pin['direction']}, cap={pin['capacitance']}"
-                  f"{func}{clock}{maxcap}")
+            maxcap = (
+                f" maxcap={pin['max_capacitance']}" if pin["max_capacitance"] else ""
+            )
+            print(
+                f"  Pin: {pin_name}  "
+                f"dir={pin['direction']}, cap={pin['capacitance']}"
+                f"{func}{clock}{maxcap}"
+            )
 
             for arc in pin["timing_arcs"]:
                 related = arc["related_pin"]
@@ -192,8 +198,9 @@ def print_timing_summary(report):
                     if pt in ip:
                         pwrs.append(f"{pt}={ip[pt]['mean']:.4f}")
                 if pwrs:
-                    print(f"  InternalPower({ip['related_pin']}): "
-                          f"{', '.join(pwrs)}")
+                    print(
+                        f"  InternalPower({ip['related_pin']}): " f"{', '.join(pwrs)}"
+                    )
 
         print()
 
@@ -228,7 +235,9 @@ def main():
         for c in report["cells"].values()
         for p in c["pins"].values()
     )
-    print(f"\nStatistics: {cell_count} cells, {pin_count} pins, {arc_count} timing arcs")
+    print(
+        f"\nStatistics: {cell_count} cells, {pin_count} pins, {arc_count} timing arcs"
+    )
 
 
 if __name__ == "__main__":

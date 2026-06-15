@@ -11,6 +11,7 @@ Based on the tutorial section: "Converting to JSON"
 """
 
 import json
+
 from liberty.parser import parse_liberty
 from liberty.types import EscapedString
 
@@ -28,6 +29,7 @@ def _json_safe(value):
 # ======================================================================
 # METHOD 2: Custom JSON Serialization with liberty-parser
 # ======================================================================
+
 
 def liberty_group_to_dict(group):
     result = {
@@ -62,9 +64,7 @@ def method2_custom_serialization(lib_file, output_json):
         json.dump(json_data, f, indent=2)
 
     # Summary
-    cell_count = sum(
-        1 for g in library.get_groups("cell")
-    )
+    cell_count = sum(1 for g in library.get_groups("cell"))
     print(f"  Converted {cell_count} cells")
     print(f"  Output size: {len(json.dumps(json_data)):,} bytes")
     return json_data
@@ -73,6 +73,7 @@ def method2_custom_serialization(lib_file, output_json):
 # ======================================================================
 # METHOD 3: Selective JSON Extraction (timing analysis)
 # ======================================================================
+
 
 def extract_timing_data(lib_file):
     with open(lib_file, "r") as f:
@@ -98,14 +99,23 @@ def extract_timing_data(lib_file):
             arcs = []
             for timing in pin.get_groups("timing"):
                 arc = {
-                    "related_pin": _json_safe(timing.get_attribute("related_pin", "unknown")),
-                    "timing_sense": _json_safe(timing.get_attribute("timing_sense", "unknown")),
-                    "timing_type": _json_safe(timing.get_attribute("timing_type", "unknown")),
+                    "related_pin": _json_safe(
+                        timing.get_attribute("related_pin", "unknown")
+                    ),
+                    "timing_sense": _json_safe(
+                        timing.get_attribute("timing_sense", "unknown")
+                    ),
+                    "timing_type": _json_safe(
+                        timing.get_attribute("timing_type", "unknown")
+                    ),
                 }
                 for table_name in [
-                    "cell_rise", "cell_fall",
-                    "rise_transition", "fall_transition",
-                    "rise_constraint", "fall_constraint",
+                    "cell_rise",
+                    "cell_fall",
+                    "rise_transition",
+                    "fall_transition",
+                    "rise_constraint",
+                    "fall_constraint",
                 ]:
                     tbl_grp = timing.get_groups(table_name)
                     if tbl_grp:
@@ -146,18 +156,18 @@ def method3_selective_extraction(lib_file, output_json):
     # Summary
     for cell_name, info in data.items():
         pin_count = len(info["pins"])
-        arc_count = sum(
-            len(p.get("timing_arcs", []))
-            for p in info["pins"].values()
+        arc_count = sum(len(p.get("timing_arcs", [])) for p in info["pins"].values())
+        print(
+            f"  {cell_name}: {pin_count} pins, {arc_count} timing arcs, "
+            f"area={info['area']}"
         )
-        print(f"  {cell_name}: {pin_count} pins, {arc_count} timing arcs, "
-              f"area={info['area']}")
     return data
 
 
 # ======================================================================
 # METHOD 1: libertymetric (if available)
 # ======================================================================
+
 
 def method1_libertymetric(lib_file, output_json):
     """Method 1: Using libertymetric (if installed)."""
@@ -179,6 +189,7 @@ def method1_libertymetric(lib_file, output_json):
 # ======================================================================
 # MAIN
 # ======================================================================
+
 
 def main():
     lib_file = "example_minimal.lib"
@@ -205,9 +216,7 @@ def main():
         loaded_data = json.load(f)
     print(f"  Loaded JSON root type: {loaded_data['type']}")
     print(f"  Loaded JSON root args: {loaded_data['args']}")
-    cell_count = sum(
-        1 for g in loaded_data.get("groups", []) if g["type"] == "cell"
-    )
+    cell_count = sum(1 for g in loaded_data.get("groups", []) if g["type"] == "cell")
     print(f"  Cells in JSON: {cell_count}")
 
     print("\nAll conversions completed successfully.")

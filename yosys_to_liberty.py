@@ -9,6 +9,7 @@ its ports mapped to pins.
 
 import json
 from collections import OrderedDict
+
 from liberty.parser import parse_liberty
 
 
@@ -28,14 +29,14 @@ def format_attr(key, value, level):
     """Format a Liberty attribute assignment."""
     if isinstance(value, list):
         items = ", ".join(lib_str(v) for v in value)
-        return f'{indent(level)}{key} ({items}) ;'
-    return f'{indent(level)}{key} : {lib_str(value)} ;'
+        return f"{indent(level)}{key} ({items}) ;"
+    return f"{indent(level)}{key} : {lib_str(value)} ;"
 
 
 def format_group(group_name, args, attrs, subgroups, level):
     """Format a Liberty group block."""
     args_str = "(" + ", ".join(lib_str(a) for a in args) + ")" if args else "()"
-    lines = [f'{indent(level)}{group_name}{args_str} {{']
+    lines = [f"{indent(level)}{group_name}{args_str} {{"]
     for k, v in attrs.items():
         lines.append(format_attr(k, v, level + 1))
     for sg_name, sg_args, sg_attrs, sg_subs in subgroups:
@@ -66,7 +67,7 @@ def generate_liberty(cell_types, lib_name="yosys_derived"):
     lines.append("    process : 1.0 ;")
     lines.append("    temperature : 25.0 ;")
     lines.append("    voltage : 1.2 ;")
-    lines.append("    tree_type : \"balanced_tree\" ;")
+    lines.append('    tree_type : "balanced_tree" ;')
     lines.append("  }")
     lines.append("")
     lines.append("  lu_table_template (delay_template_2x2) {")
@@ -93,7 +94,7 @@ def generate_liberty(cell_types, lib_name="yosys_derived"):
 
         # Add key parameters as attributes
         for pk, pv in params.items():
-            lines.append(f'    {pk} : {lib_str(pv)} ;')
+            lines.append(f"    {pk} : {lib_str(pv)} ;")
 
         # Pins
         for pin_name in sorted(ports.keys()):
@@ -112,17 +113,19 @@ def generate_liberty(cell_types, lib_name="yosys_derived"):
                     func = f"({' & '.join(in_pins)})"
                 if pin_name in ("Q", "QN"):
                     func = "IQ" if pin_name == "Q" else "!IQ"
-                lines.append(f'      function : {lib_str(func)} ;')
+                lines.append(f"      function : {lib_str(func)} ;")
 
             if direction == "output":
                 lines.append("      max_capacitance : 2.0 ;")
                 lines.append("")
                 # Pick the first input pin as the related_pin for timing
                 in_pins = sorted(p for p, d in ports.items() if d == "input")
-                related = "CK" if "CK" in ports else (in_pins[0] if in_pins else "unknown")
+                related = (
+                    "CK" if "CK" in ports else (in_pins[0] if in_pins else "unknown")
+                )
                 lines.append("      timing () {")
                 lines.append(f'        related_pin : "{related}" ;')
-                lines.append('        timing_sense : positive_unate ;')
+                lines.append("        timing_sense : positive_unate ;")
                 lines.append("        cell_rise (delay_template_2x2) {")
                 lines.append('          values ("0.1, 0.2", "0.3, 0.4") ;')
                 lines.append("        }")
@@ -173,14 +176,14 @@ def extract_cell_types(yosys_json_path):
         "$mod": {"A": "input", "B": "input", "Y": "output"},
         "$pow": {"A": "input", "B": "input", "Y": "output"},
         "$and": {"A": "input", "B": "input", "Y": "output"},
-        "$or":  {"A": "input", "B": "input", "Y": "output"},
+        "$or": {"A": "input", "B": "input", "Y": "output"},
         "$xor": {"A": "input", "B": "input", "Y": "output"},
-        "$eq":  {"A": "input", "B": "input", "Y": "output"},
-        "$ne":  {"A": "input", "B": "input", "Y": "output"},
-        "$ge":  {"A": "input", "B": "input", "Y": "output"},
-        "$le":  {"A": "input", "B": "input", "Y": "output"},
-        "$lt":  {"A": "input", "B": "input", "Y": "output"},
-        "$gt":  {"A": "input", "B": "input", "Y": "output"},
+        "$eq": {"A": "input", "B": "input", "Y": "output"},
+        "$ne": {"A": "input", "B": "input", "Y": "output"},
+        "$ge": {"A": "input", "B": "input", "Y": "output"},
+        "$le": {"A": "input", "B": "input", "Y": "output"},
+        "$lt": {"A": "input", "B": "input", "Y": "output"},
+        "$gt": {"A": "input", "B": "input", "Y": "output"},
         "$shl": {"A": "input", "B": "input", "Y": "output"},
         "$shr": {"A": "input", "B": "input", "Y": "output"},
         "$sshl": {"A": "input", "B": "input", "Y": "output"},
@@ -194,7 +197,13 @@ def extract_cell_types(yosys_json_path):
         "$sr": {"SET": "input", "CLR": "input", "Q": "output"},
         "$ff": {"D": "input", "Q": "output"},
         "$dlatch": {"EN": "input", "D": "input", "Q": "output"},
-        "$dlatchsr": {"EN": "input", "D": "input", "SET": "input", "CLR": "input", "Q": "output"},
+        "$dlatchsr": {
+            "EN": "input",
+            "D": "input",
+            "SET": "input",
+            "CLR": "input",
+            "Q": "output",
+        },
         "$not": {"A": "input", "Y": "output"},
         "$pos": {"A": "input", "Y": "output"},
         "$neg": {"A": "input", "Y": "output"},
@@ -218,8 +227,20 @@ def extract_cell_types(yosys_json_path):
         "$_DFF_PN1_": {"C": "input", "D": "input", "R": "input", "Q": "output"},
         "$_DFF_NN0_": {"C": "input", "D": "input", "R": "input", "Q": "output"},
         "$_DFF_NN1_": {"C": "input", "D": "input", "R": "input", "Q": "output"},
-        "$_DFF_PP0P_": {"C": "input", "D": "input", "R": "input", "S": "input", "Q": "output"},
-        "$_DFF_PP1P_": {"C": "input", "D": "input", "R": "input", "S": "input", "Q": "output"},
+        "$_DFF_PP0P_": {
+            "C": "input",
+            "D": "input",
+            "R": "input",
+            "S": "input",
+            "Q": "output",
+        },
+        "$_DFF_PP1P_": {
+            "C": "input",
+            "D": "input",
+            "R": "input",
+            "S": "input",
+            "Q": "output",
+        },
         "$_MUX_": {"A": "input", "B": "input", "S": "input", "Y": "output"},
         "$_AND_": {"A": "input", "B": "input", "Y": "output"},
         "$_OR_": {"A": "input", "B": "input", "Y": "output"},
@@ -266,8 +287,11 @@ def extract_cell_types(yosys_json_path):
                     continue
                 cell_types[cell_type] = {
                     "ports": ports,
-                    "parameters": {k: v for k, v in params.items()
-                                   if isinstance(v, (str, int, float, bool))},
+                    "parameters": {
+                        k: v
+                        for k, v in params.items()
+                        if isinstance(v, (str, int, float, bool))
+                    },
                 }
 
     return cell_types
@@ -332,6 +356,7 @@ def main():
     # Verify against schema
     try:
         import jsonschema
+
         with open("liberty_json_schema.json") as f:
             schema = json.load(f)
         jsonschema.validate(instance=json_data, schema=schema)
