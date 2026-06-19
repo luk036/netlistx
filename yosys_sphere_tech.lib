@@ -252,6 +252,42 @@ library(yosys_derived) {
     pin (Y) {
       direction : "output" ;
       capacitance : 0.5 ;
+      function : "(!A)" ;
+      max_capacitance : 2.0 ;
+
+      timing () {
+        related_pin : "A" ;
+        timing_sense : positive_unate ;
+        cell_rise (delay_template_2x2) {
+          values ("0.1, 0.2", "0.3, 0.4") ;
+        }
+        rise_transition (delay_template_2x2) {
+          values ("0.05, 0.1", "0.2, 0.3") ;
+        }
+        cell_fall (delay_template_2x2) {
+          values ("0.08, 0.18", "0.25, 0.35") ;
+        }
+        fall_transition (delay_template_2x2) {
+          values ("0.04, 0.09", "0.18, 0.28") ;
+        }
+      }
+    }
+
+    leakage_power () {
+      value : 0.001 ;
+    }
+  }
+  cell (_dollar__BUF_) {
+    area : 1.0 ;
+
+    pin (A) {
+      direction : "input" ;
+      capacitance : 0.5 ;
+    }
+
+    pin (Y) {
+      direction : "output" ;
+      capacitance : 0.5 ;
       function : "(A)" ;
       max_capacitance : 2.0 ;
 
@@ -277,6 +313,7 @@ library(yosys_derived) {
       value : 0.001 ;
     }
   }
+
 
   cell (_dollar__OR_) {
     area : 1.0 ;
