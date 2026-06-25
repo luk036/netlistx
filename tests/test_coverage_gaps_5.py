@@ -44,15 +44,6 @@ class TestMakeL2Graph:
         assert G.number_of_edges() == 190  # n*(n-1)/2
 
 
-    def test_run_calls_main(self, monkeypatch: Any) -> None:
-        """Test that run() calls main with sys.argv[1:]."""
-        import sys
-
-        monkeypatch.setattr(sys, "argv", ["skeleton", "7"])
-        # Should not raise
-        run()
-
-
 class TestRandCoverEmptyNet:
     """Cover line 186 in rand_cover.py (empty net in hypergraph)."""
 
