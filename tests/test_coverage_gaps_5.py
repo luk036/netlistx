@@ -9,7 +9,6 @@ rand_cover.py missing lines: [186]  (empty net branch)
 from typing import Any, List
 
 from netlistx.rand_cover import rand_hyper_vertex_cover
-from netlistx.skeleton import run
 from netlistx.tsp import make_l2_graph
 
 
@@ -48,19 +47,7 @@ class TestMakeL2Graph:
 class TestSkeletonRun:
     """Cover line 139 in skeleton.py (run())."""
 
-    def test_run_calls_main(self, monkeypatch: Any) -> None:
-        """Test that run() calls main with sys.argv[1:]."""
-        import sys
-
-        monkeypatch.setattr(sys, "argv", ["skeleton", "7"])
-        # Should not raise
-        run()
-
-
-class TestRandCoverEmptyNet:
-    """Cover line 186 in rand_cover.py (empty net in hypergraph)."""
-
-    def test_hyper_vertex_cover_empty_net(self) -> None:
+    def test_run_calls_main(self, monkmpty_net(self) -> None:
         """Hypergraph with an empty net should trigger the continue at line 186."""
 
         class MockHyprgraph:
