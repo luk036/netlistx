@@ -6,7 +6,7 @@ rand_cover.py missing lines: [186]  (empty net branch)
 """
 
 
-from typing import Any, List
+from typing import List
 
 from netlistx.rand_cover import rand_hyper_vertex_cover
 from netlistx.tsp import make_l2_graph

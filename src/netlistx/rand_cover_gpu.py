@@ -116,10 +116,10 @@ def rand_vertex_cover_gpu(
         >>> ugraph = nx.Graph()
         >>> ugraph.add_edges_from([(0, 1), (0, 2), (1, 2)])
         >>> weight = {0: 1, 1: 1, 2: 1}
-        >>> soln, cost = rand_vertex_cover_gpu(ugraph, weight, num_trials=64, seed=42)
-        >>> isinstance(soln, set)
+        >>> soln, cost = rand_vertex_cover_gpu(ugraph, weight, num_trials=64, seed=42)  # doctest: +SKIP
+        >>> isinstance(soln, set)  # doctest: +SKIP
         True
-        >>> all(u in soln or v in soln for u, v in ugraph.edges())
+        >>> all(u in soln or v in soln for u, v in ugraph.edges())  # doctest: +SKIP
         True
     """
     if not cuda.is_available():
