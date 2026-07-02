@@ -5,6 +5,17 @@ This code defines a set of classes and functions for working with netlists, whic
 are representations of electronic circuits. The main purpose of this code is to
 provide tools for creating, manipulating, and analyzing netlists.
 
+.. svgbob::
+   :align: center
+
+      Cell1 ──── NetA ──── Cell2
+        │                    │
+        │                    │
+      NetB                NetC
+        │                    │
+        │                    │
+      Cell3 ──── NetD ──── Cell4
+
 The code doesn't take any direct inputs or produce any outputs on its own.
 Instead, it defines classes and functions that can be used by other parts of a
 program to work with netlists.
