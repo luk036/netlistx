@@ -196,15 +196,9 @@ def _solve_hadlock_component(
         if len(odd_faces) < 2:
             return {tuple(sorted(e)) for e in G.edges()}
 
-    # ---- 5. targeted shortest paths from odd-face vertices only ----
-    # Instead of all-pairs (O(|V|^2) memory), compute single-source from
-    # each odd face (O(k * |V|) where k = |odd_faces| << |V_dual|).
-    dist: Dict = {}
-    paths: Dict = {}
-    for source in odd_faces:
-        lengths, path = nx.single_source_dijkstra(dual_G, source, weight="weight")
-        dist[source] = lengths
-        paths[source] = path
+    # ---- 5. all-pairs shortest paths in the dual ----
+    dist = dict(nx.all_pairs_dijkstra_path_length(dual_G, weight="weight"))
+    paths = dict(nx.all_pairs_dijkstra_path(dual_G, weight="weight"))
 
     # ---- 6. complete graph of odd faces with shortest-path weights ----
     complete_odd = nx.Graph()

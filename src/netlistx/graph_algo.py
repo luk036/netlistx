@@ -58,9 +58,8 @@ design, scheduling problems, or resource allocation, where we need to find
 efficient ways to cover a graph or select non-adjacent elements.
 """
 
+import copy
 from typing import Any, MutableMapping, Optional, Set, Tuple, Union
-
-from netlistx import GapDict
 
 
 def min_vertex_cover_fast(
@@ -125,7 +124,7 @@ def min_vertex_cover_fast(
 
     total_dual_cost = 0  # for assertion
     total_prml_cost = 0
-    gap: MutableMapping = GapDict(weight)
+    gap = copy.copy(weight)
 
     for utx, vtx in ugraph.edges():
         if utx in coverset or vtx in coverset:
@@ -221,7 +220,7 @@ def min_maximal_independant_set(
         for vtx in ugraph[utx]:
             dep.add(vtx)
 
-    gap: MutableMapping = GapDict(weight)
+    gap = copy.copy(weight)
     total_prml_cost = 0
     total_dual_cost = 0
     for utx in ugraph:

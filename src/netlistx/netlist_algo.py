@@ -61,9 +61,8 @@ optimization scenarios where you need to select a set of items that don't
 conflict with each other while minimizing some cost metric.
 """
 
+import copy
 from typing import Any, MutableMapping, Optional, Set, Tuple, Union
-
-from netlistx import GapDict
 
 from .netlist import Netlist
 
@@ -169,7 +168,7 @@ def min_maximal_matching(
     total_prml_cost = 0
     total_dual_cost = 0
 
-    gap: MutableMapping = GapDict(weight)
+    gap = copy.copy(weight)
     for net in hyprgraph.nets:
         if any_of_dep(net):
             continue
