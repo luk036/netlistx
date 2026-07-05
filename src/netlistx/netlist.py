@@ -388,7 +388,7 @@ def read_yosys_json(filename: str) -> Netlist:
                     all_nets.add(net_id)
 
     # Add nets as net nodes
-    nets_list = sorted(list(all_nets))
+    nets_list = sorted(all_nets)
     nets_dict = {net_id: i + len(cell_names) for i, net_id in enumerate(nets_list)}
     for net_id in nets_list:
         node_id = nets_dict[net_id]
