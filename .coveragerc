@@ -2,6 +2,7 @@
 [run]
 branch = True
 source = netlistx
+omit = */cover_ai.py, */rand_cover_gpu.py
 # omit = bad_file.py
 
 [paths]
