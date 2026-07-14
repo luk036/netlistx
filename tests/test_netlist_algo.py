@@ -35,15 +35,15 @@ def test_min_maximal_matching_with_predefined_matchset(drawf_graph: Any) -> None
     assert cost <= len(drawf_graph.nets)
 
 
-def test_min_maximal_matching_with_predefined_dependents(drawf_graph: Any) -> None:
-    """Test min_maximal_matching with pre-defined dependents."""
+def test_min_maximal_matching_with_predefined_dep(drawf_graph: Any) -> None:
+    """Test min_maximal_matching with pre-defined dep set."""
     weight = {net: 1 for net in drawf_graph.nets}
-    # Add a module to the dependents set
+    # Add a module to the dep set
     if drawf_graph.modules:
         dependent_module = list(drawf_graph.modules)[0]
-        dependents = {dependent_module}
+        dep_set = {dependent_module}
         result_matchset, cost = min_maximal_matching(
-            drawf_graph, weight, dependents=dependents
+            drawf_graph, weight, dep=dep_set
         )
         # The result should be a valid matching
         assert isinstance(result_matchset, set)

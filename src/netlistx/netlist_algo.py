@@ -71,7 +71,7 @@ def min_maximal_matching(
     hyprgraph: Netlist,
     weight: MutableMapping,
     matchset: Optional[Set[Any]] = None,
-    dependents: Optional[Set[Any]] = None,
+    dep: Optional[Set[Any]] = None,
 ) -> Tuple[Set[Any], Union[int, float]]:
     r"""
     The `min_maximal_matching` function performs minimum weighted maximal matching
@@ -96,11 +96,10 @@ def min_maximal_matching(
 
     :type matchset: Optional[Set]
 
-    :param dependents: The `dependents` parameter is a set that represents the set
-        of vertices that are covered by the current matching. It is initially set
-        to an empty set, and is updated during the execution of the algorithm
+    :param dep: The `dep` parameter is a set that represents the set
+        of vertices that are covered (dependent) by the current matching.
 
-    :type dependents: Optional[Set]
+    :type dep: Optional[Set]
 
     :return: The function `min_maximal_matching` returns a tuple containing the
         matchset (a set of matched elements) and the total primal cost (an integer
@@ -142,30 +141,17 @@ def min_maximal_matching(
     """
     if matchset is None:
         matchset = set()
-    if dependents is None:
-        dependents = set()
+    if dep is None:
+        dep = set()
 
     def cover(net: Any) -> None:
-        """
-        Mark all vertices of a net as dependents (covered).
-
-        :param net: The net whose vertices should be marked as covered.
-        """
         for vtx in hyprgraph.ugraph[net]:
-            dependents.add(vtx)
+            dep.add(vtx)
 
     def any_of_dep(net: Any) -> bool:
-        """
-        Check if any vertex of a net is already covered.
+        return any(vtx in dep for vtx in hyprgraph.ugraph[net])
 
-        :param net: The net to check.
-
-        :return: True if at least one vertex of the net is in dependents.
-        :rtype: bool
-        """
-        return any(vtx in dependents for vtx in hyprgraph.ugraph[net])
-
-    total_prml_cost = 0
+    total_primal_cost = 0
     total_dual_cost = 0
 
     gap = copy.copy(weight)
@@ -173,7 +159,6 @@ def min_maximal_matching(
         if any_of_dep(net):
             continue
         if net in matchset:  # pre-define matching
-            # cover(net)
             continue
         min_val = gap[net]
         min_net = net
@@ -186,16 +171,14 @@ def min_maximal_matching(
                     min_net = net2
         cover(min_net)
         matchset.add(min_net)
-        total_prml_cost += weight[min_net]
+        total_primal_cost += weight[min_net]
         total_dual_cost += min_val
         if min_net == net:
             continue
         gap[net] -= min_val
         for vtx in hyprgraph.ugraph[net]:
             for net2 in hyprgraph.ugraph[vtx]:
-                # if net2 == net:
-                #     continue
                 gap[net2] -= min_val
 
-    assert total_dual_cost <= total_prml_cost
-    return matchset, total_prml_cost
+    assert total_dual_cost <= total_primal_cost
+    return matchset, total_primal_cost

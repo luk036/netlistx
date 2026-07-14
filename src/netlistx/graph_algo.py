@@ -25,7 +25,7 @@ edge is in the cover yet, it adds the end with the higher weight to the cover.
 It keeps track of the total weight and updates the remaining "gap" for each
 vertex. This process continues until all edges are covered.
 
-The second function, min_maximal_independant_set, finds a minimum weighted
+The second function, min_maximal_independent_set, finds a minimum weighted
 maximal independent set in a graph. An independent set is a set of vertices
 where no two vertices are connected by an edge. "Maximal" means we can't add any
 more vertices to the set without breaking this rule. Like before, we want to
@@ -123,7 +123,7 @@ def min_vertex_cover_fast(
         coverset = set()
 
     total_dual_cost = 0  # for assertion
-    total_prml_cost = 0
+    total_primal_cost = 0
     gap = copy.copy(weight)
 
     for utx, vtx in ugraph.edges():
@@ -133,22 +133,22 @@ def min_vertex_cover_fast(
             utx, vtx = vtx, utx  # swap
         coverset.add(vtx)
         total_dual_cost += gap[vtx]
-        total_prml_cost += weight[vtx]
+        total_primal_cost += weight[vtx]
         gap[utx] -= gap[vtx]
         gap[vtx] = 0
 
-    assert total_dual_cost <= total_prml_cost
-    return coverset, total_prml_cost
+    assert total_dual_cost <= total_primal_cost
+    return coverset, total_primal_cost
 
 
-def min_maximal_independant_set(
+def min_maximal_independent_set(
     ugraph: Any,
     weight: MutableMapping,
     indset: Optional[Set] = None,
     dep: Optional[Set] = None,
 ) -> Tuple[Set, Union[int, float]]:
     r"""
-    The `min_maximal_independant_set` function performs minimum weighted maximal
+    The `min_maximal_independent_set` function performs minimum weighted maximal
     independent set using primal-dual algorithm.
 
     :param ugraph: ugraph is an undirected graph represented using the NetworkX
@@ -162,22 +162,18 @@ def min_maximal_independant_set(
     :type weight: MutableMapping
 
     :param indset: The `indset` parameter is a set that represents the current
-        independent set. It is initially set to `None` and is updated during the
-        execution of the `min_maximal_independent_set` function
+        independent set.
 
     :type indset: Optional[Set]
 
     :param dep: The `dep` parameter is a set that represents the dependent vertices
-        in the graph. These are the vertices that are not included in the
-        independent set and are adjacent to vertices in the independent set. The
-        `coverset` function is used to add a vertex and its adjacent vertices to
-        the dependent set
+        in the graph.
 
     :type dep: Optional[Set]
 
-    :return: The function `min_maximal_independant_set` returns a tuple containing
+    :return: The function `min_maximal_independent_set` returns a tuple containing
         the minimum weighted maximal independent set (indset) and the total primal
-        cost (total_prml_cost).
+        cost (total_primal_cost).
 
     .. svgbob::
        :align: center
@@ -193,13 +189,13 @@ def min_maximal_independant_set(
 
     Examples:
         >>> import networkx as nx
-        >>> from netlistx.graph_algo import min_maximal_independant_set
+        >>> from netlistx.graph_algo import min_maximal_independent_set
         >>> ugraph = nx.Graph()
         >>> ugraph.add_edges_from([(0, 1), (0, 2), (1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
         >>> weight = {0: 1, 1: 1, 2: 1, 3: 1, 4: 1}
         >>> indset = set()
         >>> dep = set()
-        >>> min_maximal_independant_set(ugraph, weight, indset, dep)
+        >>> min_maximal_independent_set(ugraph, weight, indset, dep)
         ({0, 3}, 2)
 
         >>> ugraph = nx.Graph()
@@ -207,7 +203,7 @@ def min_maximal_independant_set(
         >>> weight = {0: 1, 1: 2, 2: 1}
         >>> indset = set()
         >>> dep = set()
-        >>> min_maximal_independant_set(ugraph, weight, indset, dep)
+        >>> min_maximal_independent_set(ugraph, weight, indset, dep)
         ({0, 2}, 2)
     """
     if indset is None:
@@ -221,13 +217,12 @@ def min_maximal_independant_set(
             dep.add(vtx)
 
     gap = copy.copy(weight)
-    total_prml_cost = 0
+    total_primal_cost = 0
     total_dual_cost = 0
     for utx in ugraph:
         if utx in dep:
             continue
-        if utx in indset:  # pre-define indepentant
-            # coverset(utx)
+        if utx in indset:  # pre-define independent
             continue
         min_val = gap[utx]
         min_vtx = utx
@@ -239,12 +234,12 @@ def min_maximal_independant_set(
                 min_vtx = vtx
         indset.add(min_vtx)
         coverset(min_vtx)
-        total_prml_cost += weight[min_vtx]
+        total_primal_cost += weight[min_vtx]
         total_dual_cost += min_val
         if min_vtx == utx:
             continue
         for vtx in ugraph[utx]:
             gap[vtx] -= min_val
 
-    assert total_dual_cost <= total_prml_cost
-    return indset, total_prml_cost
+    assert total_dual_cost <= total_primal_cost
+    return indset, total_primal_cost

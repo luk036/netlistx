@@ -1,7 +1,7 @@
 from typing import Any
 
 from netlistx.cover import min_cycle_cover, min_odd_cycle_cover, min_vertex_cover
-from netlistx.graph_algo import min_maximal_independant_set, min_vertex_cover_fast
+from netlistx.graph_algo import min_maximal_independent_set, min_vertex_cover_fast
 
 
 def test_min_vertex_cover(drawf_graph: Any) -> None:
@@ -22,15 +22,15 @@ def test_min_vertex_cover_fast_weighted(drawf_graph: Any) -> None:
     assert rslt == 16
 
 
-def test_min_maximal_independant_set(drawf_graph: Any) -> None:
+def test_min_maximal_independent_set(drawf_graph: Any) -> None:
     weight = {node: 1 for node in drawf_graph.ugraph}
-    _, rslt = min_maximal_independant_set(drawf_graph.ugraph, weight)
+    _, rslt = min_maximal_independent_set(drawf_graph.ugraph, weight)
     assert rslt == 7
 
 
-def test_min_maximal_independant_set_weighted(drawf_graph: Any) -> None:
+def test_min_maximal_independent_set_weighted(drawf_graph: Any) -> None:
     weight = {node: 2 for node in drawf_graph.ugraph}
-    _, rslt = min_maximal_independant_set(drawf_graph.ugraph, weight)
+    _, rslt = min_maximal_independent_set(drawf_graph.ugraph, weight)
     assert rslt == 14
 
 

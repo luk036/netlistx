@@ -6,7 +6,7 @@ import hypothesis.strategies as st
 from hypothesis import assume, given
 from networkx import Graph, complete_graph, cycle_graph, path_graph
 
-from netlistx.graph_algo import min_maximal_independant_set, min_vertex_cover_fast
+from netlistx.graph_algo import min_maximal_independent_set, min_vertex_cover_fast
 
 
 @st.composite
@@ -199,7 +199,7 @@ class TestIndependentSetProperties:
         """Test that independent set has no internal edges."""
         graph, weights = data.draw(weighted_graph_strategy())
 
-        indset, total_weight = min_maximal_independant_set(graph, weights)
+        indset, total_weight = min_maximal_independent_set(graph, weights)
 
         # No two vertices in independent set should be adjacent
         for u in indset:
@@ -214,7 +214,7 @@ class TestIndependentSetProperties:
         """Test that independent set is maximal."""
         graph, weights = data.draw(weighted_graph_strategy())
 
-        indset, total_weight = min_maximal_independant_set(graph, weights)
+        indset, total_weight = min_maximal_independent_set(graph, weights)
 
         # Every vertex not in the independent set should be adjacent to at least one vertex in it
         for node in graph.nodes():
@@ -231,7 +231,7 @@ class TestIndependentSetProperties:
         """Test that reported weight matches sum of vertex weights."""
         graph, weights = data.draw(weighted_graph_strategy())
 
-        indset, total_weight = min_maximal_independant_set(graph, weights)
+        indset, total_weight = min_maximal_independent_set(graph, weights)
 
         # Calculate expected weight
         expected_weight = sum(weights[node] for node in indset)
@@ -242,7 +242,7 @@ class TestIndependentSetProperties:
         """Test that independent set is a subset of graph nodes."""
         graph, weights = data.draw(weighted_graph_strategy())
 
-        indset, _ = min_maximal_independant_set(graph, weights)
+        indset, _ = min_maximal_independent_set(graph, weights)
 
         # All independent set vertices should be in the graph
         for node in indset:
@@ -254,7 +254,7 @@ class TestIndependentSetProperties:
         graph = Graph()
         weights: Dict[Any, Union[int, float]] = {}
 
-        indset, total_weight = min_maximal_independant_set(graph, weights)
+        indset, total_weight = min_maximal_independent_set(graph, weights)
 
         # Empty graph should have empty independent set
         assert len(indset) == 0
@@ -267,7 +267,7 @@ class TestIndependentSetProperties:
         graph.add_node(0)
         weights = {0: data.draw(st.integers(min_value=1, max_value=10))}
 
-        indset, total_weight = min_maximal_independant_set(graph, weights)
+        indset, total_weight = min_maximal_independent_set(graph, weights)
 
         # Single node should be in independent set
         assert len(indset) == 1
@@ -289,7 +289,7 @@ class TestIndependentSetProperties:
             elif choice == "dependent":
                 initial_dep.add(node)
 
-        indset, total_weight = min_maximal_independant_set(
+        indset, total_weight = min_maximal_independent_set(
             graph, weights, initial_indset.copy(), initial_dep.copy()
         )
 
@@ -305,7 +305,7 @@ class TestIndependentSetProperties:
         graph, weights = data.draw(weighted_graph_strategy())
         assume(len(graph.edges()) > 0)
 
-        indset, ind_weight = min_maximal_independant_set(graph, weights)
+        indset, ind_weight = min_maximal_independent_set(graph, weights)
         cover, cover_weight = min_vertex_cover_fast(graph, weights)
 
         # Independent set and vertex cover should be complementary (roughly)
@@ -327,7 +327,7 @@ class TestGraphAlgorithmInvariants:
         assert cover_weight >= 0
 
         # Test independent set
-        indset, ind_weight = min_maximal_independant_set(graph, weights)
+        indset, ind_weight = min_maximal_independent_set(graph, weights)
         assert ind_weight >= 0
 
     @given(data=st.data())
@@ -343,8 +343,8 @@ class TestGraphAlgorithmInvariants:
         assert weight1 == weight2
 
         # Run independent set twice
-        indset1, ind_weight1 = min_maximal_independant_set(graph, weights)
-        indset2, ind_weight2 = min_maximal_independant_set(graph, weights)
+        indset1, ind_weight1 = min_maximal_independent_set(graph, weights)
+        indset2, ind_weight2 = min_maximal_independent_set(graph, weights)
 
         assert indset1 == indset2
         assert ind_weight1 == ind_weight2
@@ -356,7 +356,7 @@ class TestGraphAlgorithmInvariants:
 
         # Get original results
         cover_orig, weight_orig = min_vertex_cover_fast(graph, weights)
-        indset_orig, ind_weight_orig = min_maximal_independant_set(graph, weights)
+        indset_orig, ind_weight_orig = min_maximal_independent_set(graph, weights)
 
         # Create isomorphic graph by relabeling nodes
         mapping = {node: f"node_{node}" for node in graph.nodes()}
@@ -371,7 +371,7 @@ class TestGraphAlgorithmInvariants:
         cover_renamed, weight_renamed = min_vertex_cover_fast(
             graph_renamed, weights_renamed
         )
-        indset_renamed, ind_weight_renamed = min_maximal_independant_set(
+        indset_renamed, ind_weight_renamed = min_maximal_independent_set(
             graph_renamed, weights_renamed
         )
 
