@@ -6,3 +6,5 @@ git+https://github.com/luk036/mywheel.git
 myst-parser[linkify]
 sphinx>=3.2.1
 sphinxcontrib-svgbob
+matplotlib
+numpy
