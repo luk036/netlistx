@@ -476,12 +476,12 @@ def read_yosys_json_sax(filename: str) -> Netlist:
     import ijson  # type: ignore[import-untyped]
 
     # ── Phase 1: streaming collection ────────────────────────────────
-    cell_names: list[str] = []          # ordered list of cell names
-    cell_idx: dict[str, int] = {}       # cell name → module ID
-    all_net_ids: set[int] = set()       # every integer net ID seen
-    port_names: list[str] = []          # ordered list of port names
-    port_nets: dict[str, set[int]] = {} # port name → connected net IDs
-    cell_edges: list[tuple[int, int]] = []   # (cell_id, raw_net_id)
+    cell_names: list[str] = []  # ordered list of cell names
+    cell_idx: dict[str, int] = {}  # cell name → module ID
+    all_net_ids: set[int] = set()  # every integer net ID seen
+    port_names: list[str] = []  # ordered list of port names
+    port_nets: dict[str, set[int]] = {}  # port name → connected net IDs
+    cell_edges: list[tuple[int, int]] = []  # (cell_id, raw_net_id)
 
     # SAX state variables (updated during event stream processing)
     _current_cell: str | None = None
@@ -520,7 +520,9 @@ def read_yosys_json_sax(filename: str) -> Netlist:
                     cell_names.append(_current_cell)
 
             # ── detect port names ────────────────────────────────
-            elif ".ports" in prefix and prefix.endswith(".ports") and event == "map_key":
+            elif (
+                ".ports" in prefix and prefix.endswith(".ports") and event == "map_key"
+            ):
                 _current_port = value  # type: ignore[assignment]
                 if _current_port not in port_nets:
                     port_nets[_current_port] = set()
@@ -558,12 +560,16 @@ def read_yosys_json_sax(filename: str) -> Netlist:
                 all_net_ids.add(value)
 
             # ── reset state on object boundaries ─────────────────
-            elif ".cells." in prefix and event == "end_map" and _current_cell is not None:
+            elif (
+                ".cells." in prefix and event == "end_map" and _current_cell is not None
+            ):
                 parts = prefix.split(".")
                 if parts[-1] == _current_cell:
                     _current_cell = None
 
-            elif ".ports." in prefix and event == "end_map" and _current_port is not None:
+            elif (
+                ".ports." in prefix and event == "end_map" and _current_port is not None
+            ):
                 parts = prefix.split(".")
                 if parts[-1] == _current_port:
                     _current_port = None

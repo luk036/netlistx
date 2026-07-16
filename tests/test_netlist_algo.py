@@ -42,9 +42,7 @@ def test_min_maximal_matching_with_predefined_dep(drawf_graph: Any) -> None:
     if drawf_graph.modules:
         dependent_module = list(drawf_graph.modules)[0]
         dep_set = {dependent_module}
-        result_matchset, cost = min_maximal_matching(
-            drawf_graph, weight, dep=dep_set
-        )
+        result_matchset, cost = min_maximal_matching(drawf_graph, weight, dep=dep_set)
         # The result should be a valid matching
         assert isinstance(result_matchset, set)
         assert isinstance(cost, (int, float))
