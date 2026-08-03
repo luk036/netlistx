@@ -64,7 +64,6 @@ from networkx.algorithms import bipartite
 from networkx.readwrite import json_graph
 
 
-# The class SimpleGraph is a subclass of nx.Graph and defines default attributes for edges and nodes.
 class SimpleGraph(nx.Graph):
     r"""
     The `SimpleGraph` class is a subclass of `nx.Graph` that defines default attributes for edges and
@@ -123,7 +122,6 @@ class TinyGraph(nx.Graph):
         self.num_nodes = n
         self._node = self.cheat_node_dict()
         self._adj = self.cheat_adjlist_outer_dict()
-        # self._pred = self.cheat_adjlist_outer_dict()
 
 
 # The `Netlist` class represents a netlist, which is a collection of modules and nets in a graph
@@ -183,25 +181,12 @@ class Netlist:
 
         self.num_modules = len(modules)
         self.num_nets = len(nets)
-        # self.net_weight: Optional[Union[Dict, List[int]]] = None
         self.module_weight: Union[RepeatArray, Dict, List[int]] = RepeatArray(
             1, self.num_modules
         )
         self.module_fixed: set = set()
         self.net_weight: Optional[Union[Dict, List[int]]] = None
-
-        # self.module_dict = {}
-        # for v in enumerate(self.module_list):
-        #     self.module_dict[v] = v
-
-        # self.net_dict = {}
-        # for i_net, net in enumerate(self.net_list):
-        #     self.net_dict[net] = i_net
-
-        # self.module_fixed = module_fixed
-        # self.has_fixed_modules = (self.module_fixed != [])
         self.max_degree = max(self.ugraph.degree[cell] for cell in modules)
-        # self.max_net_degree = max(self.ugraph.degree[net] for net in nets)
 
     def number_of_modules(self) -> int:
         """
@@ -267,18 +252,6 @@ class Netlist:
         else:
             return 1  # default value
 
-    # def get_module_weight_by_id(self, v):
-    #     """[summary]
-
-    #     Arguments:
-    #         v (size_t):  description
-
-    #     Returns:
-    #         [size_t]:  description
-    #     """
-    #     return 1 if self.module_weight is None \
-    #         else self.module_weight[v]
-
     def get_net_weight(self, _: Any) -> int:
         """
         The function `get_net_weight` returns an integer value.
@@ -313,10 +286,6 @@ def read_json(filename: str) -> Netlist:
     with open(filename, "r") as fr:
         data = json.load(fr)
 
-    # Convert 'links' to 'edges' for NetworkX compatibility
-    # if "links" in data and "edges" not in data:
-    #     data["edges"] = data.pop("links")
-
     ugraph = json_graph.node_link_graph(data, edges="edges")
     num_modules = ugraph.graph["num_modules"]
     num_nets = ugraph.graph["num_nets"]
@@ -325,9 +294,6 @@ def read_json(filename: str) -> Netlist:
         ugraph, range(num_modules), range(num_modules, num_modules + num_nets)
     )
     hyprgraph.num_pads = num_pads
-    # hyprgraph.module_weight = RepeatArray(1, num_modules)
-    # hyprgraph.net_weight = ShiftArray(1 for _ in range(num_nets))
-    # hyprgraph.net_weight.set_start(num_modules)
     return hyprgraph
 
 
@@ -370,21 +336,17 @@ def read_yosys_json(filename: str) -> Netlist:
         modules_dict[cell_name] = i
         graph.add_node(i, type="module", name=cell_name)
 
-    # Collect all nets from ports and netnames
     all_nets = set()
 
-    # Nets from ports
     for port_name, port_info in module_data["ports"].items():
         for net_id in port_info["bits"]:
             all_nets.add(net_id)
 
-    # Nets from netnames
     if "netnames" in module_data:
         for netname, netinfo in module_data["netnames"].items():
             for net_id in netinfo["bits"]:
                 all_nets.add(net_id)
 
-    # Also collect nets from cell connections
     for cell_name, cell_info in module_data["cells"].items():
         for port_name, connections in cell_info["connections"].items():
             for net_id in connections:
@@ -735,10 +697,7 @@ def create_drawf() -> Netlist:
         "n4",
         "n5",
     ]
-    # net_map = {net: i_net for i_net, net in enumerate(nets)}
     modules = ["a0", "a1", "a2", "a3", "p1", "p2", "p3"]
-    # module_map = {v: i_v for i_v, v in enumerate(modules)}
-    # module_weight = [1, 3, 4, 2, 0, 0, 0]
     module_weight = {"a0": 1, "a1": 3, "a2": 4, "a3": 2, "p1": 0, "p2": 0, "p3": 0}
 
     ugraph.add_edges_from(
@@ -777,7 +736,6 @@ def create_test_netlist() -> Netlist:
     """
     ugraph = SimpleGraph()
     ugraph.add_nodes_from(["a0", "a1", "a2", "a3", "a4", "a5"])
-    # module_weight = [533, 543, 532]
     module_weight = {"a0": 533, "a1": 543, "a2": 532}
     ugraph.add_edges_from(
         [
@@ -793,9 +751,7 @@ def create_test_netlist() -> Netlist:
     ugraph.graph["num_modules"] = 3
     ugraph.graph["num_nets"] = 3
     modules = ["a0", "a1", "a2"]
-    # module_map = {v: i_v for i_v, v in enumerate(modules)}
     nets = ["a3", "a4", "a5"]
-    # net_weight = {net: 1 for net in nets}
     net_weight = RepeatArray(1, len(nets))
 
     hyprgraph = Netlist(ugraph, modules, nets)
@@ -883,7 +839,6 @@ def form_graph(
 
     # connect nodes with edges
     ugraph = bipartite.random_graph(N, M, eta)
-    # ugraph = nx.DiGraph(ugraph)
     return ugraph
 
 
@@ -917,6 +872,4 @@ def create_random_hgraph(N: int = 30, M: int = 26, eta: float = 0.1) -> Netlist:
     hyprgraph = Netlist(ugraph, range(N), range(N, N + M))
     hyprgraph.module_weight = RepeatArray(1, N)  # type: ignore[assignment]
     hyprgraph.net_weight = RepeatArray(1, M)  # type: ignore[assignment]
-    # hyprgraph.net_weight = ShiftArray(1 for _ in range(M))
-    # hyprgraph.net_weight.set_start(N)
     return hyprgraph

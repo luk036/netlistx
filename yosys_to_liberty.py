@@ -275,7 +275,6 @@ def extract_cell_types(yosys_json_path):
                 # Get parameters
                 params = cell_data.get("parameters", {})
 
-                # Collect ports (ordered from port_directions)
                 ports = {}
                 for pname in sorted(port_dirs.keys()):
                     ports[pname] = port_dirs[pname]
