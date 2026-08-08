@@ -138,6 +138,7 @@ def min_vertex_cover_fast(
         gap[vtx] = 0
 
     assert total_dual_cost <= total_primal_cost
+    assert total_primal_cost <= 2 * total_dual_cost
     return coverset, total_primal_cost
 
 
