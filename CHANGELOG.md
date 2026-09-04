@@ -1,5 +1,26 @@
 # Changelog
 
+## Version 0.5 (2026-09-04)
+
+### Features
+- **Readers moved to `readwrite` module**: `read_json`, `read_yosys_json` and `read_yosys_json_sax` now live in `netlistx.readwrite` (shared Yosys netlist builder), with `netlist.netlist` re-exporting via `__getattr__` for backward compatibility. (#afdb849)
+- **2-approximation bound assertion**: `min_vertex_cover_fast` now asserts the primal-dual 2-approximation bound. (#4bb0ff5)
+
+### Documentation
+- **AGENTS.md guidelines**: Added agent guidelines for contributors. (#ab35172)
+
+### Testing & Code Quality
+- **mypy config**: Disabled import-untyped errors for networkx. (#68504ab)
+- **Style pass**: Reformatted comments and line wrapping. (#91c65d1)
+
+### Code Cleanup
+- **Removed AI slop**: Stripped boilerplate from docstrings and comments. (#c03123a)
+- **Metadata & stale files**: Fixed description/url in setup.cfg, consolidated flake8 config into `.flake8`, dropped stale `ci.backup` workflow and `test_tsp.obj` artifact. (#c85b2fd)
+
+### Build & CI
+- **Updated GitHub Actions**: checkout→v4, setup-python→v5, codecov-action→v4. (#86a5803)
+- **RTD doc build**: Added matplotlib and numpy to `docs/requirements.txt`. (#63d8e81)
+
 ## Version 0.4 (2026-07-16)
 
 ### Features
