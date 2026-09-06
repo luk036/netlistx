@@ -3,7 +3,11 @@ import json
 import tempfile
 from typing import Any, Dict, Optional
 
-from netlistx.netlist import read_yosys_json, read_yosys_json_sax
+from netlistx.netlist import (
+    read_yosys_json,
+    read_yosys_json_directed,
+    read_yosys_json_sax,
+)
 
 
 def _make_yosys_json(
@@ -398,3 +402,42 @@ def test_dom_sax_identical_sphere3hopf() -> None:
 
     for i in range(dom.number_of_modules()):
         assert dom.get_module_weight(i) == sax.get_module_weight(i)
+
+def test_directed_driver_net_identity() -> None:
+    """The directed reader must identify the driver module of every net."""
+    cells = {
+        "and1": {
+            "type": "$and",
+            "port_directions": {"A": "input", "B": "input", "Y": "output"},
+            "connections": {"A": [0], "B": [1], "Y": [2]},
+        }
+    }
+    ports = {
+        "a": {"direction": "input", "bits": [0]},
+        "b": {"direction": "input", "bits": [1]},
+        "y": {"direction": "output", "bits": [2]},
+    }
+    netnames = {"net_a": {"bits": [0]}, "net_b": {"bits": [1]}, "net_y": {"bits": [2]}}
+
+    path = _make_yosys_json(cells, ports, netnames)
+    try:
+        netlist = read_yosys_json_directed(path)
+        driver = netlist.net_driver
+        assert driver[1] == 4  # net 0 (input a) is driven by pad node 4
+        assert driver[2] == 5  # net 1 (input b) is driven by pad node 5
+        assert driver[3] == 0  # net 2 (output y) is driven by cell 0 (Y output)
+    finally:
+        import os
+
+        os.unlink(path)
+
+
+def test_directed_sphere3hopf_every_net_has_driver() -> None:
+    """Every net of the Yosys benchmark must have exactly one driver."""
+    path = "yosys_testcases/sphere3hopf_netlist_simple.json"
+    netlist = read_yosys_json_directed(path)
+    driver = netlist.net_driver
+    assert len(driver) == netlist.number_of_nets()
+    module_ids = set(netlist.modules)
+    assert all(v in module_ids for v in driver.values())
+    assert any(v is None for v in driver.values()) is False

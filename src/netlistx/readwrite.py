@@ -364,3 +364,91 @@ def read_yosys_json_sax(filename: str) -> Netlist:
     return _build_netlist_from_parts(
         cell_names, port_names, all_net_ids, cell_edges, port_nets
     )
+
+
+def read_yosys_json_directed(filename: str) -> Netlist:
+    """Read a Yosys JSON netlist and expose the driver of every net.
+
+    A Yosys ``write_json`` module records the direction of every pin:
+    module ``ports[name]["direction"]`` for the primary I/O and
+    ``cells[inst]["port_directions"][port]`` for the cell pins.  This reader
+    derives, for every net, the single module that **drives** it (the output
+    cell pin on the net, or the module input port when the net is fed from
+    outside) and attaches it to the returned netlist as ``net_driver`` — a
+    dict mapping the netlist's compressed net node id to its driver module id
+    (``None`` when no unique driver exists).
+
+    The module -> net structure is identical to :func:`read_yosys_json`
+    (cells + ports become modules, bit indices become nets); only the
+    direction metadata is new.
+
+    Args:
+        filename: Path to the Yosys JSON file.
+
+    Returns:
+        Netlist whose ``net_driver`` attribute holds the per-net driver.
+    """
+    with open(filename, "r") as f:
+        data = json.load(f)
+
+    module_name = list(data["modules"].keys())[0]
+    module_data = data["modules"][module_name]
+
+    cell_names = list(module_data["cells"].keys())
+    port_names = list(module_data["ports"].keys())
+
+    all_net_ids: set[int] = set()
+    for port_info in module_data["ports"].values():
+        all_net_ids.update(port_info["bits"])
+    if "netnames" in module_data:
+        for netinfo in module_data["netnames"].values():
+            all_net_ids.update(netinfo["bits"])
+
+    cell_edges: list[tuple[int, int]] = []
+    pin_dirs: dict[int, list[tuple[str, int, str]]] = {}
+    for i, (_, cell_info) in enumerate(module_data["cells"].items()):
+        port_directions = cell_info.get("port_directions", {})
+        for port_name, connections in cell_info["connections"].items():
+            direction = port_directions.get(port_name)
+            for net_id in connections:
+                if isinstance(net_id, int):
+                    all_net_ids.add(net_id)
+                    cell_edges.append((i, net_id))
+                    pin_dirs.setdefault(net_id, []).append(
+                        ("cell", i, direction or "?")
+                    )
+
+    port_nets: dict[str, set[int]] = {}
+    for port_index, (port_name, port_info) in enumerate(module_data["ports"].items()):
+        port_nets[port_name] = set(port_info["bits"])
+        direction = port_info.get("direction", "?")
+        for net_id in port_info["bits"]:
+            pin_dirs.setdefault(net_id, []).append(
+                ("port", port_index, direction)
+            )
+
+    netlist = _build_netlist_from_parts(
+        cell_names, port_names, all_net_ids, cell_edges, port_nets
+    )
+
+    sorted_net_ids = sorted(all_net_ids)
+    num_cells = len(cell_names)
+    net_to_node = {
+        net_id: num_cells + i for i, net_id in enumerate(sorted_net_ids)
+    }
+    port_base = num_cells + len(sorted_net_ids)
+
+    net_driver: dict[int, int | None] = {}
+    for net_id in sorted_net_ids:
+        driver_candidates: set[int] = set()
+        for kind, index, direction in pin_dirs.get(net_id, []):
+            if direction == "output" and kind == "cell":
+                driver_candidates.add(index)
+            elif direction == "input" and kind == "port":
+                driver_candidates.add(port_base + index)
+        net_driver[net_to_node[net_id]] = (
+            driver_candidates.pop() if len(driver_candidates) == 1 else None
+        )
+    netlist.net_driver = net_driver  # type: ignore[attr-defined]
+    return netlist
+

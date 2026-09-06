@@ -278,7 +278,12 @@ def __getattr__(name: str) -> Any:
     Keeps ``from netlistx.netlist import read_json`` (and friends) working
     while the implementations live in :mod:`netlistx.readwrite`.
     """
-    if name in ("read_json", "read_yosys_json", "read_yosys_json_sax"):
+    if name in (
+        "read_json",
+        "read_yosys_json",
+        "read_yosys_json_directed",
+        "read_yosys_json_sax",
+    ):
         import netlistx.readwrite as readwrite
 
         return getattr(readwrite, name)
