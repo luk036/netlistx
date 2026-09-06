@@ -1,5 +1,20 @@
 # Changelog
 
+## Version 0.6 (2026-09-06)
+
+### Features
+- **Direction-aware Yosys JSON reader**: Added `read_yosys_json_directed()` to
+  `netlistx.readwrite`, which derives the single **driver** module of every net
+  from Yosys `write_json` pin directions (`ports[name].direction` and
+  `cells[inst].port_directions`) and exposes it as the `netlist.net_driver`
+  map. Re-exported from `netlistx.netlist` alongside the existing readers.
+  (#4c18fc2)
+
+### Testing & Code Quality
+- **Directed reader tests**: Added a driver-identity unit test (AND gate) and a
+  full-benchmark single-driver assertion on
+  `yosys_testcases/sphere3hopf_netlist_simple.json`. (#4c18fc2)
+
 ## Version 0.5 (2026-09-04)
 
 ### Features
