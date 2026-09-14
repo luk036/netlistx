@@ -197,8 +197,12 @@ def _solve_hadlock_component(
             return {tuple(sorted(e)) for e in G.edges()}
 
     # ---- 5. all-pairs shortest paths in the dual ----
-    dist = dict(nx.all_pairs_dijkstra_path_length(dual_G, weight="weight"))
-    paths = dict(nx.all_pairs_dijkstra_path(dual_G, weight="weight"))
+    # one Dijkstra sweep per source yields both distances and paths
+    dist: Dict[Any, Dict[Any, float]] = {}
+    paths: Dict[Any, Dict[Any, List[Any]]] = {}
+    for source, (d, p) in nx.all_pairs_dijkstra(dual_G, weight="weight"):
+        dist[source] = d
+        paths[source] = p
 
     # ---- 6. complete graph of odd faces with shortest-path weights ----
     complete_odd = nx.Graph()

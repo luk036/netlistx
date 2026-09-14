@@ -171,22 +171,32 @@ def two_opt(path: List[Any], G: nx.Graph) -> List[Any]:
         True
     """
     best_path = list(path)
+    n = len(best_path)
     improved = True
     while improved:
         improved = False
-        for i in range(1, len(best_path) - 2):
-            for j in range(i + 1, len(best_path)):
+        for i in range(1, n - 2):
+            prev, cur = best_path[i - 1], best_path[i]
+            d_prev_cur = G[prev][cur]["weight"]
+            for j in range(i + 1, n):
                 if j - i == 1:
                     continue  # adjacent edges → no change
 
-                # Reverse segment [i, j-1] to uncross
-                new_path = best_path[:i] + best_path[i:j][::-1] + best_path[j:]
-
-                if calculate_total_distance(new_path, G) < calculate_total_distance(
-                    best_path, G
-                ):
-                    best_path = new_path
+                # O(1) delta for reversing [i, j-1]:
+                # edges (i-1, i) + (j-1, j) become (i-1, j-1) + (i, j)
+                nxt, after = best_path[j - 1], best_path[j]
+                delta = (
+                    G[prev][nxt]["weight"]
+                    + G[cur][after]["weight"]
+                    - d_prev_cur
+                    - G[nxt][after]["weight"]
+                )
+                # epsilon rejects float-noise no-op reversals that would loop forever
+                if delta < -1e-9:
+                    best_path[i:j] = best_path[i:j][::-1]
                     improved = True
+                    prev, cur = best_path[i - 1], best_path[i]
+                    d_prev_cur = G[prev][cur]["weight"]
     return best_path
 
 

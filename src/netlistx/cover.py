@@ -43,7 +43,10 @@ import networkx as nx
 
 
 def pd_cover(
-    violate: Callable, weight: MutableMapping, soln: Set
+    violate: Callable,
+    weight: MutableMapping,
+    soln: Set,
+    redundant: Optional[Callable[[Any], bool]] = None,
 ) -> Tuple[Set, Union[int, float]]:
     """
     Primal-dual approximation algorithm with reverse-delete post-processing.
@@ -58,6 +61,12 @@ def pd_cover(
     :type weight: MutableMapping
     :param soln: The initial solution set (may be empty or contain pre-selected elements).
     :type soln: Set
+    :param redundant: Optional fast predicate deciding whether a candidate is
+        redundant given the current solution. When omitted, redundancy is
+        checked by re-scanning ``violate()``. Specialized callers can supply an
+        exact local test (e.g. vertex cover checks only the candidate's
+        neighbours), turning the post-processing pass from O(k*E) into O(E).
+    :type redundant: Optional[Callable[[Any], bool]]
 
     :return: A tuple containing the minimal cover set and its total weight.
     :rtype: Tuple[Set, Union[int, float]]
@@ -109,11 +118,14 @@ def pd_cover(
     # Removes redundant elements to ensure the cover is minimal.
     for vtx in reversed(added_order):
         soln.remove(vtx)
-        is_redundant = True
-        # Check if any structure remains uncovered without this vertex
-        for _ in violate():
-            is_redundant = False
-            break
+        if redundant is not None:
+            is_redundant = redundant(vtx)
+        else:
+            is_redundant = True
+            # Check if any structure remains uncovered without this vertex
+            for _ in violate():
+                is_redundant = False
+                break
 
         if not is_redundant:
             soln.add(vtx)
@@ -171,7 +183,10 @@ def min_vertex_cover(
                 continue
             yield [utx, vtx]
 
-    return pd_cover(violate_graph, weight, coverset)
+    def redundant(vtx: Any) -> bool:
+        return all(neighbor in coverset for neighbor in ugraph[vtx])
+
+    return pd_cover(violate_graph, weight, coverset, redundant)
 
 
 def min_hyper_vertex_cover(
@@ -265,8 +280,36 @@ def _construct_cycle(
     return S
 
 
+def _collect_cyclable_edges(ugraph: nx.Graph) -> Dict[Any, Set[Any]]:
+    """
+    Build the adjacency of edges that can lie on a cycle.
+
+    Uses biconnected components and chain (ear) decomposition to discard
+    bridge/tree edges. The result depends only on the graph topology, not on
+    the current cover, so callers compute it once and reuse it across every
+    cycle search.
+
+    :param ugraph: The input undirected graph.
+    :type ugraph: nx.Graph
+
+    :return: Mapping ``node -> set of neighbours`` reachable via cyclable edges.
+    :rtype: Dict[Any, Set[Any]]
+    """
+    cyclable: Dict[Any, Set[Any]] = {}
+    for component in nx.biconnected_components(ugraph):
+        if len(component) >= 3:
+            subgraph = ugraph.subgraph(component)
+            for chain in nx.chain_decomposition(subgraph):
+                for u, v in chain:
+                    cyclable.setdefault(u, set()).add(v)
+                    cyclable.setdefault(v, set()).add(u)
+    return cyclable
+
+
 def _generic_bfs_cycle(
-    ugraph: nx.Graph, coverset: Set[Any]
+    ugraph: nx.Graph,
+    coverset: Set[Any],
+    cyclable: Optional[Dict[Any, Set[Any]]] = None,
 ) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
     """
     Find cycles using BFS restricted to cyclable edges.
@@ -278,37 +321,38 @@ def _generic_bfs_cycle(
     :type ugraph: nx.Graph
     :param coverset: Set of nodes to exclude from cycle detection.
     :type coverset: Set[Any]
+    :param cyclable: Precomputed output of :func:`_collect_cyclable_edges`.
+        When omitted it is computed here, which is O(V+E) and should be
+        avoided inside loops.
+    :type cyclable: Optional[Dict[Any, Set[Any]]]
 
     :yields: Tuples of (info, parent, child) where info is the BFS parent/depth
              dictionary, and parent-child is the back edge forming a cycle.
     :rtype: Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]
     """
-    # Identify edges that can actually form cycles
-    cyclable_edges = set()
-    for component in nx.biconnected_components(ugraph):
-        if len(component) >= 3:
-            subgraph = ugraph.subgraph(component)
-            # Use chain (ear) decomposition to find cycle-forming edges
-            for chain in nx.chain_decomposition(subgraph):
-                for edge in chain:
-                    cyclable_edges.add(tuple(sorted(edge)))
+    if cyclable is None:
+        cyclable = _collect_cyclable_edges(ugraph)
 
     depth_limit = len(ugraph)
-    nodelist = list(ugraph.nodes())
-    for source in nodelist:
-        if source in coverset:
+    visited: Set[Any] = set()
+    for source in ugraph.nodes():
+        if source in coverset or source in visited:
             continue
         info = {source: (source, depth_limit)}
         queue = deque([source])
+        visited.add(source)
         while queue:
             parent = queue.popleft()
             succ, depth_now = info[parent]
+            neighbors = cyclable.get(parent)
+            if not neighbors:
+                continue
             for child in ugraph.neighbors(parent):
-                edge = tuple(sorted((parent, child)))
-                if child in coverset or edge not in cyclable_edges:
+                if child in coverset or child not in neighbors:
                     continue
                 if child not in info:
                     info[child] = (parent, depth_now - 1)
+                    visited.add(child)
                     queue.append(child)
                     continue
                 if succ == child:
@@ -358,8 +402,10 @@ def min_cycle_cover(
     if coverset is None:
         coverset = set()
 
+    cyclable = _collect_cyclable_edges(ugraph)
+
     def find_cycle() -> Any:
-        for info, parent, child in _generic_bfs_cycle(ugraph, coverset):
+        for info, parent, child in _generic_bfs_cycle(ugraph, coverset, cyclable):
             return _construct_cycle(info, parent, child)
 
     def violate() -> Generator:
@@ -414,8 +460,10 @@ def min_odd_cycle_cover(
     if coverset is None:
         coverset = set()
 
+    cyclable = _collect_cyclable_edges(ugraph)
+
     def find_odd_cycle() -> Any:
-        for info, parent, child in _generic_bfs_cycle(ugraph, coverset):
+        for info, parent, child in _generic_bfs_cycle(ugraph, coverset, cyclable):
             _, depth_child = info[child]
             _, depth_parent = info[parent]
             if (depth_parent - depth_child) % 2 == 0:

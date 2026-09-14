@@ -131,32 +131,40 @@ def _build_netlist_from_parts(
     graph = nx.Graph()
 
     # Add cell nodes
-    for i, name in enumerate(cell_names):
-        graph.add_node(i, type="module", name=name)
+    graph.add_nodes_from(
+        (i, {"type": "module", "name": name}) for i, name in enumerate(cell_names)
+    )
 
     # Assign sorted net IDs to graph node IDs
     nets_list = sorted(all_net_ids)
     net_to_node: dict[int, int] = {
         net_id: len(cell_names) + i for i, net_id in enumerate(nets_list)
     }
-    for net_id in nets_list:
-        graph.add_node(net_to_node[net_id], type="net", net_id=net_id)
+    graph.add_nodes_from(
+        (net_to_node[net_id], {"type": "net", "net_id": net_id}) for net_id in nets_list
+    )
 
     # Add cell -> net edges
-    for cid, raw_net_id in cell_edges:
-        if raw_net_id in net_to_node:
-            graph.add_edge(cid, net_to_node[raw_net_id])
+    graph.add_edges_from(
+        (cid, net_to_node[raw_net_id])
+        for cid, raw_net_id in cell_edges
+        if raw_net_id in net_to_node
+    )
 
     # Add port nodes and port -> net edges
     port_base = len(cell_names) + len(nets_list)
     port_nodes: list[int] = []
+    port_node_attrs: list[tuple[int, dict]] = []
+    port_edges: list[tuple[int, int]] = []
     for i, port_name in enumerate(port_names):
         pnode = port_base + i
         port_nodes.append(pnode)
-        graph.add_node(pnode, type="port", name=port_name)
+        port_node_attrs.append((pnode, {"type": "port", "name": port_name}))
         for net_id in port_nets.get(port_name, set()):
             if net_id in net_to_node:
-                graph.add_edge(pnode, net_to_node[net_id])
+                port_edges.append((pnode, net_to_node[net_id]))
+    graph.add_nodes_from(port_node_attrs)
+    graph.add_edges_from(port_edges)
 
     # Build module / net lists for Netlist constructor
     module_nodes = list(range(len(cell_names)))
