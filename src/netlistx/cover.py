@@ -372,6 +372,89 @@ def min_cycle_cover(
     return pd_cover(violate, weight, coverset)
 
 
+def _extract_odd_cycle(parent: Dict[Any, Any], utx: Any, vtx: Any) -> Deque[Any]:
+    """
+    Reconstruct the odd cycle closed by a same-colour edge ``(utx, vtx)``.
+
+    :param parent: BFS parent mapping produced by :func:`_find_odd_cycle`.
+    :type parent: Dict[Any, Any]
+    :param utx: One endpoint of the conflicting (same-colour) edge.
+    :param vtx: The other endpoint of the conflicting edge.
+
+    :return: A deque of the cycle vertices, ordered from the lowest common
+        ancestor of ``utx`` and ``vtx``.
+    :rtype: Deque[Any]
+    """
+    ancestors = set()
+    node = utx
+    while node is not None:
+        ancestors.add(node)
+        node = parent[node]
+
+    node = vtx
+    while node not in ancestors:
+        node = parent[node]
+    lca = node
+
+    branch_u = []
+    node = utx
+    while node != lca:
+        branch_u.append(node)
+        node = parent[node]
+
+    branch_v = []
+    node = vtx
+    while node != lca:
+        branch_v.append(node)
+        node = parent[node]
+
+    cycle: Deque[Any] = deque([lca])
+    cycle.extend(reversed(branch_u))
+    cycle.extend(branch_v)
+    return cycle
+
+
+def _find_odd_cycle(ugraph: nx.Graph, coverset: Set[Any]) -> Optional[Deque[Any]]:
+    """
+    Find an odd cycle avoiding ``coverset`` using BFS 2-colouring.
+
+    A graph is bipartite if and only if it admits a proper 2-colouring. A BFS
+    that encounters an edge whose endpoints share a colour has found an odd
+    cycle, which is then reconstructed from the BFS parent pointers. This runs
+    in ``O(V + E)`` per call instead of restarting a BFS from every source.
+
+    :param ugraph: The input undirected graph.
+    :type ugraph: nx.Graph
+    :param coverset: Set of nodes to exclude from cycle detection.
+    :type coverset: Set[Any]
+
+    :return: A deque of the odd cycle vertices, or ``None`` when the graph
+        induced by ``V \\ coverset`` is bipartite.
+    :rtype: Optional[Deque[Any]]
+    """
+    color: Dict[Any, int] = {}
+    parent: Dict[Any, Any] = {}
+    for source in ugraph.nodes():
+        if source in coverset or source in color:
+            continue
+        color[source] = 0
+        parent[source] = None
+        queue = deque([source])
+        while queue:
+            utx = queue.popleft()
+            utx_color = color[utx]
+            for vtx in ugraph.neighbors(utx):
+                if vtx in coverset:
+                    continue
+                if vtx not in color:
+                    color[vtx] = utx_color ^ 1
+                    parent[vtx] = utx
+                    queue.append(vtx)
+                elif color[vtx] == utx_color:
+                    return _extract_odd_cycle(parent, utx, vtx)
+    return None
+
+
 def min_odd_cycle_cover(
     ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
 ) -> Tuple[Set, Union[int, float]]:
@@ -414,16 +497,9 @@ def min_odd_cycle_cover(
     if coverset is None:
         coverset = set()
 
-    def find_odd_cycle() -> Any:
-        for info, parent, child in _generic_bfs_cycle(ugraph, coverset):
-            _, depth_child = info[child]
-            _, depth_parent = info[parent]
-            if (depth_parent - depth_child) % 2 == 0:
-                return _construct_cycle(info, parent, child)
-
     def violate() -> Generator:
         while True:
-            S = find_odd_cycle()
+            S = _find_odd_cycle(ugraph, coverset)
             if S is None:
                 break
             yield S
