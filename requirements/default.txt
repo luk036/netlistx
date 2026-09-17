@@ -1,5 +1,4 @@
 decorator>=4.1.0
 jsonschema
 networkx>=3.6.1
-numba
 numpy
