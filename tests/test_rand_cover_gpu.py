@@ -2,13 +2,48 @@ from typing import Any
 
 import networkx as nx
 import pytest
-from numba import cuda  # type: ignore[import-untyped]
+
+try:
+    from numba import cuda  # type: ignore[import-untyped]
+except ImportError:  # pragma: no cover
+    cuda = None  # type: ignore[assignment]
 
 from netlistx.rand_cover_gpu import rand_vertex_cover_gpu
 
-pytestmark = pytest.mark.skipif(not cuda.is_available(), reason="No CUDA GPU available")
+GPU_SKIP = pytest.mark.skipif(
+    cuda is None or not cuda.is_available(), reason="No CUDA GPU available"
+)
 
 
+def test_fallback_without_numba(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Falls back to the CPU implementation when numba is unavailable."""
+    import netlistx.rand_cover_gpu as rcg
+
+    monkeypatch.setattr(rcg, "cuda", None)
+    ugraph = nx.Graph()
+    ugraph.add_edges_from([(0, 1), (0, 2), (1, 2)])
+    weight = {0: 1, 1: 1, 2: 1}
+    soln, cost = rand_vertex_cover_gpu(ugraph, weight, num_trials=64, seed=0)
+    assert len(soln) == 2
+    assert cost == 2
+    for u, v in ugraph.edges():
+        assert u in soln or v in soln
+
+
+def test_fallback_valid_cover(monkeypatch: pytest.MonkeyPatch) -> None:
+    """CPU fallback still returns a valid vertex cover."""
+    import netlistx.rand_cover_gpu as rcg
+
+    monkeypatch.setattr(rcg, "cuda", None)
+    ugraph = nx.gnm_random_graph(50, 200, seed=0)
+    weight = {node: 1 for node in ugraph}
+    soln, cost = rand_vertex_cover_gpu(ugraph, weight, num_trials=256, seed=1)
+    for u, v in ugraph.edges():
+        assert u in soln or v in soln
+    assert 1 <= cost <= 50
+
+
+@GPU_SKIP
 def test_gpu_vertex_cover_simple() -> None:
     """Triangle with unit weights."""
     ugraph = nx.Graph()
@@ -22,6 +57,7 @@ def test_gpu_vertex_cover_simple() -> None:
         assert u in soln or v in soln
 
 
+@GPU_SKIP
 def test_gpu_vertex_cover_line() -> None:
     """Line graph (3 nodes, 2 edges)."""
     ugraph = nx.Graph()
@@ -33,6 +69,7 @@ def test_gpu_vertex_cover_line() -> None:
         assert u in soln or v in soln
 
 
+@GPU_SKIP
 def test_gpu_vertex_cover_star() -> None:
     """Star graph: center covers all edges."""
     ugraph = nx.Graph()
@@ -45,6 +82,7 @@ def test_gpu_vertex_cover_star() -> None:
         assert u in soln or v in soln
 
 
+@GPU_SKIP
 def test_gpu_vertex_cover_weighted() -> None:
     """Weighted edge: lighter vertex should be picked more often."""
     ugraph = nx.Graph()
@@ -57,6 +95,7 @@ def test_gpu_vertex_cover_weighted() -> None:
     assert cost == 1
 
 
+@GPU_SKIP
 def test_gpu_vertex_cover_empty_graph() -> None:
     """Empty graph returns empty cover."""
     ugraph = nx.Graph()
@@ -66,6 +105,7 @@ def test_gpu_vertex_cover_empty_graph() -> None:
     assert cost == 0
 
 
+@GPU_SKIP
 def test_gpu_vertex_cover_single_edge() -> None:
     """Single edge with equal weights."""
     ugraph = nx.Graph()
@@ -78,6 +118,7 @@ def test_gpu_vertex_cover_single_edge() -> None:
         assert u in soln or v in soln
 
 
+@GPU_SKIP
 def test_gpu_vertex_cover_deterministic_seed() -> None:
     """Same seed produces same result across runs."""
     ugraph = nx.Graph()
@@ -89,6 +130,7 @@ def test_gpu_vertex_cover_deterministic_seed() -> None:
     assert cost1 == cost2
 
 
+@GPU_SKIP
 def test_gpu_vertex_cover_with_initial_coverset() -> None:
     """Pre-seeded vertex is preserved in the cover."""
     ugraph = nx.Graph()
@@ -102,6 +144,7 @@ def test_gpu_vertex_cover_with_initial_coverset() -> None:
         assert u in soln or v in soln
 
 
+@GPU_SKIP
 def test_gpu_vertex_cover_drawf(drawf_graph: Any) -> None:
     """Integration with the drawf graph fixture."""
     weight = {node: 1 for node in drawf_graph.ugraph}
@@ -114,6 +157,7 @@ def test_gpu_vertex_cover_drawf(drawf_graph: Any) -> None:
     assert cost >= 1
 
 
+@GPU_SKIP
 def test_gpu_larger_graph() -> None:
     """Random graph with 50 nodes, 200 edges."""
     ugraph = nx.gnm_random_graph(50, 200, seed=0)

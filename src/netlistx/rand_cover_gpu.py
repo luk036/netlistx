@@ -9,6 +9,10 @@ is returned.
 This Monte Carlo approach exploits GPU parallelism by making each trial
 independent, requiring no inter-thread synchronization during execution.
 
+``numba`` is an optional dependency. When it (or a CUDA-capable GPU) is not
+available, :func:`rand_vertex_cover_gpu` transparently falls back to the CPU
+implementation :func:`netlistx.rand_cover.rand_vertex_cover`.
+
 Reference:
     L. Pitt, "A Simple Probabilistic Approximation Algorithm for Vertex Cover,"
     Technical Report, Yale University, 1985.
@@ -20,69 +24,79 @@ from typing import Dict, MutableMapping, Optional, Set, Tuple, Union
 
 import networkx as nx
 import numpy as np
-from numba import cuda  # type: ignore[import-untyped]
+
+from netlistx.rand_cover import rand_vertex_cover
+
+try:
+    from numba import cuda  # type: ignore[import-untyped, import-not-found]
+except ImportError:  # pragma: no cover
+    cuda = None  # type: ignore[assignment]
 
 THREADS_PER_BLOCK = 64
 
+if cuda is not None:
 
-@cuda.jit
-def _pitt_kernel(
-    edges: np.ndarray,
-    num_edges: int,
-    weights: np.ndarray,
-    num_vertices: int,
-    cover_words: np.ndarray,
-    costs: np.ndarray,
-    seeds: np.ndarray,
-) -> None:
-    """
-    CUDA kernel: each thread runs one independent Pitt trial.
+    @cuda.jit
+    def _pitt_kernel(
+        edges: np.ndarray,
+        num_edges: int,
+        weights: np.ndarray,
+        num_vertices: int,
+        cover_words: np.ndarray,
+        costs: np.ndarray,
+        seeds: np.ndarray,
+    ) -> None:
+        """
+        CUDA kernel: each thread runs one independent Pitt trial.
 
-    Each thread maintains its cover as a bitmask (uint32 words) stored
-    in device memory at its trial index.
-    """
-    tid = cuda.grid(1)
-    if tid >= costs.shape[0]:
-        return
+        Each thread maintains its cover as a bitmask (uint32 words) stored
+        in device memory at its trial index.
+        """
+        tid = cuda.grid(1)
+        if tid >= costs.shape[0]:
+            return
 
-    # cover_words.shape[1]
-    seed = seeds[tid]
+        # cover_words.shape[1]
+        seed = seeds[tid]
 
-    for i in range(num_edges):
-        u = edges[i, 0]
-        v = edges[i, 1]
+        for i in range(num_edges):
+            u = edges[i, 0]
+            v = edges[i, 1]
 
-        u_word = u >> 5
-        v_word = v >> 5
-        u_bit = 1 << (u & 31)
-        v_bit = 1 << (v & 31)
+            u_word = u >> 5
+            v_word = v >> 5
+            u_bit = 1 << (u & 31)
+            v_bit = 1 << (v & 31)
 
-        u_sel = (cover_words[tid, u_word] & u_bit) != 0
-        v_sel = (cover_words[tid, v_word] & v_bit) != 0
+            u_sel = (cover_words[tid, u_word] & u_bit) != 0
+            v_sel = (cover_words[tid, v_word] & v_bit) != 0
 
-        if not u_sel and not v_sel:
-            # LCG random number generator (per-thread state)
-            seed = (seed * 1103515245 + 12345) & 0x7FFFFFFF
-            rand_val = seed / 2147483648.0
+            if not u_sel and not v_sel:
+                # LCG random number generator (per-thread state)
+                seed = (seed * 1103515245 + 12345) & 0x7FFFFFFF
+                rand_val = seed / 2147483648.0
 
-            w_u = weights[u]
-            w_v = weights[v]
-            threshold = w_v / (w_u + w_v)
+                w_u = weights[u]
+                w_v = weights[v]
+                threshold = w_v / (w_u + w_v)
 
-            if rand_val < threshold:
-                cover_words[tid, u_word] |= u_bit
-            else:
-                cover_words[tid, v_word] |= v_bit
+                if rand_val < threshold:
+                    cover_words[tid, u_word] |= u_bit
+                else:
+                    cover_words[tid, v_word] |= v_bit
 
-    # Compute cost
-    cost = 0
-    for vi in range(num_vertices):
-        vi_word = vi >> 5
-        vi_bit = 1 << (vi & 31)
-        if (cover_words[tid, vi_word] & vi_bit) != 0:
-            cost += weights[vi]
+        # Compute cost
+        cost = 0
+        for vi in range(num_vertices):
+            vi_word = vi >> 5
+            vi_bit = 1 << (vi & 31)
+            if (cover_words[tid, vi_word] & vi_bit) != 0:
+                cost += weights[vi]
 
-    costs[tid] = cost
+        costs[tid] = cost
+
+else:  # pragma: no cover
+    _pitt_kernel = None  # type: ignore[assignment]
 
 
 def rand_vertex_cover_gpu(
@@ -97,6 +111,9 @@ def rand_vertex_cover_gpu(
 
     Runs ``num_trials`` independent randomized Pitt trials in parallel on the
     GPU and returns the cover with the lowest total weight.
+
+    When ``numba`` is not installed, or no CUDA-capable GPU is available,
+    falls back to the CPU implementation :func:`rand_vertex_cover`.
 
     :param ugraph: The input undirected graph.
     :type ugraph: nx.Graph
@@ -122,8 +139,8 @@ def rand_vertex_cover_gpu(
         >>> all(u in soln or v in soln for u, v in ugraph.edges())  # doctest: +SKIP
         True
     """
-    if not cuda.is_available():
-        raise RuntimeError("No CUDA-capable GPU found")
+    if cuda is None or not cuda.is_available():
+        return rand_vertex_cover(ugraph, weight, coverset, seed)
 
     if coverset is None:
         coverset = set()
