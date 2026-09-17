@@ -115,4 +115,4 @@ netlistx provides netlist representations and graph algorithms for electronic de
 - **I/O**: JSON readers including Yosys JSON — DOM-style (`read_yosys_json`) and streaming SAX via `ijson` (`read_yosys_json_sax`)
 - **Covering algorithms**: primal-dual approximation with reverse-delete post-processing (`pd_cover`, `min_vertex_cover`, `min_cycle_cover`, `min_odd_cycle_cover`, `min_hyper_vertex_cover`) for edges, cycles, and odd cycles
 - **Routing/other**: Hadlock router (`hadlock.py`), TSP heuristics (`tsp.py`), random cover generators
-- **Used by**: `ckpttnpy`; **key dependencies**: `networkx`, `numpy`, `numba`, `jsonschema`, `ijson`, `mywheel`
+- **Used by**: `ckpttnpy`; **key dependencies**: `networkx`, `numpy`, `jsonschema`, `ijson`, `mywheel` (`numba` is optional, for GPU acceleration via `netlistx[gpu]`; CPU fallback when absent)
