@@ -423,9 +423,7 @@ def read_yosys_json_directed(filename: str) -> Netlist:
         port_nets[port_name] = set(port_info["bits"])
         direction = port_info.get("direction", "?")
         for net_id in port_info["bits"]:
-            pin_dirs.setdefault(net_id, []).append(
-                ("port", port_index, direction)
-            )
+            pin_dirs.setdefault(net_id, []).append(("port", port_index, direction))
 
     netlist = _build_netlist_from_parts(
         cell_names, port_names, all_net_ids, cell_edges, port_nets
@@ -433,9 +431,7 @@ def read_yosys_json_directed(filename: str) -> Netlist:
 
     sorted_net_ids = sorted(all_net_ids)
     num_cells = len(cell_names)
-    net_to_node = {
-        net_id: num_cells + i for i, net_id in enumerate(sorted_net_ids)
-    }
+    net_to_node = {net_id: num_cells + i for i, net_id in enumerate(sorted_net_ids)}
     port_base = num_cells + len(sorted_net_ids)
 
     net_driver: dict[int, int | None] = {}
@@ -451,4 +447,3 @@ def read_yosys_json_directed(filename: str) -> Netlist:
         )
     netlist.net_driver = net_driver  # type: ignore[attr-defined]
     return netlist
-

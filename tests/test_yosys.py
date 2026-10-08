@@ -403,6 +403,7 @@ def test_dom_sax_identical_sphere3hopf() -> None:
     for i in range(dom.number_of_modules()):
         assert dom.get_module_weight(i) == sax.get_module_weight(i)
 
+
 def test_directed_driver_net_identity() -> None:
     """The directed reader must identify the driver module of every net."""
     cells = {
