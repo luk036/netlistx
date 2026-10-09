@@ -1,0 +1,20 @@
+---
+cref: true
+codeBlockCaptions: true
+figureTitle: "Figure"
+tableTitle: "Table"
+listingTitle: "Listing"
+lofTitle: "List of Figures"
+lotTitle: "List of Tables"
+
+figPrefix: "Figure"
+figPrefixTemplate: "$$i$$"
+eqnPrefix: "Equation"
+eqnPrefixTemplate: "($$i$$)"
+tblPrefix: "Table"
+tblPrefixTemplate: "$$i$$"
+secPrefix: "Section"
+secPrefixTemplate: "$$i$$"
+lstPrefix: "Listing"
+lstPrefixTemplate: "$$i$$"
+---

@@ -1,0 +1,43 @@
+---
+title: "Combinatorial Optimization for Electronic Design Automation: Approximation Algorithms, Primal-Dual Methods, and Cross-Language Performance Engineering"
+author:
+  - "Lukas (luk036)"
+date: 2026
+documentclass: IEEEtran
+classoption:
+  - journal
+abstract: |
+  This paper surveys and synthesizes the theory and engineering of
+  combinatorial optimization algorithms for electronic design automation
+  (EDA). We begin from the complexity-theoretic landscape -- P, FPTAS, PTAS,
+  APX, and NPO -- and then develop three algorithmic threads that share the
+  same few primitives. First, the primal-dual method yields simple,
+  solver-free 2-approximations for covering problems: weighted vertex cover,
+  hypergraph vertex cover, cycle cover, odd-cycle cover, and Steiner forest,
+  with reverse-delete post-processing that guarantees minimality and a
+  randomized (Pitt) variant that is embarrassingly parallel. Second, the
+  Christofides algorithm combines a minimum spanning tree, an exact
+  minimum-weight perfect matching via Edmonds' blossom, an Eulerian circuit,
+  and shortcutting to give the classic 3/2-approximation for metric TSP.
+  Third, Hadlock's algorithm reduces planar MAX-CUT to minimum-weight perfect
+  matching on the odd faces of the dual graph and is accelerated by
+  biconnected-component decomposition. We then evaluate the covering
+  framework on the ISPD98 IBM circuits, from ibm01 (12,752 modules) to ibm18
+  (210,613 modules), reporting cover quality and runtimes on real EDA
+  netlists. A cross-language implementation study spanning Python, C++20, and
+  Rust shows that a single violation oracle -- one BFS 2-colouring -- can
+  replace an asymptotically wasteful routine; we decompose the resulting
+  speedups into an algorithmic factor (O(V+E) replacing O(V(V+E))) and an
+  implementation factor (compiled versus interpreted), rather than a single
+  blended ratio. A companion investigation of Hadlock's matcher found that
+  92% of the runtime sat in one call, that a compiled blossom is ~246x
+  faster, and that the original C++ implementation silently returned
+  suboptimal cuts owing to a face-position/face-id indexing defect. We close
+  with engineering lessons on profiling, deterministic data structures, GPU
+  acceleration, and verifying the answer rather than the clock.
+csl: ieee.csl
+bibliography: refs.bib
+link-citations: true
+reference-section-title: References
+numbersections: true
+---

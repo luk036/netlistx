@@ -1,0 +1,25 @@
+---
+header-includes:
+  - |
+    \usepackage{microtype}
+  - |
+    \usepackage{etoolbox}
+    \AtBeginEnvironment{longtable}{\footnotesize}
+    \AtBeginEnvironment{table}{\footnotesize}
+    \AtBeginEnvironment{codelisting}{\footnotesize}
+    \setlength{\LTcapwidth}{\columnwidth}
+    \setlength{\emergencystretch}{2em}
+  - |
+    \AtBeginDocument{%
+      \crefname{figure}{Fig.}{Figs.}%
+      \Crefname{figure}{Fig.}{Figs.}%
+      \crefname{table}{Table}{Tables}%
+      \Crefname{table}{Table}{Tables}%
+      \crefname{section}{Section}{Sections}%
+      \Crefname{section}{Section}{Sections}%
+      \crefname{equation}{Eq.}{Eqs.}%
+      \Crefname{equation}{Eq.}{Eqs.}%
+      \crefname{codelisting}{Listing}{Listings}%
+      \Crefname{codelisting}{Listing}{Listings}%
+    }
+---
