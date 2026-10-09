@@ -5,9 +5,7 @@ Demonstrates the improvement from using 2-Opt after the Christofides
 initial tour, for a 100-city instance.
 """
 
-import math
 import os
-import random
 
 import matplotlib
 
@@ -21,20 +19,14 @@ import networkx as nx
 from netlistx.tsp import (
     calculate_total_distance,
     christofides_tsp,
+    make_l2_graph,
     solve_christofides_2opt_tsp,
 )
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Create a complete graph with random coordinates (Metric TSP)
 num_nodes = 100
-G = nx.complete_graph(num_nodes)
-pos = {i: (random.uniform(0, 100), random.uniform(0, 100)) for i in range(num_nodes)}
-
-for u, v in G.edges():
-    dx = pos[u][0] - pos[v][0]
-    dy = pos[u][1] - pos[v][1]
-    G[u][v]["weight"] = math.sqrt(dx * dx + dy * dy)
+G, pos = make_l2_graph(num_nodes, seed=42)
 
 # Run Christofides alone
 initial_path = christofides_tsp(G)

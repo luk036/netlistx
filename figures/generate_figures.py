@@ -19,6 +19,7 @@ Writes ``*.svg`` next to this file.
 
 from __future__ import annotations
 
+import json
 import math
 import os
 import sys
@@ -461,13 +462,28 @@ def figure_oracle() -> str:
     return "".join(out)
 
 
-PY_DATA = {
-    "name": "Python (netlistx)",
-    "color": PY_C,
-    "x": [50, 100, 200, 400],
-    "before": [106.7, 296.8, 1503.4, 9506.6],
-    "after": [1.1973, 2.8585, 10.9761, 46.7344],
-}
+def _load_python_data() -> dict:
+    path = os.path.join(HERE, "odd_cycle_cover_timings.json")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as handle:
+            raw = json.load(handle)
+        return {
+            "name": "Python (netlistx)",
+            "color": PY_C,
+            "x": raw["n"],
+            "before": raw["before_ms"],
+            "after": raw["after_ms"],
+        }
+    return {
+        "name": "Python (netlistx)",
+        "color": PY_C,
+        "x": [50, 100, 200, 400],
+        "before": [106.7, 296.8, 1503.4, 9506.6],
+        "after": [1.1973, 2.8585, 10.9761, 46.7344],
+    }
+
+
+PY_DATA = _load_python_data()
 CPP_DATA = {
     "name": "C++ (xnetwork-cpp)",
     "color": CPP_C,
