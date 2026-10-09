@@ -1,5 +1,29 @@
 # Changelog
 
+## Version 0.7 (2026-10-09)
+
+### Features
+- **Optional numba with CPU fallback**: `rand_cover_gpu` now imports numba lazily and only defines the CUDA kernel when numba is present; `rand_vertex_cover_gpu` falls back to the CPU `rand_vertex_cover` when numba is missing or no CUDA GPU is available, instead of raising `RuntimeError`. Tests guard the numba import so the module collects without it. (#d2954c9)
+
+### Performance
+- **Single 2-colouring BFS for the odd-cycle-cover oracle**: `_find_odd_cycle` replaces the per-call biconnected-component + chain decomposition and multi-source BFS in `min_odd_cycle_cover` with one O(V+E) BFS 2-colouring that returns the first odd cycle — measured ~90–200× faster on sparse graphs with identical cover size and cost. (#c123c82)
+
+### Documentation
+- **Reproducible odd-cycle-cover figures**: Generator script plus 7 SVG figures (even vs odd cycle, mixed cover, oracle before/after, per-language scaling, speedup summary), computed with the real implementation so they cannot drift. (#5b86266)
+- **AGENTS.md**: Noted that numba is optional and documented the `netlistx[gpu]` extra and the CPU fallback. (#0db10a0)
+
+### Testing & Code Quality
+- **GPU fallback tests**: Added `benches/test_bm_odd_cycle_cover.py` and extended `test_rand_cover_gpu.py` to cover both fallback branches. (#c123c82, #d2954c9)
+
+### Code Cleanup
+- **Style**: Reformatted `readwrite` and the Yosys test per ruff. (#94c8227)
+
+### Build & CI
+- **Optional `gpu` extra**: Moved numba out of `install_requires` into the `netlistx[gpu]` extra (and from `requirements/default.txt` into `requirements/extras.txt`). (#c08c362)
+
+### Maintenance
+- **Requirements**: Alphabetized `requirements/extras.txt`. (#82606d0)
+
 ## Version 0.6 (2026-09-06)
 
 ### Features
