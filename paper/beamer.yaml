@@ -1,0 +1,21 @@
+---
+# Metadata for the Beamer deck. Load with: --metadata-file=beamer.yaml
+# Build (from paper/):
+#   pandoc --citeproc -s -t beamer --slide-level=3 \
+#     --metadata-file=beamer.yaml --include-in-header=preamble.tex \
+#     comb_optim-talk.md -o comb_optim-talk.tex
+#   lualatex -interaction=nonstopmode -halt-on-error comb_optim-talk.tex  (x2)
+# --include-in-header and --slide-level are CLI-only: pandoc parses YAML header
+# includes as Markdown (mangling raw LaTeX) and ignores a YAML slide-level.
+# slide-level 3 fixes # = section, ## = subsection, ### = frame.
+title: "Combinatorial Optimization for Electronic Design Automation"
+subtitle: "Primal-dual covering, Christofides metric TSP, and Hadlock planar MAX-CUT across Python, C++, Rust"
+author: "Lukas (luk036)"
+institute: "netlistx"
+date: "2026"
+theme: "Frankfurt"
+aspectratio: 169
+bibliography: refs.bib
+csl: ieee.csl
+link-citations: true
+---

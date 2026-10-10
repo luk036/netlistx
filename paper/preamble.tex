@@ -1,0 +1,54 @@
+% -*- coding: utf-8 -*-
+% Beamer preamble for the comb_optim talk (mode B).
+% Build (from paper/; two lualatex passes for the toc):
+%   pandoc --citeproc -s -t beamer --slide-level=3 \
+%          --metadata-file=beamer.yaml --include-in-header=preamble.tex \
+%          comb_optim-talk.md -o comb_optim-talk.tex
+%   lualatex -interaction=nonstopmode -halt-on-error comb_optim-talk.tex   (x2)
+% --include-in-header MUST be a CLI flag: pandoc parses YAML header-includes
+% as Markdown and mangles raw LaTeX.
+
+\usepackage{fontspec}
+\directlua{luaotfload.add_fallback("emojifb", {"Segoe UI Emoji:mode=harf"})}
+\setsansfont{Latin Modern Sans}[RawFeature={fallback=emojifb}]
+\setmainfont{Latin Modern Roman}[RawFeature={fallback=emojifb}]
+\setmonofont{Latin Modern Mono}[RawFeature={fallback=emojifb},Scale=0.86]
+
+\usepackage{amsmath,amssymb}
+
+\usepackage{xcolor}
+\definecolor{nordred}{HTML}{BF616A}
+\definecolor{nordblue}{HTML}{5E81AC}
+\definecolor{nordgreen}{HTML}{A3BE8C}
+\definecolor{nordpurple}{HTML}{B48EAD}
+
+\usepackage{pgf,tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc,fit,backgrounds}
+\tikzset{
+  nb/.style={draw, rounded corners, align=center, font=\scriptsize,
+             inner sep=4pt, minimum height=7mm},
+  nblue/.style={nb, fill=blue!12, draw=nordblue, line width=1pt},
+  nyellow/.style={nb, fill=yellow!35, draw=orange!80!black, line width=1pt},
+  nred/.style={nb, fill=red!12, draw=nordred, line width=1.5pt},
+  ngreen/.style={nb, fill=green!16, draw=green!45!black, line width=1pt},
+  ar/.style={-{Stealth[length=2mm]}, draw=black!55, line width=0.8pt},
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamercolor{structure}{fg=nordblue}
+\setbeamertemplate{footline}[frame number]
+% Keep pandoc's highlighted code blocks compact enough to fit their frames.
+\BeforeBeginEnvironment{Shaded}{\footnotesize}
+% Fit the 8-section outline on a single frame.
+\setbeamerfont{section in toc}{size=\scriptsize}
+% Latin Modern Mono has no bold face: keep pandoc's green keywords, drop the bold.
+\renewcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+\renewcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+% No per-section / per-subsection title pages: keeps the deck near the 30-page
+% target (pandoc's template emits \AtBeginSection and \AtBeginSubsection).
+\AtBeginSection{}
+\AtBeginSubsection{}
+\newcommand{\columnsbegin}{\begin{columns}}
+\newcommand{\columnsend}{\end{columns}}
+\newcommand{\col}[1]{\column{#1}}

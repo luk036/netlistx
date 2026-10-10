@@ -1,5 +1,7 @@
 comb_optim.pdf
 comb_optim.tex
+comb_optim-talk.pdf
+comb_optim-talk.tex
 figures/*.pdf
 *.aux
 *.log
@@ -10,3 +12,6 @@ figures/*.pdf
 *.blg
 *.synctex.gz
 *.toc
+*.nav
+*.snm
+*.vrb
