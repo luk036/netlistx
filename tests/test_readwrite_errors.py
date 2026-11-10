@@ -4,12 +4,7 @@ import json
 
 import pytest
 
-from netlistx.readwrite import (
-    read_json,
-    read_netd,
-    read_yosys_json,
-    read_yosys_json_directed,
-)
+from netlistx.readwrite import read_json, read_netd, read_yosys_json, read_yosys_json_directed
 
 
 def test_read_netd_missing_file(tmp_path) -> None:
