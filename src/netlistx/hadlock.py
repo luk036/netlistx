@@ -110,11 +110,7 @@ def _build_dual(
         w = G[e[0]][e[1]].get(weight, 1)
         for a in range(len(face_ids)):
             for b in range(a + 1, len(face_ids)):
-                fi, fj = (
-                    (face_ids[a], face_ids[b])
-                    if face_ids[a] < face_ids[b]
-                    else (face_ids[b], face_ids[a])
-                )
+                fi, fj = (face_ids[a], face_ids[b]) if face_ids[a] < face_ids[b] else (face_ids[b], face_ids[a])
                 key = (fi, fj)
                 if key not in info or w < info[key][0]:
                     info[key] = (w, e)
@@ -189,16 +185,12 @@ def _solve_hadlock_component(
         # Already bipartite — every edge can be in the cut
         return {tuple(sorted(e)) for e in G.edges()}
 
-    if len(odd_faces) % 2 != 0:
-        # Handshaking lemma guarantees an even number of odd faces,
-        # but guard against edge cases.
-        odd_faces = odd_faces[:-1]
-        if len(odd_faces) < 2:
-            return {tuple(sorted(e)) for e in G.edges()}
-
     # ---- 5. all-pairs shortest paths in the dual ----
-    dist = dict(nx.all_pairs_dijkstra_path_length(dual_G, weight="weight"))
-    paths = dict(nx.all_pairs_dijkstra_path(dual_G, weight="weight"))
+    dist: Dict[Any, Dict[Any, float]] = {}
+    paths: Dict[Any, Dict[Any, List[Any]]] = {}
+    for source, (lengths, routes) in nx.all_pairs_dijkstra(dual_G, weight="weight"):
+        dist[source] = lengths
+        paths[source] = routes
 
     # ---- 6. complete graph of odd faces with shortest-path weights ----
     complete_odd = nx.Graph()

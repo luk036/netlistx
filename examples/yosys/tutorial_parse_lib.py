@@ -12,13 +12,17 @@ This script demonstrates the core usage of the liberty-parser library:
 Based on the tutorial section: "Python: Using liberty-parser → Basic Usage"
 """
 
+from pathlib import Path
+
 import numpy as np
 from liberty.parser import parse_liberty
 from liberty.types import Group
 
+_HERE = Path(__file__).resolve().parent
+
 
 def main():
-    lib_file = "example_minimal.lib"
+    lib_file = str(_HERE / "example_minimal.lib")
 
     # ---------------------------------------------------------------
     # 1. Parse the Liberty file
@@ -68,12 +72,7 @@ def main():
                     tbl_grp = timing.get_groups(table_name)
                     if tbl_grp:
                         delay_table = tbl_grp[0].get_array("values")
-                        print(
-                            f"    {table_name}({related_pin}): "
-                            f"shape={delay_table.shape}, "
-                            f"min={delay_table.min():.4f}, "
-                            f"max={delay_table.max():.4f}"
-                        )
+                        print(f"    {table_name}({related_pin}): " f"shape={delay_table.shape}, " f"min={delay_table.min():.4f}, " f"max={delay_table.max():.4f}")
 
     # ---------------------------------------------------------------
     # 3. Extract a specific delay table as a NumPy array
@@ -107,14 +106,9 @@ def main():
 
     for cell_group in library.get_groups("cell"):
         is_seq = "ff" in cell_group
-        has_clock = any(
-            pin.get_attribute("clock", False) for pin in cell_group.get_groups("pin")
-        )
+        has_clock = any(pin.get_attribute("clock", False) for pin in cell_group.get_groups("pin"))
         if is_seq or has_clock:
-            print(
-                f"  {cell_group.args[0]}: "
-                f"sequential={is_seq}, has_clock_pin={has_clock}"
-            )
+            print(f"  {cell_group.args[0]}: " f"sequential={is_seq}, has_clock_pin={has_clock}")
 
     # ---------------------------------------------------------------
     # 5. Extract library-level attributes
@@ -158,7 +152,7 @@ def main():
 
     # Write modified version
     modified_lib = str(library)
-    output_file = "example_modified.lib"
+    output_file = str(_HERE / "example_modified.lib")
     with open(output_file, "w") as f:
         f.write(modified_lib)
     print(f"  Wrote modified library to: {output_file}")

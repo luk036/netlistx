@@ -1,8 +1,4 @@
-"""Targeted tests to cover uncovered lines in hadlock.py.
-
-Missing lines: [109, 180, 195, 196, 197]
-Missing branches: [[108, 109], [179, 180], [192, 195], [196, 197], [196, 200], [209, 207], [223, 221]]
-"""
+"""Edge-case tests for hadlock.py."""
 
 import networkx as nx
 
@@ -10,7 +6,7 @@ from netlistx.hadlock import solve_hadlock_max_cut, validate_max_cut
 
 
 class TestHadlockBridgeEdge:
-    """Cover line 109: bridge/boundary edge in _build_dual."""
+    """Bridge/boundary edge in _build_dual."""
 
     def test_graph_with_bridge(self) -> None:
         """A planar graph containing a bridge edge.
@@ -37,7 +33,7 @@ class TestHadlockBridgeEdge:
 
 
 class TestHadlockNoFacesComponent:
-    """Cover line 180: component with no faces."""
+    """Component with no faces."""
 
     def test_tiny_component(self) -> None:
         """A single edge component with no faces may trigger _solve_hadlock_component."""
@@ -48,25 +44,6 @@ class TestHadlockNoFacesComponent:
         ok, val = validate_max_cut(G, cut)
         assert ok
         assert val == 5
-
-
-class TestHadlockOddFaceGuard:
-    """Cover lines 195-197: guard for odd number of odd faces."""
-
-    def test_single_odd_face_guard(self) -> None:
-        """A graph with a single odd face (if handshaking lemma is violated).
-
-        This is very hard to trigger in practice since handshaking always holds.
-        We test a simple case that works through the normal path.
-        """
-        G = nx.Graph()
-        G.add_edge(0, 1, weight=1)
-        G.add_edge(1, 2, weight=1)
-        G.add_edge(2, 0, weight=1)
-
-        cut = solve_hadlock_max_cut(G)
-        ok, val = validate_max_cut(G, cut)
-        assert ok
 
 
 class TestHadlockBiconnectedComponents:

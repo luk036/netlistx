@@ -16,12 +16,7 @@ except ImportError:
 import matplotlib.pyplot as plt
 import networkx as nx
 
-from netlistx.tsp import (
-    calculate_total_distance,
-    christofides_tsp,
-    make_l2_graph,
-    solve_christofides_2opt_tsp,
-)
+from netlistx.tsp import calculate_total_distance, christofides_tsp, make_l2_graph, solve_christofides_2opt_tsp
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -44,21 +39,11 @@ print(f"Improvement:                       {dist_initial - dist_refined:.2f}")
 plt.figure(figsize=(8, 6))
 nx.draw(G, pos, with_labels=True, node_color="lightblue", edge_color="gray", alpha=0.3)
 
-edgelist_initial = [
-    (tsp_path_initial[i], tsp_path_initial[i + 1])
-    for i in range(len(tsp_path_initial) - 1)
-]
-nx.draw_networkx_edges(
-    G, pos, edgelist=edgelist_initial, edge_color="red", width=2, alpha=0.5
-)
+edgelist_initial = [(tsp_path_initial[i], tsp_path_initial[i + 1]) for i in range(len(tsp_path_initial) - 1)]
+nx.draw_networkx_edges(G, pos, edgelist=edgelist_initial, edge_color="red", width=2, alpha=0.5)
 
-edgelist_refined = [
-    (tsp_path_refined[i], tsp_path_refined[i + 1])
-    for i in range(len(tsp_path_refined) - 1)
-]
-nx.draw_networkx_edges(
-    G, pos, edgelist=edgelist_refined, edge_color="blue", width=2, alpha=0.8
-)
+edgelist_refined = [(tsp_path_refined[i], tsp_path_refined[i + 1]) for i in range(len(tsp_path_refined) - 1)]
+nx.draw_networkx_edges(G, pos, edgelist=edgelist_refined, edge_color="blue", width=2, alpha=0.8)
 
 plt.title(f"Christofides (red, {dist_initial:.1f}) → +2-Opt (blue, {dist_refined:.1f})")
 plt.tight_layout()

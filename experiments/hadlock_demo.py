@@ -55,10 +55,7 @@ def demo():
     edge_labels = nx.get_edge_attributes(G, "weight")
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-    plt.title(
-        f"Hadlock's Algorithm Max-Cut\n"
-        f"Value: {max_cut_value} (Total {total_weight})"
-    )
+    plt.title(f"Hadlock's Algorithm Max-Cut\n" f"Value: {max_cut_value} (Total {total_weight})")
     plt.legend(loc="upper left")
     plt.axis("off")
 

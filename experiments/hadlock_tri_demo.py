@@ -50,9 +50,7 @@ def demo_hadlock_tri(num_nodes=100):
                 part_dict[n] = 1
         node_color = [part_dict.get(i, 0) for i in range(num_nodes)]
 
-    nx.draw_networkx_edges(
-        G, pos, edgelist=list(max_cut_edges), edge_color="red", width=1.5, alpha=0.6
-    )
+    nx.draw_networkx_edges(G, pos, edgelist=list(max_cut_edges), edge_color="red", width=1.5, alpha=0.6)
     nx.draw_networkx_edges(
         G,
         pos,
@@ -61,13 +59,9 @@ def demo_hadlock_tri(num_nodes=100):
         width=2,
         style="dashed",
     )
-    nx.draw_networkx_nodes(
-        G, pos, node_size=30, node_color=node_color, cmap=plt.cm.RdYlBu
-    )
+    nx.draw_networkx_nodes(G, pos, node_size=30, node_color=node_color, cmap=plt.cm.RdYlBu)
 
-    plt.title(
-        f"Planar MAX-CUT (Hadlock)\nBipartite Valid: {is_bipartite} | Cut Weight: {weight}"
-    )
+    plt.title(f"Planar MAX-CUT (Hadlock)\nBipartite Valid: {is_bipartite} | Cut Weight: {weight}")
     plt.show()
 
     print(f"Validation: Is the cut subgraph bipartite? {is_bipartite}")

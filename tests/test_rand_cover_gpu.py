@@ -5,14 +5,12 @@ import pytest
 
 try:
     from numba import cuda  # type: ignore[import-untyped]
-except ImportError:  # pragma: no cover
+except (ImportError, AttributeError):  # pragma: no cover
     cuda = None  # type: ignore[assignment]
 
 from netlistx.rand_cover_gpu import rand_vertex_cover_gpu
 
-GPU_SKIP = pytest.mark.skipif(
-    cuda is None or not cuda.is_available(), reason="No CUDA GPU available"
-)
+GPU_SKIP = pytest.mark.skipif(cuda is None or not cuda.is_available(), reason="No CUDA GPU available")
 
 
 def test_fallback_without_numba(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -136,9 +134,7 @@ def test_gpu_vertex_cover_with_initial_coverset() -> None:
     ugraph = nx.Graph()
     ugraph.add_edges_from([(0, 1), (1, 2), (2, 0)])
     weight = {0: 1, 1: 1, 2: 1}
-    soln, cost = rand_vertex_cover_gpu(
-        ugraph, weight, coverset={0}, num_trials=64, seed=42
-    )
+    soln, cost = rand_vertex_cover_gpu(ugraph, weight, coverset={0}, num_trials=64, seed=42)
     assert 0 in soln
     for u, v in ugraph.edges():
         assert u in soln or v in soln
@@ -148,9 +144,7 @@ def test_gpu_vertex_cover_with_initial_coverset() -> None:
 def test_gpu_vertex_cover_drawf(drawf_graph: Any) -> None:
     """Integration with the drawf graph fixture."""
     weight = {node: 1 for node in drawf_graph.ugraph}
-    soln, cost = rand_vertex_cover_gpu(
-        drawf_graph.ugraph, weight, num_trials=256, seed=42
-    )
+    soln, cost = rand_vertex_cover_gpu(drawf_graph.ugraph, weight, num_trials=256, seed=42)
     for u, v in drawf_graph.ugraph.edges():
         assert u in soln or v in soln
     assert cost <= len(drawf_graph.ugraph)

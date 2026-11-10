@@ -71,22 +71,12 @@ def text(
     weight: str = "normal",
     rotate: float | None = None,
 ) -> str:
-    transform = (
-        f' transform="rotate({rotate} {x:.1f} {y:.1f})"' if rotate is not None else ""
-    )
-    return (
-        f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" text-anchor="{anchor}" '
-        f'fill="{fill}" font-weight="{weight}"{transform}>{esc(body)}</text>'
-    )
+    transform = f' transform="rotate({rotate} {x:.1f} {y:.1f})"' if rotate is not None else ""
+    return f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" text-anchor="{anchor}" ' f'fill="{fill}" font-weight="{weight}"{transform}>{esc(body)}</text>'
 
 
-def circle(
-    cx: float, cy: float, r: float, *, fill: str, stroke: str, sw: float = 2.0
-) -> str:
-    return (
-        f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="{fill}" '
-        f'stroke="{stroke}" stroke-width="{sw}"/>'
-    )
+def circle(cx: float, cy: float, r: float, *, fill: str, stroke: str, sw: float = 2.0) -> str:
+    return f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r}" fill="{fill}" ' f'stroke="{stroke}" stroke-width="{sw}"/>'
 
 
 def line(
@@ -102,10 +92,7 @@ def line(
 ) -> str:
     d = f' stroke-dasharray="{dash}"' if dash else ""
     a = ' marker-end="url(#arrow)"' if arrow else ""
-    return (
-        f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
-        f'stroke="{stroke}" stroke-width="{sw}" stroke-linecap="round"{d}{a}/>'
-    )
+    return f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" ' f'stroke="{stroke}" stroke-width="{sw}" stroke-linecap="round"{d}{a}/>'
 
 
 def rect(
@@ -119,18 +106,12 @@ def rect(
     sw: float = 1.0,
     rx: float = 0.0,
 ) -> str:
-    return (
-        f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" '
-        f'rx="{rx}" fill="{fill}" stroke="{stroke}" stroke-width="{sw}"/>'
-    )
+    return f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{h:.1f}" ' f'rx="{rx}" fill="{fill}" stroke="{stroke}" stroke-width="{sw}"/>'
 
 
 def polyline(points: list[tuple[float, float]], *, stroke: str, sw: float = 2.5) -> str:
     pts = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
-    return (
-        f'<polyline points="{pts}" fill="none" stroke="{stroke}" '
-        f'stroke-width="{sw}" stroke-linejoin="round" stroke-linecap="round"/>'
-    )
+    return f'<polyline points="{pts}" fill="none" stroke="{stroke}" ' f'stroke-width="{sw}" stroke-linejoin="round" stroke-linecap="round"/>'
 
 
 def graph_node(
@@ -144,9 +125,7 @@ def graph_node(
     sw: float = 2.0,
     tsize: float = 13.0,
 ) -> str:
-    return circle(cx, cy, r, fill=fill, stroke=stroke, sw=sw) + text(
-        cx, cy + tsize * 0.36, label, size=tsize, weight="bold"
-    )
+    return circle(cx, cy, r, fill=fill, stroke=stroke, sw=sw) + text(cx, cy + tsize * 0.36, label, size=tsize, weight="bold")
 
 
 def svg_open(w: float, h: float, title: str) -> str:
@@ -164,15 +143,11 @@ def svg_open(w: float, h: float, title: str) -> str:
 
 
 def panel(x: float, y: float, w: float, h: float, title: str) -> str:
-    return rect(x, y, w, h, fill=PANEL, stroke=PANEL_STROKE, sw=1.5, rx=10) + text(
-        x + 18, y + 30, title, size=15, anchor="start", weight="bold"
-    )
+    return rect(x, y, w, h, fill=PANEL, stroke=PANEL_STROKE, sw=1.5, rx=10) + text(x + 18, y + 30, title, size=15, anchor="start", weight="bold")
 
 
 def banner(w: float, title: str, subtitle: str) -> str:
-    return text(w / 2, 34, title, size=21, weight="bold") + text(
-        w / 2, 58, subtitle, size=13, fill=MUTED
-    )
+    return text(w / 2, 34, title, size=21, weight="bold") + text(w / 2, 58, subtitle, size=13, fill=MUTED)
 
 
 def write_svg(name: str, body: str) -> str:
@@ -209,9 +184,7 @@ def figure_even_vs_odd() -> str:
         out.append(line(*pos_square[u], *pos_square[v], stroke=EDGE, sw=2.5))
     for node, (cx, cy) in pos_square.items():
         out.append(graph_node(cx, cy, f"n{node}"))
-    out.append(
-        text(225, 372, "2-colourable, so no odd cycle exists", size=13, fill=MUTED)
-    )
+    out.append(text(225, 372, "2-colourable, so no odd cycle exists", size=13, fill=MUTED))
     out.append(
         text(
             225,
@@ -241,9 +214,7 @@ def figure_even_vs_odd() -> str:
                 sw=3.0 if chosen else 2.0,
             )
         )
-    out.append(
-        text(700, 372, "one vertex breaks the only odd cycle", size=13, fill=MUTED)
-    )
+    out.append(text(700, 372, "one vertex breaks the only odd cycle", size=13, fill=MUTED))
     names = ", ".join(f"n{v}" for v in sorted(tri_cover))
     out.append(
         text(
@@ -327,9 +298,7 @@ def figure_cover_mixed() -> str:
     return "".join(out)
 
 
-def _mini_graph(
-    cx: float, cy: float, scale: float, colors: list[str] | None = None
-) -> str:
+def _mini_graph(cx: float, cy: float, scale: float, colors: list[str] | None = None) -> str:
     pts = [
         (cx - 62 * scale, cy - 56 * scale),
         (cx + 62 * scale, cy - 56 * scale),
@@ -344,9 +313,7 @@ def _mini_graph(
         stroke = NODE_STROKE
         if colors:
             stroke = COLOR_A_STROKE if colors[idx] == COLOR_A else COLOR_B_STROKE
-        body.append(
-            graph_node(px, py, "", fill=fill, stroke=stroke, r=13 * scale, sw=2.0)
-        )
+        body.append(graph_node(px, py, "", fill=fill, stroke=stroke, r=13 * scale, sw=2.0))
     return "".join(body)
 
 
@@ -366,18 +333,10 @@ def figure_oracle() -> str:
     out.append(text(340, 160, "5 BFS passes", size=12, fill=MUTED))
     for i in range(5):
         chip_x = 288 + i * 30
-        out.append(
-            rect(chip_x, 175, 24, 24, fill="#fdf2f1", stroke="#e6b0aa", sw=1.4, rx=5)
-        )
-        out.append(
-            text(chip_x + 12, 192, str(i + 1), size=12, fill=BEFORE, weight="bold")
-        )
-    out.append(
-        text(245, 266, "BFS restarted from every source,", size=12.5, fill=MUTED)
-    )
-    out.append(
-        text(245, 288, "topology recomputed on every call", size=12.5, fill=MUTED)
-    )
+        out.append(rect(chip_x, 175, 24, 24, fill="#fdf2f1", stroke="#e6b0aa", sw=1.4, rx=5))
+        out.append(text(chip_x + 12, 192, str(i + 1), size=12, fill=BEFORE, weight="bold"))
+    out.append(text(245, 266, "BFS restarted from every source,", size=12.5, fill=MUTED))
+    out.append(text(245, 288, "topology recomputed on every call", size=12.5, fill=MUTED))
     out.append(rect(50, 312, 390, 113, fill="#fdf2f1", stroke="#e6b0aa", sw=1.5, rx=8))
     out.append(
         text(
@@ -418,18 +377,12 @@ def figure_oracle() -> str:
     )
 
     out.append(panel(500, 80, 430, 360, "AFTER - single linear pass"))
-    out.append(
-        _mini_graph(
-            620, 205, 0.82, colors=[COLOR_A, COLOR_B, COLOR_A, COLOR_B, COLOR_A]
-        )
-    )
+    out.append(_mini_graph(620, 205, 0.82, colors=[COLOR_A, COLOR_B, COLOR_A, COLOR_B, COLOR_A]))
     out.append(line(700, 205, 750, 205, stroke=MUTED, sw=2.0, arrow=True))
     out.append(text(758, 195, "first same-colour", size=12, fill=MUTED, anchor="start"))
     out.append(text(758, 213, "edge = odd cycle", size=12, fill=MUTED, anchor="start"))
     out.append(rect(520, 300, 390, 122, fill="#f0f9f3", stroke="#a9dfbf", sw=1.5, rx=8))
-    out.append(
-        text(715, 328, "cost per call:  O(V + E)", size=16, weight="bold", fill=AFTER)
-    )
+    out.append(text(715, 328, "cost per call:  O(V + E)", size=16, weight="bold", fill=AFTER))
     out.append(
         text(
             715,
@@ -526,17 +479,13 @@ def scaling_chart(data: dict, *, note: str | None = None) -> str:
         return top + frac * plot_h
 
     out = [svg_open(w, h, f"Runtime scaling - {data['name']}")]
-    out.append(
-        banner(w, f"Odd cycle cover runtime - {data['name']}", "lower is better")
-    )
+    out.append(banner(w, f"Odd cycle cover runtime - {data['name']}", "lower is better"))
 
     decade = lo
     while decade <= hi * 1.0001:
         y = py(decade)
         out.append(line(left, y, right, y, stroke=GRID, sw=1.0))
-        out.append(
-            text(left - 12, y + 4, f"{decade:,.0f}", size=12, anchor="end", fill=MUTED)
-        )
+        out.append(text(left - 12, y + 4, f"{decade:,.0f}", size=12, anchor="end", fill=MUTED))
         decade *= 10
 
     out.append(line(left, top, left, bottom, stroke=MUTED, sw=1.5))
@@ -588,11 +537,7 @@ def scaling_chart(data: dict, *, note: str | None = None) -> str:
     out.append(text(left + 164, 90, "after", size=12.5, anchor="start", fill=INK))
 
     if note:
-        out.append(
-            rect(
-                left, h - 42, plot_w, 28, fill=PANEL, stroke=PANEL_STROKE, sw=1.2, rx=6
-            )
-        )
+        out.append(rect(left, h - 42, plot_w, 28, fill=PANEL, stroke=PANEL_STROKE, sw=1.2, rx=6))
         out.append(text(left + plot_w / 2, h - 23, note, size=11.5, fill=MUTED))
 
     out.append("</svg>\n")
@@ -607,11 +552,7 @@ def speedup_chart() -> str:
     series = []
     all_n: list[int] = []
     for data in (PY_DATA, CPP_DATA, RUST_DATA):
-        ratios = [
-            (n, before / after)
-            for n, before, after in zip(data["x"], data["before"], data["after"])
-            if before is not None and after
-        ]
+        ratios = [(n, before / after) for n, before, after in zip(data["x"], data["before"], data["after"]) if before is not None and after]
         series.append((data["name"], data["color"], ratios))
         all_n.extend(n for n, _ in ratios)
 
@@ -621,15 +562,11 @@ def speedup_chart() -> str:
     y_lo = 1.0
 
     def px(n: int) -> float:
-        frac = (math.log10(n) - math.log10(x_lo)) / (
-            math.log10(x_hi) - math.log10(x_lo)
-        )
+        frac = (math.log10(n) - math.log10(x_lo)) / (math.log10(x_hi) - math.log10(x_lo))
         return left + frac * plot_w
 
     def py(value: float) -> float:
-        frac = (math.log10(value) - math.log10(y_lo)) / (
-            math.log10(y_hi) - math.log10(y_lo)
-        )
+        frac = (math.log10(value) - math.log10(y_lo)) / (math.log10(y_hi) - math.log10(y_lo))
         return bottom - frac * plot_h
 
     out = [svg_open(w, h, "Speedup by input size")]
@@ -645,9 +582,7 @@ def speedup_chart() -> str:
     while decade <= y_hi * 1.0001:
         y = py(decade)
         out.append(line(left, y, right, y, stroke=GRID, sw=1.0))
-        out.append(
-            text(left - 12, y + 4, f"{decade:g}x", size=12, anchor="end", fill=MUTED)
-        )
+        out.append(text(left - 12, y + 4, f"{decade:g}x", size=12, anchor="end", fill=MUTED))
         decade *= 10
 
     out.append(line(left, top, left, bottom, stroke=MUTED, sw=1.5))
@@ -657,9 +592,7 @@ def speedup_chart() -> str:
         if x_lo <= n <= x_hi:
             out.append(line(px(n), bottom, px(n), bottom + 5, stroke=MUTED, sw=1.2))
             out.append(text(px(n), bottom + 24, f"{n}", size=12, fill=MUTED))
-    out.append(
-        text((left + right) / 2, bottom + 48, "nodes (n, log scale)", size=13, fill=INK)
-    )
+    out.append(text((left + right) / 2, bottom + 48, "nodes (n, log scale)", size=13, fill=INK))
     out.append(text(34, (top + bottom) / 2, "speedup", size=13, fill=INK, rotate=-90))
 
     for name, color, ratios in series:
@@ -668,9 +601,7 @@ def speedup_chart() -> str:
             out.append(polyline(pts, stroke=color, sw=3.0))
         for (mx, my), (_, v) in zip(pts, ratios):
             out.append(circle(mx, my, 5.5, fill="#ffffff", stroke=color, sw=3.0))
-            out.append(
-                text(mx, my - 13, f"{v:,.0f}x", size=11, fill=color, weight="bold")
-            )
+            out.append(text(mx, my - 13, f"{v:,.0f}x", size=11, fill=color, weight="bold"))
 
     lx = left
     for name, color, _ in series:
@@ -688,9 +619,7 @@ def main() -> None:
         "02_odd_cycle_cover_mixed.svg": figure_cover_mixed(),
         "03_oracle_before_after.svg": figure_oracle(),
         "04_scaling_python.svg": scaling_chart(PY_DATA),
-        "05_scaling_cpp.svg": scaling_chart(
-            CPP_DATA, note="C++ 'before' at n=400 did not finish within a 20-minute cap"
-        ),
+        "05_scaling_cpp.svg": scaling_chart(CPP_DATA, note="C++ 'before' at n=400 did not finish within a 20-minute cap"),
         "06_scaling_rust.svg": scaling_chart(RUST_DATA),
         "07_speedup_summary.svg": speedup_chart(),
     }

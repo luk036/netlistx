@@ -1,13 +1,10 @@
 """Tests for read_yosys_json and read_yosys_json_sax functions."""
+
 import json
 import tempfile
 from typing import Any, Dict, Optional
 
-from netlistx.netlist import (
-    read_yosys_json,
-    read_yosys_json_directed,
-    read_yosys_json_sax,
-)
+from netlistx.netlist import read_yosys_json, read_yosys_json_directed, read_yosys_json_sax
 
 
 def _make_yosys_json(

@@ -1,5 +1,40 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- **`SimpleGraph` attribute aliasing**: edge/node attribute factories now return
+  a fresh dict instead of sharing one class-level object across every node,
+  edge, and graph instance.
+- **`Netlist.get_net_weight`** now honours `net_weight` (RepeatArray, mapping,
+  or list) instead of always returning `1`.
+- **`form_graph(seed=0)`** is now reproducible; it no longer mutates the global
+  RNG and uses `bipartite.random_graph(..., seed=seed)`.
+- **Randomized cover with zero-weight pads** no longer divides by zero; the GPU
+  path also handles zero weights and applies reverse-delete post-processing.
+- **Input sets are no longer mutated**: `cover.*`, `min_maximal_matching`,
+  `min_vertex_cover_fast`, and `min_maximal_independent_set` copy their
+  `coverset`/`matchset`/`dep` arguments.
+- **`readwrite` validation**: malformed `.net` headers, missing JSON graph
+  metadata, and Yosys files without modules now raise `ValueError`.
+
+### Changed
+- **Packaging**: `mywheel>=0.7` is declared (fresh installs now import), Python
+  `>=3.11` is required, `numpy`/`jsonschema` moved to the `gpu`/`examples`
+  extras, `py.typed` and `algorithm.md` are explicitly packaged, and the
+  legacy `setup.py` was removed.
+- **Dead code**: removed `src/netlistx/cover_ai.py` and de-duplicated the Yosys
+  DOM/directed reader parsing.
+- **Performance**: `two_opt` now uses an O(1) 2-opt delta instead of recomputing
+  tour length; Hadlock computes dual distances and paths in a single pass.
+
+### CI and docs
+- Consolidated the three test workflows into one OS × Python matrix
+  (Linux/Windows/macOS, 3.11–3.14) with a 90% coverage gate, pre-commit, mypy,
+  and a test gate before publishing.
+- Real documentation landing page, install/quickstart in the README, cleaned-up
+  contributor guide, and example data moved to `examples/yosys/`.
+
 ## Version 0.7 (2026-10-09)
 
 ### Features

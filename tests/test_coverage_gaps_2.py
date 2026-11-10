@@ -1,8 +1,4 @@
-"""Targeted tests to cover uncovered lines in netlist.py.
-
-Missing lines: [102, 106, 112, 113, 114]
-Missing branches: [[405, 404], [681, 685]]
-"""
+"""Edge-case tests for netlist.py (TinyGraph, SimpleGraph, form_graph, Yosys reader)."""
 
 import json
 import tempfile
@@ -14,7 +10,7 @@ from netlistx.netlist import SimpleGraph, TinyGraph, form_graph, read_yosys_json
 
 
 class TestTinyGraph:
-    """Cover TinyGraph.init_nodes() and its helper methods (lines 102, 106, 112-114)."""
+    """Cover TinyGraph.init_nodes() and its helper methods."""
 
     def test_tiny_graph_init(self) -> None:
         """Create a TinyGraph and call init_nodes."""
@@ -45,7 +41,7 @@ class TestTinyGraph:
 
 
 class TestFormGraphWithoutSeed:
-    """Cover branch [681, 685] in form_graph - when seed is falsy."""
+    """Cover form_graph when seed is None."""
 
     def test_form_graph_no_seed(self) -> None:
         """Call form_graph without providing a seed (default None)."""
@@ -55,7 +51,7 @@ class TestFormGraphWithoutSeed:
 
 
 class TestReadYosysJsonEdgeCases:
-    """Cover branch [405, 404] - port net_id not in nets_dict."""
+    """Cover ports whose net id is not in nets_dict."""
 
     def test_port_with_missing_net_id(self) -> None:
         """Port referencing a net_id not collected as a net node."""
@@ -88,7 +84,7 @@ class TestReadYosysJsonEdgeCases:
 
 
 class TestNetlistSimpleGraph:
-    """Cover SimpleGraph.single_edge_dict (lines 102, 106 in coverage report)."""
+    """Cover SimpleGraph attribute-dict factories."""
 
     def test_simple_graph_edge_attr(self) -> None:
         """Create SimpleGraph and verify edge_attr_dict_factory works."""

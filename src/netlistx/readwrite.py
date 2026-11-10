@@ -25,6 +25,9 @@ def read_netd(filename: str) -> Netlist:
     with open(filename, "r") as f:
         lines = f.readlines()
 
+    if len(lines) < 5:
+        raise ValueError(f"invalid .net file {filename!r}: expected a 5-line header, " f"found {len(lines)} line(s)")
+
     numPins = int(lines[1].strip())
     numNets = int(lines[2].strip())
     numModules = int(lines[3].strip())
@@ -102,12 +105,14 @@ def read_json(filename: str) -> Netlist:
         data = json.load(fr)
 
     ugraph = json_graph.node_link_graph(data, edges="edges")
+    required = ("num_modules", "num_nets", "num_pads")
+    missing = [key for key in required if key not in ugraph.graph]
+    if missing:
+        raise ValueError(f"JSON graph in {filename!r} is missing required metadata: {missing}")
     num_modules = ugraph.graph["num_modules"]
     num_nets = ugraph.graph["num_nets"]
     num_pads = ugraph.graph["num_pads"]
-    hyprgraph = Netlist(
-        ugraph, range(num_modules), range(num_modules, num_modules + num_nets)
-    )
+    hyprgraph = Netlist(ugraph, range(num_modules), range(num_modules, num_modules + num_nets))
     hyprgraph.num_pads = num_pads
     return hyprgraph
 
@@ -136,9 +141,7 @@ def _build_netlist_from_parts(
 
     # Assign sorted net IDs to graph node IDs
     nets_list = sorted(all_net_ids)
-    net_to_node: dict[int, int] = {
-        net_id: len(cell_names) + i for i, net_id in enumerate(nets_list)
-    }
+    net_to_node: dict[int, int] = {net_id: len(cell_names) + i for i, net_id in enumerate(nets_list)}
     for net_id in nets_list:
         graph.add_node(net_to_node[net_id], type="net", net_id=net_id)
 
@@ -185,6 +188,57 @@ def _build_netlist_from_parts(
     return netlist
 
 
+def _first_module_data(data: dict) -> dict:
+    """Return the first module's data, raising ValueError when none exists."""
+    modules = data.get("modules")
+    if not modules:
+        raise ValueError("Yosys JSON contains no 'modules'")
+    return next(iter(modules.values()))
+
+
+def _collect_yosys_parts(
+    module_data: dict,
+) -> tuple[
+    list[str],
+    list[str],
+    set[int],
+    list[tuple[int, int]],
+    dict[str, set[int]],
+    dict[int, list[tuple[str, int, str]]],
+]:
+    """Collect cells, ports, nets, edges, and pin directions from a module."""
+    cell_names = list(module_data["cells"].keys())
+    port_names = list(module_data["ports"].keys())
+
+    all_net_ids: set[int] = set()
+    for port_info in module_data["ports"].values():
+        all_net_ids.update(port_info["bits"])
+    if "netnames" in module_data:
+        for netinfo in module_data["netnames"].values():
+            all_net_ids.update(netinfo["bits"])
+
+    cell_edges: list[tuple[int, int]] = []
+    pin_dirs: dict[int, list[tuple[str, int, str]]] = {}
+    for i, (_, cell_info) in enumerate(module_data["cells"].items()):
+        port_directions = cell_info.get("port_directions", {})
+        for port_name, connections in cell_info["connections"].items():
+            direction = port_directions.get(port_name)
+            for net_id in connections:
+                if isinstance(net_id, int):
+                    all_net_ids.add(net_id)
+                    cell_edges.append((i, net_id))
+                    pin_dirs.setdefault(net_id, []).append(("cell", i, direction or "?"))
+
+    port_nets: dict[str, set[int]] = {}
+    for port_index, (port_name, port_info) in enumerate(module_data["ports"].items()):
+        port_nets[port_name] = set(port_info["bits"])
+        direction = port_info.get("direction", "?")
+        for net_id in port_info["bits"]:
+            pin_dirs.setdefault(net_id, []).append(("port", port_index, direction))
+
+    return cell_names, port_names, all_net_ids, cell_edges, port_nets, pin_dirs
+
+
 def read_yosys_json(filename: str) -> Netlist:
     """
     Read a Yosys JSON file and convert it to a Netlist object.
@@ -203,38 +257,9 @@ def read_yosys_json(filename: str) -> Netlist:
         data = json.load(f)
 
     # Only the first module (typically the top module) is processed
-    module_name = list(data["modules"].keys())[0]
-    module_data = data["modules"][module_name]
-
-    # Collect cells and ports in file order
-    cell_names = list(module_data["cells"].keys())
-    port_names = list(module_data["ports"].keys())
-
-    # Collect all unique net IDs (port bits and netnames bits are kept as-is;
-    # string constants like "0" in cell connections are skipped)
-    all_net_ids: set[int] = set()
-    for port_info in module_data["ports"].values():
-        all_net_ids.update(port_info["bits"])
-    if "netnames" in module_data:
-        for netinfo in module_data["netnames"].values():
-            all_net_ids.update(netinfo["bits"])
-
-    cell_edges: list[tuple[int, int]] = []
-    for i, cell_info in enumerate(module_data["cells"].values()):
-        for connections in cell_info["connections"].values():
-            for net_id in connections:
-                if isinstance(net_id, int):
-                    all_net_ids.add(net_id)
-                    cell_edges.append((i, net_id))
-
-    # Port connections
-    port_nets: dict[str, set[int]] = {}
-    for port_name, port_info in module_data["ports"].items():
-        port_nets[port_name] = set(port_info["bits"])
-
-    return _build_netlist_from_parts(
-        cell_names, port_names, all_net_ids, cell_edges, port_nets
-    )
+    module_data = _first_module_data(data)
+    cell_names, port_names, all_net_ids, cell_edges, port_nets, _ = _collect_yosys_parts(module_data)
+    return _build_netlist_from_parts(cell_names, port_names, all_net_ids, cell_edges, port_nets)
 
 
 def read_yosys_json_sax(filename: str) -> Netlist:
@@ -306,64 +331,41 @@ def read_yosys_json_sax(filename: str) -> Netlist:
                     cell_names.append(_current_cell)
 
             # ── detect port names ────────────────────────────────
-            elif (
-                ".ports" in prefix and prefix.endswith(".ports") and event == "map_key"
-            ):
+            elif ".ports" in prefix and prefix.endswith(".ports") and event == "map_key":
                 _current_port = value  # type: ignore[assignment]
                 if _current_port not in port_nets:
                     port_nets[_current_port] = set()
                     port_names.append(_current_port)
 
             # ── cell connection net IDs ──────────────────────────
-            elif (
-                ".connections." in prefix
-                and prefix.endswith(".item")
-                and event == "number"
-                and isinstance(value, int)
-            ):
+            elif ".connections." in prefix and prefix.endswith(".item") and event == "number" and isinstance(value, int):
                 if _current_cell is not None and _current_cell in cell_idx:
                     cell_edges.append((cell_idx[_current_cell], value))
                     all_net_ids.add(value)
 
             # ── port bit net IDs ─────────────────────────────────
-            elif (
-                ".ports." in prefix
-                and ".bits.item" in prefix
-                and event == "number"
-                and isinstance(value, int)
-            ):
+            elif ".ports." in prefix and ".bits.item" in prefix and event == "number" and isinstance(value, int):
                 all_net_ids.add(value)
                 if _current_port is not None:
                     port_nets[_current_port].add(value)
 
             # ── netnames bit net IDs ─────────────────────────────
-            elif (
-                ".netnames." in prefix
-                and ".bits.item" in prefix
-                and event == "number"
-                and isinstance(value, int)
-            ):
+            elif ".netnames." in prefix and ".bits.item" in prefix and event == "number" and isinstance(value, int):
                 all_net_ids.add(value)
 
             # ── reset state on object boundaries ─────────────────
-            elif (
-                ".cells." in prefix and event == "end_map" and _current_cell is not None
-            ):
+            elif ".cells." in prefix and event == "end_map" and _current_cell is not None:
                 parts = prefix.split(".")
                 if parts[-1] == _current_cell:
                     _current_cell = None
 
-            elif (
-                ".ports." in prefix and event == "end_map" and _current_port is not None
-            ):
+            elif ".ports." in prefix and event == "end_map" and _current_port is not None:
                 parts = prefix.split(".")
                 if parts[-1] == _current_port:
                     _current_port = None
 
     # ── Phase 2: build the graph from collected data ─────────────────
-    return _build_netlist_from_parts(
-        cell_names, port_names, all_net_ids, cell_edges, port_nets
-    )
+    return _build_netlist_from_parts(cell_names, port_names, all_net_ids, cell_edges, port_nets)
 
 
 def read_yosys_json_directed(filename: str) -> Netlist:
@@ -391,43 +393,11 @@ def read_yosys_json_directed(filename: str) -> Netlist:
     with open(filename, "r") as f:
         data = json.load(f)
 
-    module_name = list(data["modules"].keys())[0]
-    module_data = data["modules"][module_name]
+    module_data = _first_module_data(data)
 
-    cell_names = list(module_data["cells"].keys())
-    port_names = list(module_data["ports"].keys())
+    cell_names, port_names, all_net_ids, cell_edges, port_nets, pin_dirs = _collect_yosys_parts(module_data)
 
-    all_net_ids: set[int] = set()
-    for port_info in module_data["ports"].values():
-        all_net_ids.update(port_info["bits"])
-    if "netnames" in module_data:
-        for netinfo in module_data["netnames"].values():
-            all_net_ids.update(netinfo["bits"])
-
-    cell_edges: list[tuple[int, int]] = []
-    pin_dirs: dict[int, list[tuple[str, int, str]]] = {}
-    for i, (_, cell_info) in enumerate(module_data["cells"].items()):
-        port_directions = cell_info.get("port_directions", {})
-        for port_name, connections in cell_info["connections"].items():
-            direction = port_directions.get(port_name)
-            for net_id in connections:
-                if isinstance(net_id, int):
-                    all_net_ids.add(net_id)
-                    cell_edges.append((i, net_id))
-                    pin_dirs.setdefault(net_id, []).append(
-                        ("cell", i, direction or "?")
-                    )
-
-    port_nets: dict[str, set[int]] = {}
-    for port_index, (port_name, port_info) in enumerate(module_data["ports"].items()):
-        port_nets[port_name] = set(port_info["bits"])
-        direction = port_info.get("direction", "?")
-        for net_id in port_info["bits"]:
-            pin_dirs.setdefault(net_id, []).append(("port", port_index, direction))
-
-    netlist = _build_netlist_from_parts(
-        cell_names, port_names, all_net_ids, cell_edges, port_nets
-    )
+    netlist = _build_netlist_from_parts(cell_names, port_names, all_net_ids, cell_edges, port_nets)
 
     sorted_net_ids = sorted(all_net_ids)
     num_cells = len(cell_names)
@@ -442,8 +412,6 @@ def read_yosys_json_directed(filename: str) -> Netlist:
                 driver_candidates.add(index)
             elif direction == "input" and kind == "port":
                 driver_candidates.add(port_base + index)
-        net_driver[net_to_node[net_id]] = (
-            driver_candidates.pop() if len(driver_candidates) == 1 else None
-        )
+        net_driver[net_to_node[net_id]] = driver_candidates.pop() if len(driver_candidates) == 1 else None
     netlist.net_driver = net_driver  # type: ignore[attr-defined]
     return netlist

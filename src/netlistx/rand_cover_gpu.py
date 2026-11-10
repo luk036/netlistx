@@ -29,7 +29,7 @@ from netlistx.rand_cover import rand_vertex_cover
 
 try:
     from numba import cuda  # type: ignore[import-untyped, import-not-found]
-except ImportError:  # pragma: no cover
+except (ImportError, AttributeError):  # pragma: no cover
     cuda = None  # type: ignore[assignment]
 
 THREADS_PER_BLOCK = 64
@@ -52,7 +52,7 @@ if cuda is not None:
         Each thread maintains its cover as a bitmask (uint32 words) stored
         in device memory at its trial index.
         """
-        tid = cuda.grid(1)
+        tid: int = cuda.grid(1)  # type: ignore[call-arg]
         if tid >= costs.shape[0]:
             return
 
@@ -78,7 +78,8 @@ if cuda is not None:
 
                 w_u = weights[u]
                 w_v = weights[v]
-                threshold = w_v / (w_u + w_v)
+                denom = w_u + w_v
+                threshold = 0.5 if denom == 0 else w_v / denom
 
                 if rand_val < threshold:
                     cover_words[tid, u_word] |= u_bit
@@ -140,7 +141,13 @@ def rand_vertex_cover_gpu(
         True
     """
     if cuda is None or not cuda.is_available():
-        return rand_vertex_cover(ugraph, weight, coverset, seed)
+        best_soln, best_cost = rand_vertex_cover(ugraph, weight, coverset, seed)
+        rng = _random.Random(seed)
+        for _ in range(1, max(1, num_trials)):
+            trial_soln, cost = rand_vertex_cover(ugraph, weight, coverset, rng.randint(0, 2**31 - 1))
+            if cost < best_cost:
+                best_soln, best_cost = trial_soln, cost
+        return best_soln, best_cost
 
     if coverset is None:
         coverset = set()
@@ -166,9 +173,7 @@ def rand_vertex_cover_gpu(
 
     # Generate seeds for each trial
     rng = _random.Random(seed)
-    seeds_np = np.array(
-        [rng.randint(0, 2**31 - 1) for _ in range(num_trials)], dtype=np.int32
-    )
+    seeds_np = np.array([rng.randint(0, 2**31 - 1) for _ in range(num_trials)], dtype=np.int32)
 
     # Allocate cover bitmask array: (num_trials, num_words)
     num_words = (n_vertices + 31) // 32
@@ -210,7 +215,6 @@ def rand_vertex_cover_gpu(
 
     # Find best trial
     best_idx = int(np.argmin(costs_np))
-    best_cost = float(costs_np[best_idx])
 
     # Extract best cover set
     best_mask = covers_np[best_idx]
@@ -219,4 +223,15 @@ def rand_vertex_cover_gpu(
         if (best_mask[vi >> 5] >> (vi & 31)) & 1:
             soln.add(vertices[vi])
 
-    return soln, best_cost
+    # Reverse-delete post-processing (mirrors the CPU implementation).
+    initial = set(coverset)
+    for vtx in sorted(
+        (v for v in soln if v not in initial),
+        key=lambda v: weight[v],
+        reverse=True,
+    ):
+        soln.remove(vtx)
+        if not all(u in soln or w in soln for u, w in ugraph.edges()):
+            soln.add(vtx)
+
+    return soln, sum(weight[v] for v in soln)

@@ -1,16 +1,33 @@
 # 🖇  netlistx
 
-Add a short description here!
+Netlist representations and graph algorithms for electronic design automation.
 
-## 👉 Note
+## Installation
 
-> This is the main page of your project's [Sphinx] documentation. It is
-> formatted in [Markdown]. Add additional pages by creating md-files in
-> `docs` or rst-files (formatted in [reStructuredText]) and adding links to
-> them in the `Contents` section below.
->
-> Please check [Sphinx] and [MyST] for more information
-> about how to document your project and how to configure your preferences.
+````bash
+pip install netlistx
+````
+
+Python 3.11 or newer is required. Optional GPU acceleration (Numba CUDA):
+
+````bash
+pip install netlistx[gpu]
+````
+
+## Quickstart
+
+````python
+import networkx as nx
+from netlistx.cover import min_vertex_cover
+from netlistx.netlist import create_inverter
+
+netlist = create_inverter()
+print(netlist.number_of_modules(), netlist.number_of_nets())
+
+graph = nx.Graph([(0, 1), (1, 2), (2, 0)])
+cover, cost = min_vertex_cover(graph, {0: 1, 1: 1, 2: 1})
+print(cover, cost)
+````
 
 ## Contents
 
@@ -23,7 +40,7 @@ License <license>
 Authors <authors>
 Changelog <changelog>
 Module Reference <api/modules>
-Figures Demo <figures_demo>
+Examples <figures_demo>
 ```
 
 ## Indices and tables
@@ -31,8 +48,3 @@ Figures Demo <figures_demo>
 - {ref}`genindex`
 - {ref}`modindex`
 - {ref}`search`
-
-[Sphinx]: http://www.sphinx-doc.org/
-[Markdown]: https://daringfireball.net/projects/markdown/
-[reStructuredText]: http://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
-[MyST]: https://myst-parser.readthedocs.io/en/latest/

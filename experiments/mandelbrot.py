@@ -132,9 +132,7 @@ class InteractiveMandelbrot:
         blockspergrid_y = int(math.ceil(HEIGHT / THREADS_PER_BLOCK[1]))
         blockspergrid = (blockspergrid_x, blockspergrid_y)
 
-        mandelbrot_kernel[blockspergrid, THREADS_PER_BLOCK](
-            self.x_min, self.x_max, self.y_min, self.y_max, d_image, MAX_ITER
-        )
+        mandelbrot_kernel[blockspergrid, THREADS_PER_BLOCK](self.x_min, self.x_max, self.y_min, self.y_max, d_image, MAX_ITER)
 
         cuda.synchronize()
         self.image = d_image.copy_to_host()
@@ -166,9 +164,7 @@ class InteractiveMandelbrot:
             return
 
         mouse_x, mouse_y = event.xdata, event.ydata
-        if (
-            mouse_x is None or mouse_y is None
-        ):  # Ignore scroll events outside the plot area
+        if mouse_x is None or mouse_y is None:  # Ignore scroll events outside the plot area
             return
 
         scale_factor = 0.8 if event.button == "up" else 1.25

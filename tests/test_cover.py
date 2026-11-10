@@ -2,12 +2,7 @@ from typing import Any
 
 import networkx as nx
 
-from netlistx.cover import (
-    min_cycle_cover,
-    min_odd_cycle_cover,
-    min_vertex_cover,
-    pd_cover,
-)
+from netlistx.cover import min_cycle_cover, min_odd_cycle_cover, min_vertex_cover, pd_cover
 
 
 def test_pd_cover() -> None:

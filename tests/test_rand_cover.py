@@ -184,9 +184,7 @@ def test_rand_hyper_vertex_cover_weighted() -> None:
         if 0 in soln:
             picks_heavy += 1
     # Vertex 1 (weight 1) should be picked far more often
-    assert (
-        picks_heavy < trials * 0.1
-    ), f"Heavy vertex picked {picks_heavy}/{trials} times"
+    assert picks_heavy < trials * 0.1, f"Heavy vertex picked {picks_heavy}/{trials} times"
 
 
 def test_rand_hyper_vertex_cover_empty() -> None:

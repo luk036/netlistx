@@ -23,21 +23,13 @@ def run_graphical_demo():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
     # Plot Vertex Cover
-    nx.draw(
-        G, pos, ax=axes[0], with_labels=True, node_color="lightgrey", edge_color="gray"
-    )
-    nx.draw_networkx_nodes(
-        G, pos, ax=axes[0], nodelist=list(vc_nodes), node_color="salmon"
-    )
+    nx.draw(G, pos, ax=axes[0], with_labels=True, node_color="lightgrey", edge_color="gray")
+    nx.draw_networkx_nodes(G, pos, ax=axes[0], nodelist=list(vc_nodes), node_color="salmon")
     axes[0].set_title(f"Min Vertex Cover\nCost: {vc_cost} | Nodes: {len(vc_nodes)}")
 
     # Plot Cycle Cover
-    nx.draw(
-        G, pos, ax=axes[1], with_labels=True, node_color="lightgrey", edge_color="gray"
-    )
-    nx.draw_networkx_nodes(
-        G, pos, ax=axes[1], nodelist=list(cc_nodes), node_color="skyblue"
-    )
+    nx.draw(G, pos, ax=axes[1], with_labels=True, node_color="lightgrey", edge_color="gray")
+    nx.draw_networkx_nodes(G, pos, ax=axes[1], nodelist=list(cc_nodes), node_color="skyblue")
     axes[1].set_title(f"Min Cycle Cover\nCost: {cc_cost} | Nodes: {len(cc_nodes)}")
 
     plt.tight_layout()

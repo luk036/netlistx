@@ -13,7 +13,7 @@ pytest tests/test_netlist.py::test_create_inverter
 # Run tests matching a pattern
 pytest -k "cover"
 
-# Run via tox (isolated environment; installs mywheel from git)
+# Run via tox (isolated environment)
 tox
 ```
 
@@ -42,14 +42,14 @@ tox -e linkcheck      # Check for broken doc links
 
 ### Project Structure
 - Source code: `src/netlistx/`
-- Tests: `tests/` (test_netlist.py, test_netlist_algo.py, test_graph_algo.py, test_cover.py, test_pd_cover.py, test_hadlock.py, test_tsp.py, test_readwrite.py, test_yosys.py, test_rand_cover.py, hypothesis and stress variants)
+- Tests: `tests/` (test_netlist.py, test_netlist_algo.py, test_graph_algo.py, test_cover.py, test_pd_cover.py, test_hadlock.py, test_tsp.py, test_readwrite.py, test_readwrite_errors.py, test_yosys.py, test_rand_cover.py, hypothesis and stress variants)
 - Version managed via setuptools_scm (`no-guess-dev` scheme)
 
 ### Naming Conventions
 - **Classes**: PascalCase (e.g., `Netlist`, `SimpleGraph`, `TinyGraph`)
 - **Functions/Methods**: snake_case (e.g., `create_inverter`, `read_yosys_json`, `min_vertex_cover_fast`, `get_module_weight`)
 - **Module-level constants**: lowercase (e.g., `all_edge_dict`)
-- **Unused parameters**: underscore `_` (e.g., `def get_net_weight(self, _: Any)`)
+- **Unused parameters**: underscore `_` (e.g., when an interface requires a parameter that is intentionally ignored)
 
 ### Type Hints
 - **Required**: All function parameters and return types
@@ -75,17 +75,18 @@ tox -e linkcheck      # Check for broken doc links
 - Validation logic falls back to default weights (`return 1`) rather than raising
 
 ### Python Version
-- No `python_requires` pin in setup.cfg
-- CI tests on Python 3.11 and 3.12; mypy targets Python 3.12
+- `python_requires = >=3.11` in `setup.cfg`
+- CI tests on Python 3.11–3.14 across Linux/Windows/macOS; mypy targets Python 3.12
 
 ### Configuration Files
-- `setup.cfg`: package metadata, pytest options, flake8 config
+- `setup.cfg`: package metadata, dependencies/extras, pytest options, flake8 config
 - `.flake8`: formatter-friendly (ignores E1/E2/E3/E501/W1/W2/W3/W5)
 - `.pre-commit-config.yaml`: pre-commit hooks
 - `mypy.ini`: Python 3.12 target, `disable_error_code = import-untyped`, ignores setuptools/matplotlib/networkx
-- `pyproject.toml`: build system (setuptools_scm)
-- `tox.ini`: task automation (test, build, clean, docs, doctests, linkcheck, publish)
-- `.coveragerc`: coverage config
+- `pyproject.toml`: build system (setuptools_scm) and black config
+- `tox.ini`: task automation (test, lint, mypy, build, clean, docs, doctests, linkcheck, publish)
+- `.coveragerc`: coverage config (GPU module omitted)
+- `.github/workflows/ci.yml`: consolidated test/lint matrix
 
 ### Pre-commit Hooks
 - trailing-whitespace
@@ -115,4 +116,4 @@ netlistx provides netlist representations and graph algorithms for electronic de
 - **I/O**: JSON readers including Yosys JSON — DOM-style (`read_yosys_json`) and streaming SAX via `ijson` (`read_yosys_json_sax`)
 - **Covering algorithms**: primal-dual approximation with reverse-delete post-processing (`pd_cover`, `min_vertex_cover`, `min_cycle_cover`, `min_odd_cycle_cover`, `min_hyper_vertex_cover`) for edges, cycles, and odd cycles
 - **Routing/other**: Hadlock router (`hadlock.py`), TSP heuristics (`tsp.py`), random cover generators
-- **Used by**: `ckpttnpy`; **key dependencies**: `networkx`, `numpy`, `jsonschema`, `ijson`, `mywheel` (`numba` is optional, for GPU acceleration via `netlistx[gpu]`; CPU fallback when absent)
+- **Used by**: `ckpttnpy`; **key dependencies**: `networkx>=3.6.1`, `mywheel>=0.7`, `ijson` (`numpy`/`jsonschema` are optional via `netlistx[gpu]`/`netlistx[examples]`; `numba` powers GPU acceleration with a CPU fallback)

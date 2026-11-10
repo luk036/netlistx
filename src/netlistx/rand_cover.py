@@ -98,10 +98,12 @@ def rand_vertex_cover(
     for u, v in ugraph.edges():
         if u in soln or v in soln:
             continue
-        # Pitt's rule: pick u with prob w(v)/(w(u)+w(v)), else pick v
+        # Pitt's rule: pick u with prob w(v)/(w(u)+w(v)), else pick v.
+        # When both endpoints have zero weight, break the tie uniformly.
         w_u = weight[u]
         w_v = weight[v]
-        threshold = w_v / (w_u + w_v)
+        denom = w_u + w_v
+        threshold = 0.5 if denom == 0 else w_v / denom
         if rng.random() < threshold:
             soln.add(u)
             added_order.append(u)
@@ -185,29 +187,33 @@ def rand_hyper_vertex_cover(
         if len(vertices) == 0:
             continue
         # Generalized Pitt rule for k vertices:
-        # P(pick vi) = (1/w(vi)) / sum(1/w(vj) for vj in net)
-        inv_weights = [1.0 / weight[v] for v in vertices]
-        total_inv = sum(inv_weights)
-        # Normalize to probabilities
-        probs = [iw / total_inv for iw in inv_weights]
-        # Sample one vertex
-        r = rng.random()
+        # P(pick vi) = (1/w(vi)) / sum(1/w(vj) for vj in net).
+        # Zero-weight vertices get infinite preference, so pick among them
+        # uniformly; otherwise sample proportionally to the inverse weight.
+        vertex_weights = [weight[v] for v in vertices]
+        zero_weight = [i for i, w in enumerate(vertex_weights) if w == 0]
+        if zero_weight:
+            vtx = vertices[zero_weight[rng.randrange(len(zero_weight))]]
+            soln.add(vtx)
+            added_order.append(vtx)
+            continue
+        inv_weights = [1.0 / w for w in vertex_weights]
+        threshold = rng.random() * sum(inv_weights)
         cumulative = 0.0
-        for i, p in enumerate(probs):
-            cumulative += p
-            if r < cumulative:
+        vtx = vertices[-1]
+        for i, inv_w in enumerate(inv_weights):
+            cumulative += inv_w
+            if threshold < cumulative:
                 vtx = vertices[i]
-                soln.add(vtx)
-                added_order.append(vtx)
                 break
+        soln.add(vtx)
+        added_order.append(vtx)
 
     # Phase 2: Reverse-Delete Post-Processing
     _reverse_delete_cover(
         soln,
         added_order,
-        lambda: all(
-            any(v in soln for v in hyprgraph.ugraph[net]) for net in hyprgraph.nets
-        ),
+        lambda: all(any(v in soln for v in hyprgraph.ugraph[net]) for net in hyprgraph.nets),
     )
 
     total_cost = sum(weight[v] for v in soln)

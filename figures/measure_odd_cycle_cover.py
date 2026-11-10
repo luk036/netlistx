@@ -19,9 +19,9 @@ ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, "src"))
 sys.path.insert(0, os.path.join(ROOT, "experiments"))
 
+import cover_ai  # noqa: E402
 import networkx as nx  # noqa: E402
 
-import cover_ai  # noqa: E402
 from netlistx.cover import min_odd_cycle_cover as new_odd_cycle_cover  # noqa: E402
 
 SIZES = [(50, 75), (100, 150), (200, 300), (400, 600)]
@@ -63,10 +63,7 @@ def main() -> None:
         out["after_cover"].append(len(after))
         out["before_cost"].append(cost_before)
         out["after_cost"].append(cost_after)
-        print(
-            f"n={n:>3}: before {ms_before:8.1f} ms ({len(before)},{cost_before})"
-            f"  after {ms_after:7.3f} ms ({len(after)},{cost_after})"
-        )
+        print(f"n={n:>3}: before {ms_before:8.1f} ms ({len(before)},{cost_before})" f"  after {ms_after:7.3f} ms ({len(after)},{cost_after})")
 
     path = os.path.join(HERE, "odd_cycle_cover_timings.json")
     with open(path, "w", encoding="utf-8") as handle:

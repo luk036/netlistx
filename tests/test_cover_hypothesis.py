@@ -6,13 +6,7 @@ import hypothesis.strategies as st
 from hypothesis import assume, given
 from networkx import Graph, complete_graph, cycle_graph, path_graph
 
-from netlistx.cover import (
-    min_cycle_cover,
-    min_hyper_vertex_cover,
-    min_odd_cycle_cover,
-    min_vertex_cover,
-    pd_cover,
-)
+from netlistx.cover import min_cycle_cover, min_hyper_vertex_cover, min_odd_cycle_cover, min_vertex_cover, pd_cover
 
 
 @st.composite
@@ -81,9 +75,7 @@ def hypergraph_strategy(draw: st.DrawFn) -> tuple:
             graph.add_edge(net, module)
 
     # Generate weights for modules only
-    weights = {
-        module: draw(st.integers(min_value=1, max_value=10)) for module in modules
-    }
+    weights = {module: draw(st.integers(min_value=1, max_value=10)) for module in modules}
 
     # Create mock hypergraph
     class MockHypergraph:
@@ -182,9 +174,7 @@ class TestHyperVertexCoverProperties:
         # Every net should have at least one connected module in the cover
         for net in hypergraph.nets:
             connected_modules = hypergraph.ugraph[net]
-            assert any(
-                module in cover for module in connected_modules
-            ), f"Net {net} not covered by any module in {cover}"
+            assert any(module in cover for module in connected_modules), f"Net {net} not covered by any module in {cover}"
 
     @given(data=st.data())
     def test_hyper_vertex_cover_weight_consistency(self, data: st.DataObject) -> None:
@@ -229,9 +219,7 @@ class TestCycleCoverProperties:
             from networkx.algorithms import cycles
 
             remaining_cycles = list(cycles.cycle_basis(remaining_graph))
-            assert (
-                len(remaining_cycles) == 0
-            ), f"Cycles found after removing cover: {remaining_cycles}"
+            assert len(remaining_cycles) == 0, f"Cycles found after removing cover: {remaining_cycles}"
         except ImportError:
             # Fallback: check if graph is a forest (no cycles)
             assert remaining_graph.number_of_edges() <= len(remaining_nodes) - 1
@@ -297,9 +285,7 @@ class TestOddCycleCoverProperties:
 
             remaining_cycles = list(cycles.cycle_basis(remaining_graph))
             for cycle in remaining_cycles:
-                assert (
-                    len(cycle) % 2 == 0
-                ), f"Odd cycle {cycle} found after removing cover"
+                assert len(cycle) % 2 == 0, f"Odd cycle {cycle} found after removing cover"
         except ImportError:
             # Skip this test if cycles module not available
             pass
@@ -337,9 +323,7 @@ class TestPDCoverProperties:
         """Test basic properties of pd_cover function."""
         # Create a simple violate function
         elements = [0, 1, 2, 3]
-        weights = {
-            i: data.draw(st.integers(min_value=1, max_value=10)) for i in elements
-        }
+        weights = {i: data.draw(st.integers(min_value=1, max_value=10)) for i in elements}
 
         def violate_simple() -> Iterator[List[int]]:
             # Yield violating sets
@@ -367,9 +351,7 @@ class TestPDCoverProperties:
     def test_pd_cover_empty_violate(self, data: st.DataObject) -> None:
         """Test pd_cover with no violations."""
         elements = [0, 1, 2]
-        weights = {
-            i: data.draw(st.integers(min_value=1, max_value=10)) for i in elements
-        }
+        weights = {i: data.draw(st.integers(min_value=1, max_value=10)) for i in elements}
 
         def violate_empty() -> Iterator[List[int]]:
             return iter([])  # No violations
@@ -385,9 +367,7 @@ class TestPDCoverProperties:
     def test_pd_cover_preexisting_solution(self, data: st.DataObject) -> None:
         """Test pd_cover with pre-existing solution."""
         elements = [0, 1, 2, 3]
-        weights = {
-            i: data.draw(st.integers(min_value=1, max_value=10)) for i in elements
-        }
+        weights = {i: data.draw(st.integers(min_value=1, max_value=10)) for i in elements}
 
         def violate_simple() -> Iterator[List[int]]:
             yield [0, 1]

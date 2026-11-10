@@ -69,9 +69,7 @@ def run_algorithms(G: nx.Graph, weight: Dict) -> List[Result]:
     # 5. GPU-Accelerated (if available)
     if HAS_CUDA:
         try:
-            gc_nodes, gc_cost = rand_vertex_cover_gpu(
-                G, weight, num_trials=512, seed=42
-            )
+            gc_nodes, gc_cost = rand_vertex_cover_gpu(G, weight, num_trials=512, seed=42)
             results.append(Result("GPU (512 trials)", gc_nodes, gc_cost, "violet"))
         except Exception:
             pass
@@ -112,9 +110,7 @@ def plot_results(G: nx.Graph, pos: Dict, results: List[Result], weight: Dict) ->
             node_size=200,
             font_size=8,
         )
-        nx.draw_networkx_nodes(
-            G, pos, ax=ax, nodelist=list(r.cover), node_color=r.color, node_size=200
-        )
+        nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=list(r.cover), node_color=r.color, node_size=200)
         # Annotate weights on nodes
         labels = {n: f"{n}\n(w={weight[n]})" for n in G.nodes()}
         nx.draw_networkx_labels(G, pos, ax=ax, labels=labels, font_size=6)

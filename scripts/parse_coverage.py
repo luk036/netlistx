@@ -32,9 +32,7 @@ print("Files with lowest test coverage:")
 print("=" * 60)
 for i, info in enumerate(coverage_info[:10]):
     print(f"{i + 1}. File: {info['file']}")
-    print(
-        f"   Coverage: {info['coverage_percent']:.1f}% ({info['covered_lines']}/{info['total_lines']} lines)"
-    )
+    print(f"   Coverage: {info['coverage_percent']:.1f}% ({info['covered_lines']}/{info['total_lines']} lines)")
     print(f"   Missing lines count: {info['missing_lines_count']}")
     print(f"   Missing branches: {info['missing_branches']}")
 

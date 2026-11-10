@@ -11,9 +11,12 @@ Based on the tutorial section: "Converting to JSON"
 """
 
 import json
+from pathlib import Path
 
 from liberty.parser import parse_liberty
 from liberty.types import EscapedString
+
+_HERE = Path(__file__).resolve().parent
 
 
 def _json_safe(value):
@@ -99,15 +102,9 @@ def extract_timing_data(lib_file):
             arcs = []
             for timing in pin.get_groups("timing"):
                 arc = {
-                    "related_pin": _json_safe(
-                        timing.get_attribute("related_pin", "unknown")
-                    ),
-                    "timing_sense": _json_safe(
-                        timing.get_attribute("timing_sense", "unknown")
-                    ),
-                    "timing_type": _json_safe(
-                        timing.get_attribute("timing_type", "unknown")
-                    ),
+                    "related_pin": _json_safe(timing.get_attribute("related_pin", "unknown")),
+                    "timing_sense": _json_safe(timing.get_attribute("timing_sense", "unknown")),
+                    "timing_type": _json_safe(timing.get_attribute("timing_type", "unknown")),
                 }
                 for table_name in [
                     "cell_rise",
@@ -137,9 +134,7 @@ def extract_timing_data(lib_file):
         # Extract leakage power
         leakage = cell.get_groups("leakage_power")
         if leakage:
-            timing_data[cell_name]["leakage_power"] = float(
-                leakage[0].get_attribute("value", 0)
-            )
+            timing_data[cell_name]["leakage_power"] = float(leakage[0].get_attribute("value", 0))
 
     return timing_data
 
@@ -157,10 +152,7 @@ def method3_selective_extraction(lib_file, output_json):
     for cell_name, info in data.items():
         pin_count = len(info["pins"])
         arc_count = sum(len(p.get("timing_arcs", [])) for p in info["pins"].values())
-        print(
-            f"  {cell_name}: {pin_count} pins, {arc_count} timing arcs, "
-            f"area={info['area']}"
-        )
+        print(f"  {cell_name}: {pin_count} pins, {arc_count} timing arcs, " f"area={info['area']}")
     return data
 
 
@@ -192,7 +184,7 @@ def method1_libertymetric(lib_file, output_json):
 
 
 def main():
-    lib_file = "example_minimal.lib"
+    lib_file = str(_HERE / "example_minimal.lib")
 
     print("=" * 60)
     print("LIBERTY → JSON CONVERSION TUTORIAL")
@@ -200,19 +192,19 @@ def main():
 
     # --- Method 1: libertymetric ---
     print("\n--- Method 1: libertymetric ---")
-    method1_libertymetric(lib_file, "example_minimal_method1.json")
+    method1_libertymetric(lib_file, str(_HERE / "example_minimal_method1.json"))
 
     # --- Method 2: Custom Serialization ---
     print("\n--- Method 2: Custom JSON Serialization ---")
-    method2_custom_serialization(lib_file, "example_minimal_method2.json")
+    method2_custom_serialization(lib_file, str(_HERE / "example_minimal_method2.json"))
 
     # --- Method 3: Selective Timing Extraction ---
     print("\n--- Method 3: Selective Timing Extraction ---")
-    method3_selective_extraction(lib_file, "example_timing_analysis.json")
+    method3_selective_extraction(lib_file, str(_HERE / "example_timing_analysis.json"))
 
     # --- Verify round-trip for Method 2 ---
     print("\n--- Verification: Method 2 Round-Trip ---")
-    with open("example_minimal_method2.json", "r") as f:
+    with open(_HERE / "example_minimal_method2.json", "r") as f:
         loaded_data = json.load(f)
     print(f"  Loaded JSON root type: {loaded_data['type']}")
     print(f"  Loaded JSON root args: {loaded_data['args']}")

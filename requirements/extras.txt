@@ -1,3 +1,6 @@
+# Optional GPU acceleration (netlistx[gpu])
 numba
+numpy
+
+# Used by the demo scripts under experiments/
 scipy>=1.0.0
-sympy>=1.1.1

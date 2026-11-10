@@ -45,9 +45,7 @@ def netlist_strategy(draw: st.DrawFn) -> Netlist:
     # Add some module-module connections (optional)
     if draw(st.booleans()) and num_modules >= 2:
         for _ in range(draw(st.integers(min_value=0, max_value=3))):
-            m1, m2 = draw(
-                st.lists(st.sampled_from(modules), min_size=2, max_size=2, unique=True)
-            )
+            m1, m2 = draw(st.lists(st.sampled_from(modules), min_size=2, max_size=2, unique=True))
             if not graph.has_edge(m1, m2):
                 graph.add_edge(m1, m2, weight=1)
 
@@ -135,9 +133,7 @@ class TestNetlistProperties:
         """Test properties of randomly generated hypergraphs."""
         N = data.draw(st.integers(min_value=1, max_value=20))
         M = data.draw(st.integers(min_value=1, max_value=20))
-        eta = data.draw(
-            st.floats(min_value=0.01, max_value=1.0)
-        )  # Avoid very small values
+        eta = data.draw(st.floats(min_value=0.01, max_value=1.0))  # Avoid very small values
 
         netlist = create_random_hgraph(N, M, eta)
 
@@ -193,9 +189,7 @@ class TestNetlistJSON:
         # Add edges
         for net in nets:
             # Each net connects to at least one module
-            num_connections = data.draw(
-                st.integers(min_value=1, max_value=min(3, num_modules))
-            )
+            num_connections = data.draw(st.integers(min_value=1, max_value=min(3, num_modules)))
             connected_modules = data.draw(
                 st.lists(
                     st.sampled_from(modules),
@@ -213,9 +207,7 @@ class TestNetlistJSON:
         graph.graph["num_pads"] = num_pads
 
         # Create netlist
-        module_weight = {
-            i: data.draw(st.integers(min_value=1, max_value=10)) for i in modules
-        }
+        module_weight = {i: data.draw(st.integers(min_value=1, max_value=10)) for i in modules}
         netlist = Netlist(graph, modules, nets)
         netlist.module_weight = module_weight  # type: ignore[assignment]
         netlist.net_weight = [1] * num_nets  # type: ignore[assignment]
@@ -233,10 +225,7 @@ class TestNetlistJSON:
                     "num_pads": netlist.num_pads,
                 },
                 "nodes": [{"id": node} for node in netlist.ugraph.nodes()],
-                "edges": [
-                    {"source": u, "target": v, **netlist.ugraph[u][v]}
-                    for u, v in netlist.ugraph.edges()
-                ],
+                "edges": [{"source": u, "target": v, **netlist.ugraph[u][v]} for u, v in netlist.ugraph.edges()],
             }
 
             json.dump(data_dict, f)
@@ -282,9 +271,7 @@ class TestNetlistJSON:
             net_id = num_modules + i
             # Connect each net to at least one module
             module_id = i % num_modules
-            json_data["edges"].append(
-                {"source": net_id, "target": module_id, "weight": 1}
-            )
+            json_data["edges"].append({"source": net_id, "target": module_id, "weight": 1})
 
         # Test that valid JSON can be read
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
@@ -306,9 +293,7 @@ class TestNetlistInvariants:
     @given(netlist=netlist_strategy())
     def test_weighted_degree_consistency(self, netlist: Netlist) -> None:
         """Test that weighted degrees are consistent."""
-        total_module_weight = sum(
-            netlist.get_module_weight(i) for i in range(len(netlist.modules))
-        )
+        total_module_weight = sum(netlist.get_module_weight(i) for i in range(len(netlist.modules)))
         total_net_weight = sum(netlist.get_net_weight(net) for net in netlist.nets)
 
         assert total_module_weight >= 0

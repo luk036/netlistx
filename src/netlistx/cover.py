@@ -26,25 +26,12 @@ like logic optimization and circuit analysis.
 
 import copy
 from collections import deque
-from typing import (
-    Any,
-    Callable,
-    Deque,
-    Dict,
-    Generator,
-    MutableMapping,
-    Optional,
-    Set,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Deque, Dict, Generator, MutableMapping, Optional, Set, Tuple, Union
 
 import networkx as nx
 
 
-def pd_cover(
-    violate: Callable, weight: MutableMapping, soln: Set
-) -> Tuple[Set, Union[int, float]]:
+def pd_cover(violate: Callable, weight: MutableMapping, soln: Set) -> Tuple[Set, Union[int, float]]:
     """
     Primal-dual approximation algorithm with reverse-delete post-processing.
 
@@ -56,7 +43,7 @@ def pd_cover(
     :type violate: Callable
     :param weight: A mutable mapping from elements to their weights.
     :type weight: MutableMapping
-    :param soln: The initial solution set (may be empty or contain pre-selected elements).
+    :param soln: The initial solution set. **Mutated in place** and returned.
     :type soln: Set
 
     :return: A tuple containing the minimal cover set and its total weight.
@@ -94,6 +81,11 @@ def pd_cover(
 
     # Phase 1: Primal-Dual Selection
     for S in violate():
+        S = list(S)
+        if not S:
+            continue
+        for vtx in S:
+            gap.setdefault(vtx, weight.get(vtx, 1))
         min_vtx = min(S, key=lambda vertex: gap[vertex])
         min_val = gap[min_vtx]
 
@@ -118,14 +110,13 @@ def pd_cover(
         if not is_redundant:
             soln.add(vtx)
 
-    final_prml_cost = sum(weight[vtx] for vtx in soln)
-    assert total_dual_cost <= final_prml_cost
+    final_prml_cost = sum(weight.get(vtx, 1) for vtx in soln)
+    if total_dual_cost > final_prml_cost:
+        raise RuntimeError("primal-dual invariant violated: " f"dual cost {total_dual_cost} exceeds primal cost {final_prml_cost}")
     return soln, final_prml_cost
 
 
-def min_vertex_cover(
-    ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
-) -> Tuple[Set, Union[int, float]]:
+def min_vertex_cover(ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None) -> Tuple[Set, Union[int, float]]:
     r"""
     Find minimum weighted vertex cover using primal-dual with reverse-delete.
 
@@ -162,21 +153,18 @@ def min_vertex_cover(
         >>> min_vertex_cover(ugraph, weight, soln)
         ({0, 2, 3}, 3)
     """
-    if coverset is None:
-        coverset = set()
+    soln = set() if coverset is None else set(coverset)
 
     def violate_graph() -> Generator:
         for utx, vtx in ugraph.edges():
-            if utx in coverset or vtx in coverset:
+            if utx in soln or vtx in soln:
                 continue
             yield [utx, vtx]
 
-    return pd_cover(violate_graph, weight, coverset)
+    return pd_cover(violate_graph, weight, soln)
 
 
-def min_hyper_vertex_cover(
-    hyprgraph: Any, weight: MutableMapping, coverset: Optional[Set] = None
-) -> Tuple[Set, Union[int, float]]:
+def min_hyper_vertex_cover(hyprgraph: Any, weight: MutableMapping, coverset: Optional[Set] = None) -> Tuple[Set, Union[int, float]]:
     """
     Find minimum weighted vertex cover in a hypergraph using primal-dual.
 
@@ -218,21 +206,18 @@ def min_hyper_vertex_cover(
         >>> min_hyper_vertex_cover(hyprgraph, weight, soln)
         ({1}, 1)
     """
-    if coverset is None:
-        coverset = set()
+    soln = set() if coverset is None else set(coverset)
 
     def violate_netlist() -> Generator:
         for net in hyprgraph.nets:
-            if any(vtx in coverset for vtx in hyprgraph.ugraph[net]):
+            if any(vtx in soln for vtx in hyprgraph.ugraph[net]):
                 continue
             yield hyprgraph.ugraph[net]
 
-    return pd_cover(violate_netlist, weight, coverset)
+    return pd_cover(violate_netlist, weight, soln)
 
 
-def _construct_cycle(
-    info: Dict[Any, Tuple[Any, int]], parent: Any, child: Any
-) -> Deque[Any]:
+def _construct_cycle(info: Dict[Any, Tuple[Any, int]], parent: Any, child: Any) -> Deque[Any]:
     """
     Reconstruct a cycle path from BFS parent-child relationship.
 
@@ -265,9 +250,7 @@ def _construct_cycle(
     return S
 
 
-def _generic_bfs_cycle(
-    ugraph: nx.Graph, coverset: Set[Any]
-) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
+def _generic_bfs_cycle(ugraph: nx.Graph, coverset: Set[Any]) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
     """
     Find cycles using BFS restricted to cyclable edges.
 
@@ -316,9 +299,7 @@ def _generic_bfs_cycle(
                 yield info, parent, child
 
 
-def min_cycle_cover(
-    ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
-) -> Tuple[Set, Union[int, float]]:
+def min_cycle_cover(ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None) -> Tuple[Set, Union[int, float]]:
     r"""
     Find minimum weighted set of vertices covering all cycles.
 
@@ -355,11 +336,10 @@ def min_cycle_cover(
         >>> min_cycle_cover(ugraph, weight, soln)
         ({2}, 1)
     """
-    if coverset is None:
-        coverset = set()
+    soln = set() if coverset is None else set(coverset)
 
     def find_cycle() -> Any:
-        for info, parent, child in _generic_bfs_cycle(ugraph, coverset):
+        for info, parent, child in _generic_bfs_cycle(ugraph, soln):
             return _construct_cycle(info, parent, child)
 
     def violate() -> Generator:
@@ -369,7 +349,7 @@ def min_cycle_cover(
                 break
             yield S
 
-    return pd_cover(violate, weight, coverset)
+    return pd_cover(violate, weight, soln)
 
 
 def _extract_odd_cycle(parent: Dict[Any, Any], utx: Any, vtx: Any) -> Deque[Any]:
@@ -455,9 +435,7 @@ def _find_odd_cycle(ugraph: nx.Graph, coverset: Set[Any]) -> Optional[Deque[Any]
     return None
 
 
-def min_odd_cycle_cover(
-    ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
-) -> Tuple[Set, Union[int, float]]:
+def min_odd_cycle_cover(ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None) -> Tuple[Set, Union[int, float]]:
     r"""
     Find minimum weighted set of vertices covering all odd cycles.
 
@@ -494,14 +472,13 @@ def min_odd_cycle_cover(
         >>> min_odd_cycle_cover(ugraph, weight, soln)
         ({2}, 1)
     """
-    if coverset is None:
-        coverset = set()
+    soln = set() if coverset is None else set(coverset)
 
     def violate() -> Generator:
         while True:
-            S = _find_odd_cycle(ugraph, coverset)
+            S = _find_odd_cycle(ugraph, soln)
             if S is None:
                 break
             yield S
 
-    return pd_cover(violate, weight, coverset)
+    return pd_cover(violate, weight, soln)

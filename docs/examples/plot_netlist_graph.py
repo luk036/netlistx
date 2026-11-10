@@ -5,6 +5,7 @@ Netlist bipartite graph
 Bipartite visualization of an inverter netlist with modules (circles)
 and nets (squares) using the Netlist class.
 """
+
 import matplotlib.pyplot as plt
 import networkx as nx
 

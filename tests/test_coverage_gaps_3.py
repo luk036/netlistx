@@ -1,8 +1,4 @@
-"""Targeted tests to cover uncovered lines in netlist_algo.py.
-
-Missing lines: [185, 186, 193, 194, 195, 198]
-Missing branches: [[184, 185], [191, 193], [194, 172], [194, 195], [195, 194], [195, 198]]
-"""
+"""Edge-case tests for netlist_algo.min_maximal_matching."""
 
 from typing import Any
 
@@ -31,11 +27,7 @@ class MockHyprgraph:
 
 
 class TestMinMaximalMatchingUnequalWeights:
-    """Cover lines 184-186 and 193-198 in min_maximal_matching.
-
-    These lines handle the case where a neighboring net has a lower gap than
-    the current net, causing min_net != net and subsequent gap updates.
-    """
+    """Exercise the min_net != net path and subsequent gap updates."""
 
     def test_unequal_weights_triggers_alternative_selection(self) -> None:
         """Use nets with unequal weights so min_net != net triggers.
@@ -94,8 +86,7 @@ class TestMinMaximalMatchingUnequalWeights:
     def test_scattered_star_graph(self) -> None:
         """Star-like hypergraph where center module connects multiple nets.
 
-        This tests the case when min_net != net (line 191) and gap updates
-        (lines 193-198) are exercised.
+        This exercises the min_net != net branch and gap updates.
         """
         ugraph = MockUgraph(
             {

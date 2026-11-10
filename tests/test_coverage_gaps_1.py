@@ -1,27 +1,17 @@
-"""Targeted tests to cover uncovered lines in cover.py.
-
-Missing lines: [250, 251]
-Missing branches: [[221, 224], [249, 250]]
-"""
+"""Edge-case tests for cover.py helpers."""
 
 from collections import deque
 
 import networkx as nx
 
-from netlistx.cover import (
-    _construct_cycle,
-    min_cycle_cover,
-    min_hyper_vertex_cover,
-    min_odd_cycle_cover,
-    min_vertex_cover,
-)
+from netlistx.cover import _construct_cycle, min_cycle_cover, min_hyper_vertex_cover, min_odd_cycle_cover, min_vertex_cover
 
 
 class TestConstructCycleIfBranch:
-    """Cover lines 250-251 in _construct_cycle (depth_now < depth_child)."""
+    """Cover the depth_now < depth_child branch in _construct_cycle."""
 
     def test_direct_call_if_branch(self) -> None:
-        """Directly call _construct_cycle with depth_now < depth_child to cover the if branch."""
+        """Directly call _construct_cycle with depth_now < depth_child."""
         info = {0: (0, 5), 1: (0, 4), 2: (1, 3), 3: (1, 2)}
         # parent=2: depth_now=3; child=0: depth_child=5 → 3 < 5 → if branch
         result = _construct_cycle(info, 2, 0)
@@ -30,7 +20,7 @@ class TestConstructCycleIfBranch:
 
 
 class TestMinHyperVertexCoverWithCoverset:
-    """Cover branch [221, 224] in min_hyper_vertex_cover (coverset provided)."""
+    """min_hyper_vertex_cover with a caller-supplied coverset."""
 
     def test_with_non_none_coverset(self) -> None:
         """Provide a pre-existing coverset to trigger the else branch (coverset is not None)."""
@@ -42,7 +32,7 @@ class TestMinHyperVertexCoverWithCoverset:
 
         hyprgraph = MockHyprgraph(["N1", "N2"], {"N1": [0, 1], "N2": [1, 2]})
         weight = {0: 1, 1: 1, 2: 1}
-        # Pass a non-None coverset to trigger the [221, 224] branch
+        # Pass a non-None coverset to exercise the non-empty path
         coverset: set = {0}
         result, cost = min_hyper_vertex_cover(hyprgraph, weight, coverset=coverset)
         # The pre-existing vertex should be in the result

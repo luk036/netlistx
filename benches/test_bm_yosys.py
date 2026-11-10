@@ -3,6 +3,7 @@
 Pytest-benchmark fixtures are injected by ``pytest-benchmark``.
 Run with: ``pytest benches/test_bm_yosys.py --benchmark-only``
 """
+
 from typing import Any
 
 from netlistx.netlist import read_yosys_json, read_yosys_json_sax

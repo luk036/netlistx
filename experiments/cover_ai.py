@@ -1,24 +1,11 @@
 import copy
 from collections import deque
-from typing import (
-    Any,
-    Callable,
-    Deque,
-    Dict,
-    Generator,
-    MutableMapping,
-    Optional,
-    Set,
-    Tuple,
-    Union,
-)
+from typing import Any, Callable, Deque, Dict, Generator, MutableMapping, Optional, Set, Tuple, Union
 
 import networkx as nx
 
 
-def pd_cover(
-    violate: Callable, weight: MutableMapping, soln: Set
-) -> Tuple[Set, Union[int, float]]:
+def pd_cover(violate: Callable, weight: MutableMapping, soln: Set) -> Tuple[Set, Union[int, float]]:
     """
     Primal-dual approximation algorithm with reverse-delete post-processing.
     """
@@ -57,9 +44,7 @@ def pd_cover(
     return soln, final_prml_cost
 
 
-def min_vertex_cover(
-    ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
-) -> Tuple[Set, Union[int, float]]:
+def min_vertex_cover(ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None) -> Tuple[Set, Union[int, float]]:
     if coverset is None:
         coverset = set()
 
@@ -72,9 +57,7 @@ def min_vertex_cover(
     return pd_cover(violate_graph, weight, coverset)
 
 
-def min_hyper_vertex_cover(
-    hyprgraph: Any, weight: MutableMapping, coverset: Optional[Set] = None
-) -> Tuple[Set, Union[int, float]]:
+def min_hyper_vertex_cover(hyprgraph: Any, weight: MutableMapping, coverset: Optional[Set] = None) -> Tuple[Set, Union[int, float]]:
     if coverset is None:
         coverset = set()
 
@@ -87,9 +70,7 @@ def min_hyper_vertex_cover(
     return pd_cover(violate_netlist, weight, coverset)
 
 
-def _construct_cycle(
-    info: Dict[Any, Tuple[Any, int]], parent: Any, child: Any
-) -> Deque[Any]:
+def _construct_cycle(info: Dict[Any, Tuple[Any, int]], parent: Any, child: Any) -> Deque[Any]:
     _, depth_now = info[parent]
     _, depth_child = info[child]
     if depth_now < depth_child:
@@ -111,9 +92,7 @@ def _construct_cycle(
     return S
 
 
-def _generic_bfs_cycle(
-    ugraph: nx.Graph, coverset: Set[Any]
-) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
+def _generic_bfs_cycle(ugraph: nx.Graph, coverset: Set[Any]) -> Generator[Tuple[Dict[Any, Tuple[Any, int]], Any, Any], None, None]:
     """
     BFS cycle detection restricted to cyclable edges found via
     biconnected components and ear decomposition.
@@ -151,9 +130,7 @@ def _generic_bfs_cycle(
                 yield info, parent, child
 
 
-def min_cycle_cover(
-    ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
-) -> Tuple[Set, Union[int, float]]:
+def min_cycle_cover(ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None) -> Tuple[Set, Union[int, float]]:
     if coverset is None:
         coverset = set()
 
@@ -171,9 +148,7 @@ def min_cycle_cover(
     return pd_cover(violate, weight, coverset)
 
 
-def min_odd_cycle_cover(
-    ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None
-) -> Tuple[Set, Union[int, float]]:
+def min_odd_cycle_cover(ugraph: nx.Graph, weight: MutableMapping, coverset: Optional[Set] = None) -> Tuple[Set, Union[int, float]]:
     if coverset is None:
         coverset = set()
 

@@ -56,11 +56,7 @@ class TestSolveHadlockMaxCut:
         cut = solve_hadlock_max_cut(G)
         ok, val = validate_max_cut(G, cut)
         assert ok
-        excluded = sum(
-            G[u][v].get("weight", 1)
-            for u, v in G.edges()
-            if tuple(sorted((u, v))) not in cut
-        )
+        excluded = sum(G[u][v].get("weight", 1) for u, v in G.edges() if tuple(sorted((u, v))) not in cut)
         # The lightest odd-cycle-breaking edge is the diagonal (weight 2)
         assert excluded == 2
 

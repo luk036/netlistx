@@ -139,10 +139,8 @@ def min_maximal_matching(
         >>> result == {'N1', 'N3'} and cost == 2
         True
     """
-    if matchset is None:
-        matchset = set()
-    if dep is None:
-        dep = set()
+    matchset = set() if matchset is None else set(matchset)
+    dep = set() if dep is None else set(dep)
 
     def cover(net: Any) -> None:
         for vtx in hyprgraph.ugraph[net]:
@@ -180,5 +178,6 @@ def min_maximal_matching(
             for net2 in hyprgraph.ugraph[vtx]:
                 gap[net2] -= min_val
 
-    assert total_dual_cost <= total_primal_cost
+    if total_dual_cost > total_primal_cost:
+        raise RuntimeError("primal-dual invariant violated: " f"dual cost {total_dual_cost} exceeds primal cost {total_primal_cost}")
     return matchset, total_primal_cost

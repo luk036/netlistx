@@ -44,9 +44,7 @@ from typing import Any, Dict, List, Sequence, Tuple
 import networkx as nx
 
 
-def _build_graph_from_positions(
-    n: int, pos: Dict[Any, Tuple[float, float]], metric: str = "l2"
-) -> nx.Graph:
+def _build_graph_from_positions(n: int, pos: Dict[Any, Tuple[float, float]], metric: str = "l2") -> nx.Graph:
     """Build a complete graph with pairwise distances computed from positions.
 
     :param n: Number of nodes.
@@ -65,9 +63,7 @@ def _build_graph_from_positions(
     return G
 
 
-def make_l2_graph(
-    n: int, seed: int = 42
-) -> Tuple[nx.Graph, Dict[Any, Tuple[float, float]]]:
+def make_l2_graph(n: int, seed: int = 42) -> Tuple[nx.Graph, Dict[Any, Tuple[float, float]]]:
     """Create a complete graph with random **Euclidean (L2)** edge weights.
 
     The graph is a valid Metric TSP instance (triangle inequality holds).
@@ -91,9 +87,7 @@ def make_l2_graph(
     return _build_graph_from_positions(n, pos, metric="l2"), pos
 
 
-def make_l1_graph(
-    n: int, seed: int = 42
-) -> Tuple[nx.Graph, Dict[Any, Tuple[float, float]]]:
+def make_l1_graph(n: int, seed: int = 42) -> Tuple[nx.Graph, Dict[Any, Tuple[float, float]]]:
     """Create a complete graph with random **Manhattan (L1)** edge weights.
 
     Manhattan distance :math:`|\\Delta x| + |\\Delta y|` satisfies the triangle
@@ -171,22 +165,27 @@ def two_opt(path: List[Any], G: nx.Graph) -> List[Any]:
         True
     """
     best_path = list(path)
+    if len(best_path) < 4:
+        return best_path
     improved = True
     while improved:
         improved = False
-        for i in range(1, len(best_path) - 2):
-            for j in range(i + 1, len(best_path)):
+        n = len(best_path)
+        for i in range(1, n - 2):
+            a = best_path[i - 1]
+            b = best_path[i]
+            for j in range(i + 1, n):
                 if j - i == 1:
                     continue  # adjacent edges → no change
 
-                # Reverse segment [i, j-1] to uncross
-                new_path = best_path[:i] + best_path[i:j][::-1] + best_path[j:]
-
-                if calculate_total_distance(new_path, G) < calculate_total_distance(
-                    best_path, G
-                ):
-                    best_path = new_path
+                c = best_path[j - 1]
+                d = best_path[j]
+                # Reversing [i, j-1] replaces (a,b)+(c,d) with (a,c)+(b,d).
+                delta = G[a][c]["weight"] + G[b][d]["weight"] - G[a][b]["weight"] - G[c][d]["weight"]
+                if delta < -1e-12:
+                    best_path[i:j] = reversed(best_path[i:j])
                     improved = True
+                    b = best_path[i]
     return best_path
 
 

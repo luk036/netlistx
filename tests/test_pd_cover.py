@@ -61,7 +61,5 @@ class TestCoverAlgorithms:
             test_soln = set(soln)
             test_soln.remove(node)
             # If any edge is not covered, the original was minimal.
-            uncovered_edges = [
-                e for e in G.edges() if e[0] not in test_soln and e[1] not in test_soln
-            ]
+            uncovered_edges = [e for e in G.edges() if e[0] not in test_soln and e[1] not in test_soln]
             assert len(uncovered_edges) > 0, f"Node {node} was redundant!"

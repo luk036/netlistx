@@ -1,12 +1,8 @@
 import re
 import sys
 
-
 BLOCK = re.compile(
-    r"\\begin\{longtable\}\[\]\{@\{\}(?P<spec>.*?)@\{\}\}\s*"
-    r"\\caption\{(?P<cap>.*?)\}\\label\{(?P<lab>.*?)\}\\tabularnewline"
-    r"(?P<rest>.*?)"
-    r"\\end\{longtable\}",
+    r"\\begin\{longtable\}\[\]\{@\{\}(?P<spec>.*?)@\{\}\}\s*" r"\\caption\{(?P<cap>.*?)\}\\label\{(?P<lab>.*?)\}\\tabularnewline" r"(?P<rest>.*?)" r"\\end\{longtable\}",
     re.S,
 )
 
@@ -47,13 +43,7 @@ def _convert(match: re.Match) -> str:
         head = head.replace(old, new)
         body = body.replace(old, new)
 
-    return (
-        "\\begin{table}[!t]\n\\centering\\footnotesize\n"
-        f"\\caption{{{caption}}}\\label{{{label}}}\n"
-        f"\\begin{{tabular}}{{{spec}}}\n"
-        f"{_collapse(head)}\n{body.strip()}\n\\bottomrule\n"
-        "\\end{tabular}\n\\end{table}"
-    )
+    return "\\begin{table}[!t]\n\\centering\\footnotesize\n" f"\\caption{{{caption}}}\\label{{{label}}}\n" f"\\begin{{tabular}}{{{spec}}}\n" f"{_collapse(head)}\n{body.strip()}\n\\bottomrule\n" "\\end{tabular}\n\\end{table}"
 
 
 def main() -> int:

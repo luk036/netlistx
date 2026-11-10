@@ -62,9 +62,7 @@ import copy
 from typing import Any, MutableMapping, Optional, Set, Tuple, Union
 
 
-def min_vertex_cover_fast(
-    ugraph: Any, weight: MutableMapping, coverset: Optional[Set] = None
-) -> Tuple[Set, Union[int, float]]:
+def min_vertex_cover_fast(ugraph: Any, weight: MutableMapping, coverset: Optional[Set] = None) -> Tuple[Set, Union[int, float]]:
     r"""
     The `min_vertex_cover_fast` function performs minimum weighted vertex cover
     using a primal-dual approximation algorithm (without post-processing).
@@ -119,8 +117,7 @@ def min_vertex_cover_fast(
         >>> min_vertex_cover_fast(ugraph, weight, coverset)
         ({0, 2}, 2)
     """
-    if coverset is None:
-        coverset = set()
+    coverset = set() if coverset is None else set(coverset)
 
     total_dual_cost = 0  # for assertion
     total_primal_cost = 0
@@ -137,8 +134,10 @@ def min_vertex_cover_fast(
         gap[utx] -= gap[vtx]
         gap[vtx] = 0
 
-    assert total_dual_cost <= total_primal_cost
-    assert total_primal_cost <= 2 * total_dual_cost
+    if total_dual_cost > total_primal_cost:
+        raise RuntimeError("primal-dual invariant violated: " f"dual cost {total_dual_cost} exceeds primal cost {total_primal_cost}")
+    if total_primal_cost > 2 * total_dual_cost:
+        raise RuntimeError("approximation guarantee violated: " f"primal cost {total_primal_cost} exceeds twice the dual cost " f"{total_dual_cost}")
     return coverset, total_primal_cost
 
 
@@ -207,10 +206,8 @@ def min_maximal_independent_set(
         >>> min_maximal_independent_set(ugraph, weight, indset, dep)
         ({0, 2}, 2)
     """
-    if indset is None:
-        indset = set()
-    if dep is None:
-        dep = set()
+    indset = set() if indset is None else set(indset)
+    dep = set() if dep is None else set(dep)
 
     def coverset(utx: Any) -> None:
         dep.add(utx)
@@ -242,5 +239,6 @@ def min_maximal_independent_set(
         for vtx in ugraph[utx]:
             gap[vtx] -= min_val
 
-    assert total_dual_cost <= total_primal_cost
+    if total_dual_cost > total_primal_cost:
+        raise RuntimeError("primal-dual invariant violated: " f"dual cost {total_dual_cost} exceeds primal cost {total_primal_cost}")
     return indset, total_primal_cost

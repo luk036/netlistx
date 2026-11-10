@@ -1,10 +1,4 @@
-"""Targeted tests for tsp.py, skeleton.py, and rand_cover.py.
-
-tsp.py missing lines: [64, 89, 90, 91]  (make_l2_graph)
-skeleton.py missing lines: [139]  (run())
-rand_cover.py missing lines: [186]  (empty net branch)
-"""
-
+"""Edge-case tests for tsp.py and rand_cover.py."""
 
 from typing import List
 
@@ -13,7 +7,7 @@ from netlistx.tsp import make_l2_graph
 
 
 class TestMakeL2Graph:
-    """Cover lines 89-91 and line 64 in tsp.py (make_l2_graph)."""
+    """Exercise make_l2_graph and its distance computation."""
 
     def test_make_l2_graph_basic(self) -> None:
         """Directly test make_l2_graph to cover its body."""
@@ -45,10 +39,10 @@ class TestMakeL2Graph:
 
 
 class TestRandCoverEmptyNet:
-    """Cover line 186 in rand_cover.py (empty net in hypergraph)."""
+    """Empty net in a hypergraph is skipped."""
 
     def test_hyper_vertex_cover_empty_net(self) -> None:
-        """Hypergraph with an empty net should trigger the continue at line 186."""
+        """Hypergraph with an empty net should be skipped."""
 
         class MockHyprgraph:
             def __init__(self, nets: List[str], ugraph: dict) -> None:

@@ -57,9 +57,7 @@ def demo_hadlock_refined(num_nodes=100):
                 part_dict[n] = 1
         node_color = [part_dict.get(i, 0) for i in range(num_nodes)]
 
-    nx.draw_networkx_edges(
-        G, pos, edgelist=list(max_cut_edges), edge_color="red", width=1.5, alpha=0.6
-    )
+    nx.draw_networkx_edges(G, pos, edgelist=list(max_cut_edges), edge_color="red", width=1.5, alpha=0.6)
     nx.draw_networkx_edges(
         G,
         pos,
@@ -68,17 +66,11 @@ def demo_hadlock_refined(num_nodes=100):
         width=2,
         style="dashed",
     )
-    nx.draw_networkx_nodes(
-        G, pos, node_size=30, node_color=node_color, cmap=plt.cm.RdYlBu
-    )
+    nx.draw_networkx_nodes(G, pos, node_size=30, node_color=node_color, cmap=plt.cm.RdYlBu)
 
     # Build the dual for the info display
     nx.algorithms.matching.min_weight_matching(nx.complete_graph(0), weight="weight")
-    plt.title(
-        f"Refined Planar MAX-CUT (Hadlock)\n"
-        f"Bipartite Valid: {is_bipartite} | Cut Weight: {weight} | "
-        f"Faces: {len(dual_G.nodes())} | Components: {len(biconnected_components)}"
-    )
+    plt.title(f"Refined Planar MAX-CUT (Hadlock)\n" f"Bipartite Valid: {is_bipartite} | Cut Weight: {weight} | " f"Faces: {len(dual_G.nodes())} | Components: {len(biconnected_components)}")
     plt.show()
 
     print(f"Validation: Is the cut subgraph bipartite? {is_bipartite}")
@@ -103,8 +95,6 @@ if __name__ == "__main__":
         is_bipartite, weight = demo_hadlock_refined(size)
         print(f"Result for {size} nodes - Bipartite: {is_bipartite}, Weight: {weight}")
         if is_bipartite:
-            print(
-                f"SUCCESS: {size} nodes - Bipartite: {is_bipartite}, Weight: {weight}"
-            )
+            print(f"SUCCESS: {size} nodes - Bipartite: {is_bipartite}, Weight: {weight}")
         else:
             print(f"FAILED: {size} nodes - Not bipartite")

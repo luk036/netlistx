@@ -9,8 +9,11 @@ its ports mapped to pins.
 
 import json
 from collections import OrderedDict
+from pathlib import Path
 
 from liberty.parser import parse_liberty
+
+_HERE = Path(__file__).resolve().parent
 
 
 def lib_str(value):
@@ -120,9 +123,7 @@ def generate_liberty(cell_types, lib_name="yosys_derived"):
                 lines.append("")
                 # Pick the first input pin as the related_pin for timing
                 in_pins = sorted(p for p, d in ports.items() if d == "input")
-                related = (
-                    "CK" if "CK" in ports else (in_pins[0] if in_pins else "unknown")
-                )
+                related = "CK" if "CK" in ports else (in_pins[0] if in_pins else "unknown")
                 lines.append("      timing () {")
                 lines.append(f'        related_pin : "{related}" ;')
                 lines.append("        timing_sense : positive_unate ;")
@@ -286,20 +287,16 @@ def extract_cell_types(yosys_json_path):
                     continue
                 cell_types[cell_type] = {
                     "ports": ports,
-                    "parameters": {
-                        k: v
-                        for k, v in params.items()
-                        if isinstance(v, (str, int, float, bool))
-                    },
+                    "parameters": {k: v for k, v in params.items() if isinstance(v, (str, int, float, bool))},
                 }
 
     return cell_types
 
 
 def main():
-    yosys_json = "yosys_syn_output.json"
-    lib_output = "yosys_sphere_tech.lib"
-    json_output = "yosys_sphere_tech_converted.json"
+    yosys_json = str(_HERE / "yosys_syn_output.json")
+    lib_output = str(_HERE / "yosys_sphere_tech.lib")
+    json_output = str(_HERE / "yosys_sphere_tech_converted.json")
 
     print(f"Reading Yosys netlist: {yosys_json}")
     cell_types = extract_cell_types(yosys_json)
@@ -356,7 +353,7 @@ def main():
     try:
         import jsonschema
 
-        with open("liberty_json_schema.json") as f:
+        with open(_HERE / "liberty_json_schema.json") as f:
             schema = json.load(f)
         jsonschema.validate(instance=json_data, schema=schema)
         print("JSON validation against schema: VALID")

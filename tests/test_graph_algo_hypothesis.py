@@ -179,9 +179,7 @@ class TestVertexCoverProperties:
             if data.draw(st.booleans()):
                 initial_cover.add(node)
 
-        cover, total_weight = min_vertex_cover_fast(
-            graph, weights, initial_cover.copy()
-        )
+        cover, total_weight = min_vertex_cover_fast(graph, weights, initial_cover.copy())
 
         # Initial cover should be subset of final cover
         assert initial_cover.issubset(cover)
@@ -205,9 +203,7 @@ class TestIndependentSetProperties:
         for u in indset:
             for v in indset:
                 if u != v:
-                    assert not graph.has_edge(
-                        u, v
-                    ), f"Edge ({u}, {v}) found in independent set"
+                    assert not graph.has_edge(u, v), f"Edge ({u}, {v}) found in independent set"
 
     @given(data=st.data())
     def test_independent_set_maximality(self, data: st.DataObject) -> None:
@@ -219,12 +215,8 @@ class TestIndependentSetProperties:
         # Every vertex not in the independent set should be adjacent to at least one vertex in it
         for node in graph.nodes():
             if node not in indset:
-                has_neighbor_in_indset = any(
-                    graph.has_edge(node, ind_node) for ind_node in indset
-                )
-                assert (
-                    has_neighbor_in_indset
-                ), f"Node {node} can be added to independent set {indset}"
+                has_neighbor_in_indset = any(graph.has_edge(node, ind_node) for ind_node in indset)
+                assert has_neighbor_in_indset, f"Node {node} can be added to independent set {indset}"
 
     @given(data=st.data())
     def test_independent_set_weight_consistency(self, data: st.DataObject) -> None:
@@ -289,9 +281,7 @@ class TestIndependentSetProperties:
             elif choice == "dependent":
                 initial_dep.add(node)
 
-        indset, total_weight = min_maximal_independent_set(
-            graph, weights, initial_indset.copy(), initial_dep.copy()
-        )
+        indset, total_weight = min_maximal_independent_set(graph, weights, initial_indset.copy(), initial_dep.copy())
 
         # Initial independent set should be subset of final independent set
         assert initial_indset.issubset(indset)
@@ -362,18 +352,12 @@ class TestGraphAlgorithmInvariants:
         mapping = {node: f"node_{node}" for node in graph.nodes()}
         graph_renamed = Graph()
         graph_renamed.add_nodes_from(mapping.values())
-        graph_renamed.add_edges_from(
-            [(mapping[u], mapping[v]) for u, v in graph.edges()]
-        )
+        graph_renamed.add_edges_from([(mapping[u], mapping[v]) for u, v in graph.edges()])
         weights_renamed = {mapping[node]: weight for node, weight in weights.items()}
 
         # Get results for renamed graph
-        cover_renamed, weight_renamed = min_vertex_cover_fast(
-            graph_renamed, weights_renamed
-        )
-        indset_renamed, ind_weight_renamed = min_maximal_independent_set(
-            graph_renamed, weights_renamed
-        )
+        cover_renamed, weight_renamed = min_vertex_cover_fast(graph_renamed, weights_renamed)
+        indset_renamed, ind_weight_renamed = min_maximal_independent_set(graph_renamed, weights_renamed)
 
         # Results should be equivalent up to renaming
         assert len(cover_orig) == len(cover_renamed)

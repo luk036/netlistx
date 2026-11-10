@@ -91,7 +91,6 @@ plot_pre_code = [
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
-
 # Enable markdown
 extensions.append("myst_parser")
 
@@ -152,7 +151,7 @@ release = version
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", ".venv"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", ".venv", "notes"]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
@@ -305,9 +304,6 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/" + python_version, None),
     "matplotlib": ("https://matplotlib.org/stable", None),
     "numpy": ("https://numpy.org/doc/stable", None),
-    "sklearn": ("https://scikit-learn.org/stable", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
-    "scipy": ("https://docs.scipy.org/doc/scipy", None),
     "setuptools": ("https://setuptools.pypa.io/en/stable/", None),
     "pyscaffold": ("https://pyscaffold.org/en/stable", None),
 }

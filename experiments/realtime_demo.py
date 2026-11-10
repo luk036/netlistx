@@ -50,10 +50,7 @@ def animate_pd_algorithm(ugraph, algorithm_type="vertex_cover"):
         # Check if still covered
         still_covered = True
         if algorithm_type == "vertex_cover":
-            if any(
-                u not in current_soln and v not in current_soln
-                for u, v in ugraph.edges()
-            ):
+            if any(u not in current_soln and v not in current_soln for u, v in ugraph.edges()):
                 still_covered = False
         else:
             for _ in _generic_bfs_cycle(ugraph, current_soln):
@@ -79,21 +76,13 @@ def animate_pd_algorithm(ugraph, algorithm_type="vertex_cover"):
         # Highlight violations being addressed
         if stage.startswith("Selection") and highlight:
             if isinstance(highlight, tuple):  # Edge
-                nx.draw_networkx_edges(
-                    ugraph, pos, edgelist=[highlight], edge_color="red", width=3
-                )
+                nx.draw_networkx_edges(ugraph, pos, edgelist=[highlight], edge_color="red", width=3)
             else:  # Cycle/Set
-                nx.draw_networkx_nodes(
-                    ugraph, pos, nodelist=highlight, node_color="yellow", node_size=600
-                )
+                nx.draw_networkx_nodes(ugraph, pos, nodelist=highlight, node_color="yellow", node_size=600)
 
         # Draw current solution nodes
-        nx.draw_networkx_nodes(
-            ugraph, pos, ax=ax, node_color="lightgrey", node_size=500
-        )
-        nx.draw_networkx_nodes(
-            ugraph, pos, nodelist=list(nodes), node_color="orange", node_size=500
-        )
+        nx.draw_networkx_nodes(ugraph, pos, ax=ax, node_color="lightgrey", node_size=500)
+        nx.draw_networkx_nodes(ugraph, pos, nodelist=list(nodes), node_color="orange", node_size=500)
         nx.draw_networkx_labels(ugraph, pos, ax=ax)
 
         ax.set_title(f"Algorithm: {algorithm_type}\nPhase: {stage}")

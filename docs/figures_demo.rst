@@ -1,37 +1,21 @@
-Figures Demo
-============
+Examples
+========
 
-This page demonstrates the ``.. plot::`` directive from
-``matplotlib.sphinxext.plot_directive`` for generating figures
-directly from Python code in Sphinx documentation.
+Bipartite netlist graph
+-----------------------
 
-Referencing an external script
-------------------------------
+The ``.. plot::`` directive from ``matplotlib.sphinxext.plot_directive``
+renders a script in ``docs/examples/`` directly into the page.
 
 .. plot:: examples/plot_netlist_graph.py
 
+Random hypergraph
+-----------------
+
 .. plot:: examples/plot_random_hgraph.py
 
-The plot inline directive
--------------------------
-
-You can also embed the plotting code directly in the RST file.
-Here is a simple star graph drawn with networkx:
-
-.. plot::
-
-   import matplotlib.pyplot as plt
-   import networkx as nx
-
-   G = nx.star_graph(8)
-   pos = nx.spring_layout(G, seed=42)
-   plt.figure(figsize=(6, 5))
-   nx.draw_networkx(G, pos, node_color="plum", node_size=400, with_labels=True)
-   plt.title("Star graph with 8 leaves")
-   plt.axis("off")
-
-Controlling options
--------------------
+Figure options
+--------------
 
 Use ``:width:``, ``:alt:``, and ``:align:`` as with any figure:
 
@@ -39,3 +23,19 @@ Use ``:width:``, ``:alt:``, and ``:align:`` as with any figure:
    :width: 60%
    :align: center
    :alt: Netlist bipartite graph at 60% width
+
+Yosys and Liberty tutorials
+---------------------------
+
+The scripts in ``examples/yosys/`` demonstrate Liberty parsing, JSON
+conversion, timing extraction, and Yosys-to-Liberty conversion. Run them
+from any directory; they resolve their data files relative to the script:
+
+.. code-block:: bash
+
+   python examples/yosys/tutorial_parse_lib.py
+   python examples/yosys/tutorial_convert_json.py
+   python examples/yosys/tutorial_extract_timing.py
+   python examples/yosys/yosys_to_liberty.py
+
+Install their extra dependencies with ``pip install netlistx[examples]``.

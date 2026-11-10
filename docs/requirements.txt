@@ -1,8 +1,6 @@
-git+https://github.com/luk036/mywheel.git
 # Requirements file for ReadTheDocs, check .readthedocs.yml.
-# To build the module reference correctly, make sure every external package
-# under `install_requires` in `setup.cfg` is also listed here!
-# sphinx_rtd_theme
+# The package itself (and its runtime dependencies) is installed by
+# `{ path: ., method: pip }` in .readthedocs.yml.
 myst-parser[linkify]
 sphinx>=3.2.1
 sphinxcontrib-svgbob

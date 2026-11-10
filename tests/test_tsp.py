@@ -5,13 +5,7 @@ import random
 
 import networkx as nx
 
-from netlistx.tsp import (
-    calculate_total_distance,
-    christofides_tsp,
-    make_l1_graph,
-    solve_christofides_2opt_tsp,
-    two_opt,
-)
+from netlistx.tsp import calculate_total_distance, christofides_tsp, make_l1_graph, solve_christofides_2opt_tsp, two_opt
 
 # ---------------------------------------------------------------------------
 # Helpers

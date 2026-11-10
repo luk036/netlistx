@@ -18,9 +18,7 @@ def demo_hadlock_grid(grid_size=10):
 
     # Grids are bipartite → all edges land in the max cut.
     # For a more interesting demo, uncomment the triangulation below.
-    excluded_edges = set(tuple(sorted(e)) for e in G.edges()) - set(
-        tuple(sorted(e)) for e in max_cut_edges
-    )
+    excluded_edges = set(tuple(sorted(e)) for e in G.edges()) - set(tuple(sorted(e)) for e in max_cut_edges)
 
     # 3. Visualization
     plt.figure(figsize=(12, 10))
@@ -50,10 +48,7 @@ def demo_hadlock_grid(grid_size=10):
 
     nx.draw_networkx_nodes(G, pos, node_size=20, node_color="black")
 
-    plt.title(
-        f"Hadlock's Algorithm on {grid_size}x{grid_size} Grid\n"
-        f"Bipartite → all edges in cut (weight={cut_weight})"
-    )
+    plt.title(f"Hadlock's Algorithm on {grid_size}x{grid_size} Grid\n" f"Bipartite → all edges in cut (weight={cut_weight})")
     plt.axis("off")
     plt.show()
 

@@ -46,12 +46,55 @@ The library also includes functions for reading netlists from JSON files and for
 
 Overall, this library provides a foundation for working with netlists in Python. It allows programmers to create, manipulate, and analyze netlists, which could be useful in electronic design automation tools or circuit analysis software.
 
-## Depend on
+## Installation
 
-- [mywheel](https://github.com/luk036/mywheel)
-- networkx
+```bash
+pip install netlistx
+```
 
-## 👀 See also
+Python 3.11+ is required. Optional GPU acceleration (Numba CUDA):
+
+```bash
+pip install netlistx[gpu]
+```
+
+## Quickstart
+
+```python
+import networkx as nx
+
+from netlistx.cover import min_vertex_cover
+from netlistx.netlist import create_inverter
+
+netlist = create_inverter()
+print(netlist.number_of_modules(), netlist.number_of_nets())
+
+graph = nx.Graph([(0, 1), (1, 2), (2, 0)])
+cover, cost = min_vertex_cover(graph, {0: 1, 1: 1, 2: 1})
+print(cover, cost)
+```
+
+## Dependencies
+
+- [`networkx`](https://networkx.org/) (>=3.6.1)
+- [`mywheel`](https://github.com/luk036/mywheel) (>=0.7)
+- `ijson` (streaming JSON reader)
+
+Optional extras: `netlistx[gpu]` adds `numba` + `numpy`; `netlistx[examples]`
+adds `numpy`, `jsonschema`, and `liberty-parser` for the scripts under
+`examples/`.
+
+## Repository layout
+
+- `src/netlistx/` — library code
+- `tests/` — pytest suite (including Hypothesis property tests)
+- `benches/` — pytest-benchmark performance benchmarks
+- `examples/yosys/` — Yosys/Liberty tutorials and sample data
+- `experiments/` — exploratory demos
+- `scripts/` — developer utilities
+- `docs/` — Sphinx documentation and design notes (`docs/notes/`)
+
+## See also
 
 - [netlistx-cpp](https://github.com/luk036/netlistx-cpp)
 - [slides](https://luk036.github.io/algo4dfm/primal_dual.html)
@@ -60,7 +103,6 @@ Overall, this library provides a foundation for working with netlists in Python.
 
 - [ckpttnpy](https://github.com/luk036/ckpttnpy)
 
-## 👉 Note
+## License
 
-This project has been set up using PyScaffold 4.5. For details and usage
-information on PyScaffold see https://pyscaffold.org/.
+MIT — see [LICENSE.txt](LICENSE.txt).

@@ -5,6 +5,7 @@ Random hypergraph netlist
 Visualization of a random hypergraph netlist created by
 ``create_random_hgraph()``.
 """
+
 import matplotlib.pyplot as plt
 import networkx as nx
 

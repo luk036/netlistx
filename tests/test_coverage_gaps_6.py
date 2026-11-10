@@ -1,8 +1,4 @@
-"""Targeted tests to cover uncovered lines in readwrite.py.
-
-Missing lines: [38, 41, 73, 76]
-Missing branches: [[37, 38], [40, 41], [72, 73], [75, 76]]
-"""
+"""Edge-case tests for readwrite.py (.net / .are parsing)."""
 
 import os
 import tempfile
@@ -11,7 +7,7 @@ from netlistx.readwrite import read_are, read_netd
 
 
 class TestReadNetdEdgeCases:
-    """Cover lines 38 (early break) and 41 (empty lines)."""
+    """Early pin-count break and empty lines in .net files."""
 
     def _make_net_file(self, lines: list[str]) -> str:
         """Create a temp .net file with given lines."""
@@ -21,7 +17,7 @@ class TestReadNetdEdgeCases:
         return tmp.name
 
     def test_early_break_pin_count(self) -> None:
-        """Trigger line 38 break when pin_count >= numPins.
+        """Stop reading once the declared pin count is reached.
 
         Declare 1 pin but provide more entries - should break early.
         """
@@ -42,7 +38,7 @@ class TestReadNetdEdgeCases:
             os.unlink(path)
 
     def test_empty_lines_in_file(self) -> None:
-        """Trigger line 41 continue when line is empty."""
+        """Empty lines in .net are skipped."""
         content = [
             "0\n",
             "1\n",
@@ -82,7 +78,7 @@ class TestReadNetdEdgeCases:
 
 
 class TestReadAreEdgeCases:
-    """Cover lines 73 (empty lines) and 76 (short lines)."""
+    """Empty and short lines in .are files."""
 
     def _make_are_file(self, lines: list[str]) -> str:
         """Create a temp .are file with given lines."""
@@ -92,7 +88,7 @@ class TestReadAreEdgeCases:
         return tmp.name
 
     def test_empty_line_in_are(self) -> None:
-        """Trigger line 73 continue when line is empty."""
+        """Empty lines in .are are skipped."""
         content = [
             "a0 10\n",
             "\n",  # empty line → continue
@@ -127,7 +123,7 @@ class TestReadAreEdgeCases:
             os.unlink(are_path)
 
     def test_short_line_in_are(self) -> None:
-        """Trigger line 76 continue when line has fewer than 2 parts."""
+        """Lines with fewer than two fields are skipped."""
         content = [
             "a0 10\n",
             "invalid_no_weight\n",  # < 2 parts → continue

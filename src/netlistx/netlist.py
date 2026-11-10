@@ -53,7 +53,6 @@ It allows programmers to create, manipulate, and analyze netlists, which could
 be useful in electronic design automation tools or circuit analysis software.
 """
 
-import random
 from typing import Any, Dict, Iterator, List, Optional, Union
 
 import networkx as nx
@@ -79,9 +78,14 @@ class SimpleGraph(nx.Graph):
 
     all_edge_dict = {"weight": 1}
 
-    def single_edge_dict(self) -> Dict:
-        """Returns the default edge attribute dictionary."""
-        return self.all_edge_dict
+    def single_edge_dict(self) -> Dict[str, int]:
+        """Return a fresh default attribute dictionary.
+
+        A new dictionary is created on every call so that per-edge and
+        per-node attributes never alias each other or leak across graph
+        instances.
+        """
+        return dict(self.all_edge_dict)
 
     edge_attr_dict_factory = single_edge_dict  # type: ignore
     node_attr_dict_factory = single_edge_dict  # type: ignore
@@ -179,12 +183,10 @@ class Netlist:
 
         self.num_modules = len(modules)
         self.num_nets = len(nets)
-        self.module_weight: Union[RepeatArray, Dict, List[int]] = RepeatArray(
-            1, self.num_modules
-        )
+        self.module_weight: Union[RepeatArray, Dict[Any, int], List[int]] = RepeatArray(1, self.num_modules)
         self.module_fixed: set = set()
-        self.net_weight: Optional[Union[Dict, List[int]]] = None
-        self.max_degree = max(self.ugraph.degree[cell] for cell in modules)
+        self.net_weight: Optional[Union[RepeatArray, Dict[Any, int], List[int]]] = None
+        self.max_degree = max(self.ugraph.degree[cell] for cell in modules) if self.num_modules else 0
 
     def number_of_modules(self) -> int:
         """
@@ -239,9 +241,7 @@ class Netlist:
             # Convert the modules list to get the value by index
             if isinstance(self.modules, list):
                 module_key = self.modules[v]
-                return self.module_weight.get(
-                    module_key, 1
-                )  # default to 1 if not found
+                return self.module_weight.get(module_key, 1)  # default to 1 if not found
             else:
                 # If modules is a range, assume direct indexing
                 return self.module_weight.get(v, 1)
@@ -250,19 +250,30 @@ class Netlist:
         else:
             return 1  # default value
 
-    def get_net_weight(self, _: Any) -> int:
-        """
-        The function `get_net_weight` returns an integer value.
+    def get_net_weight(self, net: Any) -> int:
+        """Return the weight of *net*.
 
-        :param _: The underscore (_) in the function signature is a convention in
-            Python to indicate that the parameter is not used within the function.
-            It is often used when a parameter is required by the function signature
-            but not actually used within the function's implementation. In this case,
-            the underscore (_) is used as a placeholder for
+        Supports the same ``net_weight`` representations accepted by
+        :meth:`get_module_weight`: a :class:`RepeatArray`, a mapping keyed by
+        net, or a list indexed by position.  Unknown nets fall back to ``1``.
 
-        :return: An integer value of 1 is being returned.
+        :param net: A net label (from ``self.nets``) or an integer index.
+        :return: The net weight, or ``1`` when no weight is assigned.
         """
-        return 1
+        if self.net_weight is None:
+            return 1
+        if isinstance(self.net_weight, dict):
+            return self.net_weight.get(net, 1)
+        index = net
+        if not isinstance(index, int) or index not in range(len(self.nets)):
+            try:
+                index = self.nets.index(net)
+            except (AttributeError, ValueError):
+                return 1
+        try:
+            return self.net_weight[index]
+        except (IndexError, KeyError):
+            return 1
 
     def __iter__(self) -> Iterator:
         """
@@ -323,8 +334,8 @@ def create_inverter() -> Netlist:
     graph.graph["num_nets"] = 2
     graph.graph["num_pads"] = 2
     hyprgraph = Netlist(graph, modules, nets)
-    hyprgraph.module_weight = module_weight  # type: ignore[assignment]
-    hyprgraph.net_weight = RepeatArray(1, len(nets))  # type: ignore[assignment]
+    hyprgraph.module_weight = module_weight
+    hyprgraph.net_weight = RepeatArray(1, len(nets))
     hyprgraph.num_pads = 2
     return hyprgraph
 
@@ -357,8 +368,8 @@ def create_inverter2() -> Netlist:
     graph.graph["num_nets"] = 2
     graph.graph["num_pads"] = 2
     hyprgraph = Netlist(graph, modules, nets)
-    hyprgraph.module_weight = module_weight  # type: ignore[assignment]
-    hyprgraph.net_weight = RepeatArray(1, len(nets))  # type: ignore[assignment]
+    hyprgraph.module_weight = module_weight
+    hyprgraph.net_weight = RepeatArray(1, len(nets))
     hyprgraph.num_pads = 2
     return hyprgraph
 
@@ -422,8 +433,8 @@ def create_drawf() -> Netlist:
     ugraph.graph["num_nets"] = 6
     ugraph.graph["num_pads"] = 3
     hyprgraph = Netlist(ugraph, modules, nets)
-    hyprgraph.module_weight = module_weight  # type: ignore[assignment]
-    hyprgraph.net_weight = RepeatArray(1, len(nets))  # type: ignore[assignment]
+    hyprgraph.module_weight = module_weight
+    hyprgraph.net_weight = RepeatArray(1, len(nets))
     hyprgraph.num_pads = 3
     return hyprgraph
 
@@ -455,8 +466,8 @@ def create_test_netlist() -> Netlist:
     net_weight = RepeatArray(1, len(nets))
 
     hyprgraph = Netlist(ugraph, modules, nets)
-    hyprgraph.module_weight = module_weight  # type: ignore[assignment]
-    hyprgraph.net_weight = net_weight  # type: ignore[assignment]
+    hyprgraph.module_weight = module_weight
+    hyprgraph.net_weight = net_weight
     return hyprgraph
 
 
@@ -512,9 +523,7 @@ def vdcorput(n: int, base: int = 2) -> List[float]:
     return [vdc(i, base) for i in range(n)]
 
 
-def form_graph(
-    N: int, M: int, _: Any, eta: float, seed: Optional[int] = None
-) -> nx.Graph:
+def form_graph(N: int, M: int, pos: Any, eta: float, seed: Optional[int] = None) -> nx.Graph:
     """Generate a random bipartite graph with *N* and *M* nodes.
 
     Uses :func:`networkx.algorithms.bipartite.random_graph` to create
@@ -525,8 +534,8 @@ def form_graph(
     :type N: int
     :param M: Number of nodes in the second partition (nets).
     :type M: int
-    :param _: Unused positional parameter (for API compatibility).
-    :type _: Any
+    :param pos: Optional node-position mapping stored as a ``pos`` attribute.
+    :type pos: Any
     :param eta: Edge probability for the random bipartite graph.
     :type eta: float
     :param seed: Optional random seed for reproducibility.
@@ -534,11 +543,9 @@ def form_graph(
     :return: A random bipartite graph.
     :rtype: nx.Graph
     """
-    if seed:
-        random.seed(seed)
-
-    # connect nodes with edges
-    ugraph = bipartite.random_graph(N, M, eta)
+    ugraph = bipartite.random_graph(N, M, eta, seed=seed)
+    if pos is not None:
+        nx.set_node_attributes(ugraph, dict(pos), "pos")
     return ugraph
 
 
@@ -562,14 +569,14 @@ def create_random_hgraph(N: int = 30, M: int = 26, eta: float = 0.1) -> Netlist:
     T = N + M
     xbase = 2
     ybase = 3
-    x = [i for i in vdcorput(T, xbase)]
-    y = [i for i in vdcorput(T, ybase)]
+    x = vdcorput(T, xbase)
+    y = vdcorput(T, ybase)
     pos = zip(x, y)
     ugraph = form_graph(N, M, pos, eta, seed=5)
 
     ugraph.graph["num_modules"] = N
     ugraph.graph["num_nets"] = M
     hyprgraph = Netlist(ugraph, range(N), range(N, N + M))
-    hyprgraph.module_weight = RepeatArray(1, N)  # type: ignore[assignment]
-    hyprgraph.net_weight = RepeatArray(1, M)  # type: ignore[assignment]
+    hyprgraph.module_weight = RepeatArray(1, N)
+    hyprgraph.net_weight = RepeatArray(1, M)
     return hyprgraph
