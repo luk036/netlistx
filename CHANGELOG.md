@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## Version 0.8 (2026-11-20)
 
-### Fixed
+### Bug Fixes
 - **`SimpleGraph` attribute aliasing**: edge/node attribute factories now return
   a fresh dict instead of sharing one class-level object across every node,
   edge, and graph instance.
@@ -18,20 +18,30 @@
 - **`readwrite` validation**: malformed `.net` headers, missing JSON graph
   metadata, and Yosys files without modules now raise `ValueError`.
 
-### Changed
-- **Packaging**: `mywheel>=0.7` is declared (fresh installs now import), Python
-  `>=3.11` is required, `numpy`/`jsonschema` moved to the `gpu`/`examples`
-  extras, `py.typed` and `algorithm.md` are explicitly packaged, and the
-  legacy `setup.py` was removed.
-- **Dead code**: removed `src/netlistx/cover_ai.py` and de-duplicated the Yosys
-  DOM/directed reader parsing.
-- **Performance**: `two_opt` now uses an O(1) 2-opt delta instead of recomputing
-  tour length; Hadlock computes dual distances and paths in a single pass.
+### Performance
+- **`two_opt` O(1) delta**: the 2-opt move delta is computed directly instead of
+  recomputing the tour length.
+- **Single-pass Hadlock**: dual distances and paths are computed in one pass.
 
-### CI and docs
-- Consolidated the three test workflows into one OS × Python matrix
-  (Linux/Windows/macOS, 3.11–3.14) with a 90% coverage gate, pre-commit, mypy,
+### Code Cleanup
+- Removed `src/netlistx/cover_ai.py` and de-duplicated the Yosys DOM/directed
+  reader parsing.
+- Reformatted the `readwrite` imports to satisfy isort.
+
+### Packaging
+- `mywheel>=0.7` is declared (fresh installs now import), Python `>=3.11` is
+  required, `numpy`/`jsonschema` moved to the `gpu`/`examples` extras,
+  `py.typed` and `algorithm.md` are explicitly packaged, and the legacy
+  `setup.py` was removed.
+- `numpy` was added to the `testing` extra so `test_rand_cover_gpu.py` collects
+  and mypy passes.
+
+### Build & CI
+- Consolidated the three test workflows into one OS x Python matrix
+  (Linux/Windows/macOS, 3.11-3.14) with a 90% coverage gate, pre-commit, mypy,
   and a test gate before publishing.
+
+### Documentation
 - Real documentation landing page, install/quickstart in the README, cleaned-up
   contributor guide, and example data moved to `examples/yosys/`.
 
